@@ -42,13 +42,13 @@ function formatCategoryLabel(id: string): string {
 
 function SupplyPage() {
   const fetchProducts = useServerFn(getProducts);
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery<SheetProduct[]>({
     queryKey: ["supply-products"],
-    queryFn: () => fetchProducts(),
+    queryFn: () => fetchProducts() as Promise<SheetProduct[]>,
     staleTime: 60_000,
   });
 
-  const products = data ?? [];
+  const products: SheetProduct[] = data ?? [];
   const categories = useMemo(() => {
     const map = new Map<string, number>();
     for (const p of products) map.set(p.category, (map.get(p.category) ?? 0) + 1);
