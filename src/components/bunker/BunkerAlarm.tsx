@@ -110,7 +110,7 @@ export function BunkerAlarm() {
           </span>
         </div>
         <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          {ALARMS.length} FEED
+          LATEST {visible.length}
         </span>
       </div>
 
