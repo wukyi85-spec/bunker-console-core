@@ -13,6 +13,7 @@ import { Route as SupplyRouteImport } from './routes/supply'
 import { Route as RankRouteImport } from './routes/rank'
 import { Route as OrderCompleteRouteImport } from './routes/order-complete'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MissionLogRouteImport } from './routes/mission-log'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LoadoutRouteImport } from './routes/loadout'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -37,6 +38,11 @@ const OrderCompleteRoute = OrderCompleteRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissionLogRoute = MissionLogRouteImport.update({
+  id: '/mission-log',
+  path: '/mission-log',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/loadout': typeof LoadoutRoute
   '/login': typeof LoginRoute
+  '/mission-log': typeof MissionLogRoute
   '/onboarding': typeof OnboardingRoute
   '/order-complete': typeof OrderCompleteRoute
   '/rank': typeof RankRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/loadout': typeof LoadoutRoute
   '/login': typeof LoginRoute
+  '/mission-log': typeof MissionLogRoute
   '/onboarding': typeof OnboardingRoute
   '/order-complete': typeof OrderCompleteRoute
   '/rank': typeof RankRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/loadout': typeof LoadoutRoute
   '/login': typeof LoginRoute
+  '/mission-log': typeof MissionLogRoute
   '/onboarding': typeof OnboardingRoute
   '/order-complete': typeof OrderCompleteRoute
   '/rank': typeof RankRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/loadout'
     | '/login'
+    | '/mission-log'
     | '/onboarding'
     | '/order-complete'
     | '/rank'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/loadout'
     | '/login'
+    | '/mission-log'
     | '/onboarding'
     | '/order-complete'
     | '/rank'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/loadout'
     | '/login'
+    | '/mission-log'
     | '/onboarding'
     | '/order-complete'
     | '/rank'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LoadoutRoute: typeof LoadoutRoute
   LoginRoute: typeof LoginRoute
+  MissionLogRoute: typeof MissionLogRoute
   OnboardingRoute: typeof OnboardingRoute
   OrderCompleteRoute: typeof OrderCompleteRoute
   RankRoute: typeof RankRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mission-log': {
+      id: '/mission-log'
+      path: '/mission-log'
+      fullPath: '/mission-log'
+      preLoaderRoute: typeof MissionLogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LoadoutRoute: LoadoutRoute,
   LoginRoute: LoginRoute,
+  MissionLogRoute: MissionLogRoute,
   OnboardingRoute: OnboardingRoute,
   OrderCompleteRoute: OrderCompleteRoute,
   RankRoute: RankRoute,
