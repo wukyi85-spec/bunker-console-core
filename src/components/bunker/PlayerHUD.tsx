@@ -36,15 +36,20 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
     <button
       type="button"
       onClick={onClick}
+      style={{ width: 360 }}
       className={cn(
-        "group relative flex items-stretch gap-3 rounded-md p-2.5 pr-3.5",
-        "glass-panel text-left transition-all duration-300",
-        "hover:border-neon/50 hover:shadow-[0_16px_44px_-14px_color-mix(in_oklab,var(--neon)_45%,transparent)]",
+        "group relative flex items-stretch gap-3 rounded-md p-3 pr-4",
+        "gunmetal-glass text-left transition-all duration-300",
+        "hover:border-neon/60 hover:shadow-[0_22px_60px_-16px_color-mix(in_oklab,var(--neon)_55%,transparent)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60",
         className,
       )}
       aria-label="Open Player Room"
     >
+      {/* Carbon fiber weave overlay */}
+      <span className="pointer-events-none absolute inset-0 rounded-md carbon-weave opacity-70" />
+      {/* Neon outer glow ring */}
+      <span className="pointer-events-none absolute -inset-px rounded-md ring-1 ring-inset ring-neon/25" />
       {/* Sweep highlight on hover */}
       <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-md">
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
