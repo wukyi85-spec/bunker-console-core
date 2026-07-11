@@ -116,9 +116,9 @@ export function BunkerAlarm() {
 
       <div className="mx-1 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
-      {/* Feed */}
-      <div className="mt-2 flex flex-1 min-h-0 flex-col gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
-        {ALARMS.slice(0, mountedCount).map((a, i) => {
+      {/* Feed — latest 3 only, no scroll */}
+      <div className="mt-2 flex flex-col gap-2">
+        {visible.slice(0, mountedCount).map((a, i) => {
           const Icon = a.icon;
           const styles = toneStyles[a.tone];
           return (
@@ -175,6 +175,18 @@ export function BunkerAlarm() {
         })}
       </div>
 
+      {/* View All action */}
+      <button
+        type="button"
+        className="group/va relative mt-2.5 flex items-center justify-center gap-2 overflow-hidden rounded-sm border border-neon/30 bg-panel/50 py-1.5 font-display text-[10px] font-black uppercase tracking-[0.32em] text-neon/90 transition-all hover:border-neon/70 hover:bg-neon/10 hover:text-neon hover:shadow-[0_0_16px_-4px_var(--neon)] active:scale-[0.98]"
+      >
+        <span className="absolute inset-0 overflow-hidden">
+          <span className="absolute -inset-y-4 -left-1/3 w-1/2 bg-gradient-to-r from-transparent via-neon/20 to-transparent opacity-0 group-hover/va:opacity-100 group-hover/va:animate-btn-sweep" />
+        </span>
+        View All
+        <span aria-hidden className="text-neon">›</span>
+      </button>
+
       {/* Footer */}
       <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
         <span className="text-neon/70">// LIVE</span>
@@ -183,3 +195,4 @@ export function BunkerAlarm() {
     </div>
   );
 }
+
