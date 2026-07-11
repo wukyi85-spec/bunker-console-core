@@ -154,52 +154,71 @@
     0 0 0 1px rgb(0 0 0 / 0.4);
 }
 
-/* Premium gunmetal glass with neon rim + soft shadow */
+/* Premium gunmetal glass with subtle white rim — no green tint. Used for HUD only. */
 @utility gunmetal-glass {
   background:
     linear-gradient(
       145deg,
-      color-mix(in oklab, var(--panel-elevated) 92%, transparent) 0%,
-      color-mix(in oklab, var(--panel) 82%, transparent) 100%
+      color-mix(in oklab, var(--panel-elevated) 94%, transparent) 0%,
+      color-mix(in oklab, var(--panel) 88%, transparent) 100%
     );
-  backdrop-filter: blur(14px) saturate(150%);
-  border: 1px solid color-mix(in oklab, var(--neon) 32%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.08);
   box-shadow:
-    0 18px 50px -14px rgb(0 0 0 / 0.85),
-    0 0 0 1px rgb(0 0 0 / 0.55),
-    inset 0 1px 0 0 color-mix(in oklab, var(--neon) 18%, transparent),
-    0 0 26px -6px color-mix(in oklab, var(--neon) 40%, transparent);
+    0 20px 60px -18px rgb(0 0 0 / 0.9),
+    0 0 0 1px rgb(0 0 0 / 0.5),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.06);
 }
 
-/* Carbon fiber weave — overlay as a background layer */
+/* Premium lounge panel — matte black, glass reflection, thin border, no stripes */
+@utility lounge-panel {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--panel-elevated) 90%, transparent) 0%,
+      color-mix(in oklab, var(--panel) 96%, transparent) 100%
+    );
+  backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid rgb(255 255 255 / 0.06);
+  box-shadow:
+    0 24px 60px -24px rgb(0 0 0 / 0.9),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.04);
+}
+
+/* Ultra-subtle carbon fiber texture — replaces the striped weave */
 @utility carbon-weave {
   background-image:
-    repeating-linear-gradient(
-      45deg,
-      rgb(255 255 255 / 0.028) 0 2px,
-      transparent 2px 4px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgb(0 0 0 / 0.38) 0 2px,
-      transparent 2px 4px
+    radial-gradient(
+      circle at 50% 0%,
+      rgb(255 255 255 / 0.04) 0%,
+      transparent 50%
     );
-  background-size: 6px 6px, 6px 6px;
 }
 
-/* Machined gunmetal button surface */
+/* Barely-visible micro-noise texture for panel surfaces */
+@utility premium-noise {
+  background-image:
+    repeating-radial-gradient(
+      circle at 30% 20%,
+      rgb(255 255 255 / 0.012) 0px,
+      transparent 1px
+    );
+  background-size: 3px 3px;
+}
+
+/* Matte black button body with soft top highlight and press shadow */
 @utility metal-bevel {
   background:
     linear-gradient(
       180deg,
-      color-mix(in oklab, var(--panel-elevated) 96%, white 4%) 0%,
-      color-mix(in oklab, var(--panel) 92%, transparent) 55%,
-      color-mix(in oklab, #000 55%, var(--panel)) 100%
+      color-mix(in oklab, var(--panel-elevated) 88%, rgb(255 255 255) 3%) 0%,
+      var(--panel) 55%,
+      color-mix(in oklab, #000 60%, var(--panel)) 100%
     );
   box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.08),
-    inset 0 -1px 0 0 rgb(0 0 0 / 0.7),
-    0 8px 22px -8px rgb(0 0 0 / 0.7);
+    inset 0 1px 0 0 rgb(255 255 255 / 0.06),
+    inset 0 -1px 0 0 rgb(0 0 0 / 0.75),
+    0 10px 28px -12px rgb(0 0 0 / 0.85);
 }
 
 @keyframes hud-pulse {
