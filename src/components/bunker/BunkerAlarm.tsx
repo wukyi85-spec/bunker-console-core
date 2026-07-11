@@ -96,7 +96,8 @@ export function BunkerAlarm() {
   }, [visible.length]);
 
   return (
-    <div className="relative flex h-full w-full flex-col rounded-md glass-panel p-3">
+    <div className="relative flex w-full flex-col rounded-md gunmetal-glass p-3">
+      <span className="pointer-events-none absolute inset-0 rounded-md carbon-weave opacity-60" />
       {/* Header */}
       <div className="flex items-center justify-between px-1 pb-2">
         <div className="flex items-center gap-2">
