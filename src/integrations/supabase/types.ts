@@ -14,7 +14,147 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          address: string
+          character_id: string | null
+          created_at: string
+          customer_name: string
+          gold_earned: number
+          grand_total: number
+          id: string
+          items: Json
+          mission_number: string
+          notes: string | null
+          payment_method: string
+          phone: string
+          player_key: string
+          player_name: string | null
+          product_total: number
+          status: string
+          total_grams: number
+          updated_at: string
+          xp_earned: number
+        }
+        Insert: {
+          address: string
+          character_id?: string | null
+          created_at?: string
+          customer_name: string
+          gold_earned?: number
+          grand_total?: number
+          id?: string
+          items?: Json
+          mission_number: string
+          notes?: string | null
+          payment_method: string
+          phone: string
+          player_key: string
+          player_name?: string | null
+          product_total?: number
+          status?: string
+          total_grams?: number
+          updated_at?: string
+          xp_earned?: number
+        }
+        Update: {
+          address?: string
+          character_id?: string | null
+          created_at?: string
+          customer_name?: string
+          gold_earned?: number
+          grand_total?: number
+          id?: string
+          items?: Json
+          mission_number?: string
+          notes?: string | null
+          payment_method?: string
+          phone?: string
+          player_key?: string
+          player_name?: string | null
+          product_total?: number
+          status?: string
+          total_grams?: number
+          updated_at?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
+      player_stats: {
+        Row: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          current_rank: string
+          gold: number
+          level: number
+          player_key: string
+          player_name: string | null
+          total_purchase: number
+          total_weight: number
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          activity?: number
+          character_id?: string | null
+          created_at?: string
+          current_rank?: string
+          gold?: number
+          level?: number
+          player_key: string
+          player_name?: string | null
+          total_purchase?: number
+          total_weight?: number
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          activity?: number
+          character_id?: string | null
+          created_at?: string
+          current_rank?: string
+          gold?: number
+          level?: number
+          player_key?: string
+          player_name?: string | null
+          total_purchase?: number
+          total_weight?: number
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      ranks: {
+        Row: {
+          accent: string | null
+          display_order: number
+          id: string
+          max_xp: number | null
+          min_xp: number
+          name: string
+          rewards: Json
+        }
+        Insert: {
+          accent?: string | null
+          display_order?: number
+          id: string
+          max_xp?: number | null
+          min_xp: number
+          name: string
+          rewards?: Json
+        }
+        Update: {
+          accent?: string | null
+          display_order?: number
+          id?: string
+          max_xp?: number | null
+          min_xp?: number
+          name?: string
+          rewards?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
