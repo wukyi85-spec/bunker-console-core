@@ -46,10 +46,9 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
       )}
       aria-label="Open Player Room"
     >
-      {/* Carbon fiber weave overlay */}
-      <span className="pointer-events-none absolute inset-0 rounded-md carbon-weave opacity-70" />
-      {/* Neon outer glow ring */}
-      <span className="pointer-events-none absolute -inset-px rounded-md ring-1 ring-inset ring-neon/25" />
+      {/* Soft top glass highlight */}
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px rounded-md bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
       {/* Sweep highlight on hover */}
       <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-md">
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
