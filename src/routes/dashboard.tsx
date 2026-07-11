@@ -17,7 +17,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   return (
-    <OrientationGate>
+    
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
         {/* ============ FULLSCREEN BUNKER SCENE ============ */}
         <div className="absolute inset-0 animate-camera-breathe">
@@ -99,6 +99,6 @@ function DashboardPage() {
           <GameNav />
         </div>
       </div>
-    </OrientationGate>
+    
   );
 }
