@@ -93,8 +93,8 @@ export function GameNav() {
                 isActive &&
                   "drop-shadow-[0_0_10px_color-mix(in_oklab,var(--neon)_75%,transparent)]",
               )}
-              />
             />
+
             <span className="relative font-display text-[10.5px] font-bold uppercase tracking-[0.26em]">
               {item.label}
             </span>
