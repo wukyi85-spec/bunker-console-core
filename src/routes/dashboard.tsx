@@ -19,12 +19,13 @@ function DashboardPage() {
   return (
     
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
-        {/* ============ FULLSCREEN BUNKER SCENE ============ */}
+        {/* ============ FULLSCREEN BUNKER SCENE (zoomed ~15%) ============ */}
         <div className="absolute inset-0 animate-camera-breathe">
           <img
             src={heroImage}
             alt=""
             className="h-full w-full object-cover object-center"
+            style={{ transform: "scale(1.15)", transformOrigin: "center 45%" }}
             draggable={false}
           />
         </div>
