@@ -116,7 +116,7 @@ function SupplyPage() {
             </span>
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto pr-1 md:grid-cols-3">
+          <div className="grid min-h-0 flex-1 grid-cols-2 gap-3.5 overflow-y-auto pr-1 md:grid-cols-3 md:gap-4">
             {products.map((p) => (
               <ProductCard
                 key={p.id}
