@@ -48,7 +48,8 @@ function SupplyPage() {
 
   return (
     <AppShell>
-      <div className="grid h-full w-full grid-cols-[200px_1fr_320px] gap-3 animate-in fade-in duration-500">
+      <div className="grid h-full w-full grid-cols-[220px_1fr_360px] gap-5 animate-in fade-in duration-500">
+
         {/* LEFT — Category menu */}
         <Panel variant="default" corners className="corner-frame-lines flex flex-col p-3">
           <div className="mb-3 flex items-center gap-2 border-b border-border/60 pb-2">
