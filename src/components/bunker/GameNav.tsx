@@ -17,8 +17,6 @@ interface NavItem {
   match?: (path: string) => boolean;
 }
 
-// All routes point at existing pages (unbuilt sections fall through to
-// /dashboard for now) so TanStack Router's type-safe Link stays valid.
 const items: NavItem[] = [
   {
     to: "/supply",
@@ -36,8 +34,14 @@ const items: NavItem[] = [
 export function GameNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav className="relative flex items-stretch gap-2.5 rounded-lg gunmetal-glass p-2">
-      <span className="pointer-events-none absolute inset-0 rounded-lg carbon-weave opacity-50" />
+    <nav
+      className={cn(
+        "relative flex items-stretch gap-2.5 rounded-2xl p-2.5",
+        "bg-black/55 backdrop-blur-xl",
+        "border border-white/8",
+        "shadow-[0_28px_60px_-24px_rgb(0_0_0/0.9),inset_0_1px_0_0_rgb(255_255_255/0.05)]",
+      )}
+    >
       {items.map((item, i) => {
         const Icon = item.icon;
         const isActive = item.match ? item.match(pathname) : pathname === item.to;
@@ -45,73 +49,66 @@ export function GameNav() {
           <Link
             key={i}
             to={item.to}
-            style={{ width: 170, height: 68 }}
+            style={{ width: 168, height: 66 }}
             className={cn(
               "group relative flex flex-col items-center justify-center gap-1 overflow-hidden",
-              "rounded-md px-3 transition-all duration-300 select-none",
-              "metal-bevel border",
+              "rounded-xl px-3 select-none",
+              "transition-all duration-300 ease-out",
+              // Matte black body with thin white border
+              "bg-gradient-to-b from-[rgb(28_28_28)] to-[rgb(14_14_14)]",
+              "border",
               isActive
-                ? "border-neon/80 text-neon shadow-[0_0_28px_-4px_color-mix(in_oklab,var(--neon)_70%,transparent),inset_0_0_0_1px_color-mix(in_oklab,var(--neon)_35%,transparent),inset_0_1px_0_0_rgb(255_255_255/0.12)]"
-                : "border-white/5 text-muted-foreground hover:border-neon/50 hover:text-foreground hover:shadow-[0_0_22px_-8px_color-mix(in_oklab,var(--neon)_60%,transparent)]",
-              "active:scale-[0.97] active:translate-y-[1px]",
+                ? "border-neon/70 text-neon -translate-y-0.5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--neon)_55%,transparent),0_16px_36px_-14px_color-mix(in_oklab,var(--neon)_50%,transparent),inset_0_1px_0_0_rgb(255_255_255/0.06)]"
+                : cn(
+                    "border-white/10 text-white/60",
+                    "hover:border-white/25 hover:text-white hover:-translate-y-0.5",
+                    "hover:shadow-[0_14px_30px_-14px_rgb(0_0_0/0.85),inset_0_1px_0_0_rgb(255_255_255/0.06)]",
+                  ),
+              "active:translate-y-0 active:scale-[0.98]",
             )}
           >
-            {/* Carbon weave surface */}
-            <span className="pointer-events-none absolute inset-0 rounded-md carbon-weave opacity-40" />
+            {/* Soft top highlight — glass reflection */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-60"
+            />
 
             {/* Hover sweep */}
-            <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-md">
-              <span className="absolute -inset-y-6 -left-1/3 w-1/2 bg-gradient-to-r from-transparent via-neon/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
+            <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl">
+              <span className="absolute -inset-y-6 -left-1/3 w-1/2 bg-gradient-to-r from-transparent via-white/8 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
             </span>
 
-            {/* Top neon rail */}
-            <span
-              className={cn(
-                "pointer-events-none absolute inset-x-3 top-0 h-px transition-opacity",
-                isActive
-                  ? "bg-neon opacity-100 shadow-[0_0_8px_var(--neon)]"
-                  : "bg-neon/30 opacity-40 group-hover:opacity-80",
-              )}
-            />
-
-            {/* Corner ticks */}
-            <span
-              className={cn(
-                "pointer-events-none absolute left-1.5 top-1.5 h-2 w-2 border-l border-t transition-colors",
-                isActive ? "border-neon" : "border-white/20 group-hover:border-neon/70",
-              )}
-            />
-            <span
-              className={cn(
-                "pointer-events-none absolute bottom-1.5 right-1.5 h-2 w-2 border-b border-r transition-colors",
-                isActive ? "border-neon" : "border-white/20 group-hover:border-neon/70",
-              )}
-            />
+            {/* Active soft ambient glow */}
+            {isActive && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--neon)_18%,transparent)_0%,transparent_70%)]"
+              />
+            )}
 
             <Icon
               className={cn(
-                "relative h-6 w-6 transition-transform duration-300",
-                "group-hover:-translate-y-0.5 group-active:translate-y-0",
-                isActive && "drop-shadow-[0_0_8px_color-mix(in_oklab,var(--neon)_80%,transparent)]",
+                "relative h-[22px] w-[22px] transition-all duration-300",
+                "group-hover:-translate-y-0.5",
+                isActive &&
+                  "drop-shadow-[0_0_10px_color-mix(in_oklab,var(--neon)_75%,transparent)]",
               )}
+              strokeWidth={1.75}
             />
-            <span className="relative font-display text-[11px] font-black uppercase tracking-[0.24em]">
+            <span className="relative font-display text-[10.5px] font-bold uppercase tracking-[0.26em]">
               {item.label}
             </span>
 
-            {/* Active bottom glow */}
-            <span
-              className={cn(
-                "pointer-events-none absolute inset-x-2 bottom-0 h-[2px] transition-opacity",
-                isActive
-                  ? "bg-neon opacity-100 shadow-[0_0_10px_var(--neon)]"
-                  : "opacity-0",
-              )}
-            />
+            {/* Active underline */}
+            {isActive && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-6 bottom-1.5 h-[2px] rounded-full bg-neon/90 shadow-[0_0_10px_var(--neon)]"
+              />
+            )}
           </Link>
         );
       })}
     </nav>
   );
 }
-
