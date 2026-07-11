@@ -1,5 +1,4 @@
 // Loadout store — localStorage backed. Future: swap for Supabase orders/cart table.
-import { findProduct, type Product } from "./products";
 
 const KEY = "bunker.loadout";
 const ORDERS_KEY = "bunker.orders";
@@ -10,6 +9,10 @@ export interface LoadoutItem {
   grams: number;
   pricePerGram: number;
   quantity: number;
+  // Snapshot from the sheet so loadout renders without a live fetch.
+  productName: string;
+  productImage?: string;
+  category?: string;
 }
 
 export interface Order {
@@ -79,17 +82,15 @@ export function clearLoadout() {
 }
 
 export interface EnrichedItem extends LoadoutItem {
-  product: Product | undefined;
   subtotal: number;
   gramsTotal: number;
 }
 
 export function enrichLoadout(items: LoadoutItem[]): EnrichedItem[] {
   return items.map((i) => {
-    const product = findProduct(i.productId);
     const gramsTotal = i.grams * i.quantity;
     const subtotal = gramsTotal * i.pricePerGram;
-    return { ...i, product, subtotal, gramsTotal };
+    return { ...i, subtotal, gramsTotal };
   });
 }
 
