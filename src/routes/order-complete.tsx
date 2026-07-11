@@ -63,10 +63,10 @@ function OrderCompletePage() {
 
           <div className="relative mt-5 flex gap-2">
             <Link to="/dashboard">
-              <BunkerButton variant="outline">Return to Lobby</BunkerButton>
+              <BunkerButton variant="outline">Return to Bunker</BunkerButton>
             </Link>
-            <Link to="/supply">
-              <BunkerButton variant="primary">New Supply Run</BunkerButton>
+            <Link to="/mission-log">
+              <BunkerButton variant="primary">View Mission Log</BunkerButton>
             </Link>
           </div>
         </Panel>
