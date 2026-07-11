@@ -81,6 +81,7 @@ const toneStyles: Record<AlarmTone, { badge: string; label: string; icon: string
 };
 
 export function BunkerAlarm() {
+  const visible = ALARMS.slice(0, 3);
   const [mountedCount, setMountedCount] = useState(0);
 
   // Progressive reveal for the notification list — feels like intel dropping in.
@@ -89,10 +90,10 @@ export function BunkerAlarm() {
     const t = setInterval(() => {
       i += 1;
       setMountedCount(i);
-      if (i >= ALARMS.length) clearInterval(t);
-    }, 120);
+      if (i >= visible.length) clearInterval(t);
+    }, 140);
     return () => clearInterval(t);
-  }, []);
+  }, [visible.length]);
 
   return (
     <div className="relative flex h-full w-full flex-col rounded-md glass-panel p-3">
