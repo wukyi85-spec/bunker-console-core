@@ -5,11 +5,17 @@ import { BackToBunker } from "./BackToBunker";
 
 interface AppShellProps {
   children: ReactNode;
-  /** Hide the "Back to Bunker" button (e.g. on dashboard itself). */
   hideBack?: boolean;
+  hideLogo?: boolean;
+  hideNav?: boolean;
 }
 
-export function AppShell({ children, hideBack = false }: AppShellProps) {
+export function AppShell({
+  children,
+  hideBack = false,
+  hideLogo = false,
+  hideNav = false,
+}: AppShellProps) {
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background text-foreground">
       {/* Ambient lounge backdrop — very subtle, no green tint */}
@@ -20,20 +26,20 @@ export function AppShell({ children, hideBack = false }: AppShellProps) {
       {/* Top-left: Logo + Back button stack */}
       <header className="relative z-20 flex items-start justify-between gap-4 px-6 py-5 md:px-9 md:py-6">
         <div className="flex flex-col gap-3">
-          <Logo />
+          {!hideLogo && <Logo />}
           {!hideBack && <BackToBunker />}
         </div>
       </header>
 
-      {/* Center stage — internal pages get the full horizontal room */}
       <main className="relative z-10 flex-1 min-h-0 px-6 pb-4 md:px-9">
         {children}
       </main>
 
-      {/* Bottom nav */}
-      <footer className="relative z-20 flex items-center justify-center px-4 pb-4 md:px-6 md:pb-5">
-        <GameNav />
-      </footer>
+      {!hideNav && (
+        <footer className="relative z-20 flex items-center justify-center px-4 pb-4 md:px-6 md:pb-5">
+          <GameNav />
+        </footer>
+      )}
     </div>
   );
 }
