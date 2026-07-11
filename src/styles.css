@@ -148,3 +148,16 @@
 @utility animate-hud-pulse {
   animation: hud-pulse 2.4s ease-in-out infinite;
 }
+
+@keyframes hero-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.05); }
+}
+
+@utility animate-hero-drift-slow {
+  animation: hero-drift 18s ease-in-out infinite;
+}
+
+@utility animate-hero-drift-slower {
+  animation: hero-drift 28s ease-in-out infinite reverse;
+}
