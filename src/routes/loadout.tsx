@@ -36,18 +36,18 @@ function LoadoutPage() {
   const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items);
 
   return (
-    <AppShell>
-      <div className="grid h-full w-full grid-cols-[1fr_320px] gap-3 animate-in fade-in duration-500">
-        {/* LEFT — Items */}
-        <Panel variant="default" className="flex min-h-0 flex-col p-3">
-          <div className="mb-2 flex items-center justify-between border-b border-border/60 pb-2">
+    <AppShell hideLogo hideNav>
+      <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500">
+        {/* LEFT — Inventory */}
+        <Panel variant="default" className="flex min-h-0 flex-col p-4">
+          <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-2">
-              <Backpack className="h-3.5 w-3.5 text-neon" />
-              <span className="font-display text-xs font-bold uppercase tracking-widest">
-                Operator Loadout
+              <Backpack className="h-4 w-4 text-neon" />
+              <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
+                Loadout Inventory
               </span>
             </div>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               {enriched.length} ITEMS · {totalGrams}G
             </span>
           </div>
@@ -59,7 +59,7 @@ function LoadoutPage() {
                 Loadout Empty
               </div>
               <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70">
-                Requisition supplies from the arsenal
+                Requisition supplies from the Supply Room
               </p>
               <Link to="/supply">
                 <BunkerButton variant="outline" className="mt-4">
@@ -72,23 +72,26 @@ function LoadoutPage() {
               {enriched.map((i) => (
                 <div
                   key={`${i.productId}-${i.sizeLabel}`}
-                  className="flex items-center gap-3 rounded-md border border-border/60 bg-panel-elevated/60 p-2 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  className="flex items-center gap-3 rounded-md border border-white/10 bg-panel-elevated/60 p-2.5 animate-in fade-in slide-in-from-bottom-2 duration-300"
                 >
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-border/60 bg-hud">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border border-white/10 bg-hud">
                     {i.productImage ? (
                       <img src={i.productImage} alt={i.productName} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
-                        <Package className="h-6 w-6 text-neon/60" />
+                        <Package className="h-7 w-7 text-neon/60" />
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
+                    <div className="font-display text-sm font-bold uppercase tracking-wider text-foreground truncate">
                       {i.productName ?? i.productId}
                     </div>
                     <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       SIZE · {i.sizeLabel} · {i.grams}G
+                    </div>
+                    <div className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-neon/80">
+                      ฿{i.pricePerGram.toFixed(0)}/G
                     </div>
                   </div>
                   <QuantityStepper
@@ -106,8 +109,9 @@ function LoadoutPage() {
                   <button
                     onClick={() => removeFromLoadout(i.productId, i.sizeLabel)}
                     className="rounded-sm p-2 text-muted-foreground transition-colors hover:bg-destructive/20 hover:text-destructive"
+                    aria-label="Remove"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               ))}
@@ -115,21 +119,22 @@ function LoadoutPage() {
           )}
         </Panel>
 
-        {/* RIGHT — Totals */}
-        <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-3">
-          <div className="mb-2 border-b border-border/60 pb-2">
-            <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-muted-foreground">
-              // Mission Payload
+        {/* RIGHT — Order Summary */}
+        <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-4">
+          <div className="mb-3 border-b border-white/10 pb-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+              // Order Summary
             </span>
           </div>
 
           <div className="flex flex-col gap-2 text-xs">
-            <Row label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
             <Row label="Total Weight" value={`${totalGrams} G`} />
+            <Row label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
+            <Row label="Delivery Fee" value="TO BE CONFIRMED" muted />
 
-            <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent" />
+            <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-            <div className="rounded-sm border border-border/60 bg-background/40 p-2">
+            <div className="rounded-sm border border-white/10 bg-background/40 p-2.5">
               <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                 Minimum Requirement
               </div>
@@ -160,27 +165,27 @@ function LoadoutPage() {
               </div>
             </div>
 
-            <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent" />
+            <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
             <div className="flex items-center justify-between">
               <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Grand Total
               </span>
-              <span className="font-display text-lg font-bold text-neon">
+              <span className="font-display text-xl font-bold text-neon">
                 ฿{productTotal.toLocaleString()}
               </span>
             </div>
           </div>
 
           {!minMet && enriched.length > 0 && (
-            <div className="mt-2 flex items-start gap-2 rounded-sm border border-amber-400/40 bg-amber-400/10 p-2">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
+            <div className="mt-3 flex items-start gap-2 rounded-sm border border-amber-400/40 bg-amber-400/10 p-2.5">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
               <div>
                 <div className="font-display text-[11px] font-bold uppercase tracking-widest text-amber-300">
                   Mission Requirement Not Met
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-200/80">
-                  Minimum order 50G or ฿1,000
+                  Minimum Order: 50G or ฿1,000
                 </div>
               </div>
             </div>
@@ -190,7 +195,7 @@ function LoadoutPage() {
             variant="primary"
             size="lg"
             disabled={!minMet || enriched.length === 0}
-            className="mt-3 w-full"
+            className="mt-4 w-full"
             onClick={() => navigate({ to: "/checkout" })}
           >
             Proceed to Checkout
@@ -201,13 +206,20 @@ function LoadoutPage() {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
     <div className="flex items-center justify-between">
       <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
         {label}
       </span>
-      <span className="font-display text-sm font-bold text-foreground">{value}</span>
+      <span
+        className={cn(
+          "font-display text-sm font-bold",
+          muted ? "text-muted-foreground" : "text-foreground",
+        )}
+      >
+        {value}
+      </span>
     </div>
   );
 }
