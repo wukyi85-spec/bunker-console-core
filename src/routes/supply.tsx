@@ -1,7 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { useQuery, useServerFn } from "@tanstack/react-query";
-import { useServerFn as useTanStackServerFn } from "@tanstack/react-start";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { getProducts, type SheetProduct } from "@/lib/products.functions";
 import { addToLoadout, getLoadout, subscribeLoadout } from "@/lib/loadout";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -15,7 +15,6 @@ import {
   ShieldAlert,
   X,
 } from "lucide-react";
-import { useEffect } from "react";
 
 export const Route = createFileRoute("/supply")({
   head: () => ({
