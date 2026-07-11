@@ -150,7 +150,7 @@ function CheckoutPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
-                    {i.product?.name ?? i.productId}
+                    {i.productName ?? i.productId}
                   </div>
                   <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                     {i.sizeLabel} · x{i.quantity}
