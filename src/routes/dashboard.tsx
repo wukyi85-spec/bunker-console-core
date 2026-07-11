@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/bunker/AppShell";
-import { DashboardHero } from "@/components/bunker/DashboardHero";
+import { Logo } from "@/components/bunker/Logo";
+import { PlayerHUD } from "@/components/bunker/PlayerHUD";
+import { GameNav } from "@/components/bunker/GameNav";
 import { BunkerAlarm } from "@/components/bunker/BunkerAlarm";
+import { OrientationGate } from "@/components/bunker/OrientationGate";
+import heroImage from "@/assets/bunker-hero.jpg";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -15,25 +18,88 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   return (
-    <AppShell>
-      <div className="relative h-full w-full animate-in fade-in duration-700">
-        {/* Deep ambient bunker lighting */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-1/4 top-0 h-[140%] w-[70%] rounded-full bg-[radial-gradient(circle,rgb(255_170_80/0.06)_0%,transparent_60%)] animate-hero-drift-slower" />
-          <div className="absolute -right-1/4 bottom-0 h-[120%] w-[60%] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--neon)_10%,transparent)_0%,transparent_65%)] animate-hero-drift-slow" />
+    <OrientationGate>
+      <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
+        {/* ============ FULLSCREEN BUNKER SCENE ============ */}
+        <div className="absolute inset-0 animate-camera-breathe">
+          <img
+            src={heroImage}
+            alt=""
+            className="h-full w-full object-cover object-center"
+            draggable={false}
+          />
         </div>
 
-        {/* Hero + right alarm panel */}
-        <div className="relative flex h-full w-full items-stretch gap-4 md:gap-6">
-          <div className="relative h-full w-[70%] max-w-[70%]">
-            <DashboardHero />
-          </div>
+        {/* Ambient fog layers */}
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-screen animate-fog"
+          style={{
+            background:
+              "radial-gradient(60% 40% at 30% 65%, rgb(255 255 255 / 0.06), transparent 70%), radial-gradient(50% 35% at 70% 55%, rgb(200 220 255 / 0.05), transparent 75%)",
+            filter: "blur(6px)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-screen animate-fog-reverse"
+          style={{
+            background:
+              "radial-gradient(45% 30% at 55% 80%, rgb(255 240 210 / 0.05), transparent 75%)",
+            filter: "blur(10px)",
+          }}
+        />
 
-          <div className="relative hidden h-full flex-1 sm:flex">
+        {/* Cinematic vignette + top/bottom fades so HUD sits legible over scene */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgb(0_0_0/0.55)_100%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background/80 via-background/30 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-background/85 via-background/40 to-transparent" />
+
+        {/* Subtle HUD grid + scanline over everything */}
+        <div className="pointer-events-none absolute inset-0 hud-grid opacity-15" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 animate-scanline bg-gradient-to-b from-transparent via-neon/8 to-transparent" />
+
+        {/* Top scanline hairline */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
+
+        {/* ============ FLOATING HUD OVERLAYS ============ */}
+
+        {/* Top left — Logo only */}
+        <div className="absolute left-4 top-4 z-20 md:left-6 md:top-5 animate-in fade-in slide-in-from-left-4 duration-700">
+          <Logo />
+        </div>
+
+        {/* Top right — Player HUD */}
+        <div className="absolute right-4 top-4 z-20 md:right-6 md:top-5 animate-in fade-in slide-in-from-right-4 duration-700">
+          <PlayerHUD />
+        </div>
+
+        {/* Right side — Bunker Alarm (floating, narrow, transparent) */}
+        <div className="pointer-events-none absolute right-4 top-[130px] bottom-[120px] z-10 hidden w-[260px] md:right-6 sm:flex sm:w-[240px] md:w-[280px] animate-in fade-in slide-in-from-right-6 duration-1000">
+          <div className="pointer-events-auto h-full w-full">
             <BunkerAlarm />
           </div>
         </div>
+
+        {/* Bottom-left tactical caption */}
+        <div className="absolute bottom-6 left-5 z-10 flex flex-col gap-1 md:left-7 animate-in fade-in duration-1000">
+          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
+            // BUNKER ONLINE
+          </span>
+          <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
+            Sector 07 · Secure Channel
+          </span>
+        </div>
+
+        {/* Bottom-right telemetry */}
+        <div className="absolute bottom-6 right-5 z-10 hidden flex-col items-end gap-1 font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground md:flex md:right-7 animate-in fade-in duration-1000">
+          <span className="text-neon/80">// LIVE</span>
+          <span>47.812N · 122.335W</span>
+        </div>
+
+        {/* Bottom center — Floating nav dock */}
+        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <GameNav />
+        </div>
       </div>
-    </AppShell>
+    </OrientationGate>
   );
 }
