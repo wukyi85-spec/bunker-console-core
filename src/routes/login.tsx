@@ -6,6 +6,7 @@ import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { AccessDenied } from "@/components/bunker/AccessDenied";
+import { getPlayerProfile } from "@/lib/player";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -33,7 +34,8 @@ function LoginScreen() {
     setVerifying(true);
     // Placeholder verify animation — no auth yet.
     window.setTimeout(() => {
-      navigate({ to: "/dashboard" });
+      const profile = getPlayerProfile();
+      navigate({ to: profile.firstLoginCompleted ? "/dashboard" : "/onboarding" });
     }, 1600);
   }
 
