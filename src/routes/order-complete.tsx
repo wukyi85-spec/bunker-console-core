@@ -21,7 +21,7 @@ function OrderCompletePage() {
   const { id } = Route.useSearch();
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="flex h-full w-full items-center justify-center animate-in fade-in duration-700">
         <Panel
           variant="elevated"
