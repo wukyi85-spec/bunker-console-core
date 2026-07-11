@@ -1,5 +1,4 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { RotateCw } from "lucide-react";
 import { Logo } from "./Logo";
 
 export function OrientationGate({ children }: { children: ReactNode }) {
@@ -8,8 +7,6 @@ export function OrientationGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const check = () => {
-      // Universal portrait detection — desktop is virtually always landscape,
-      // so this only meaningfully blocks phones/tablets held upright.
       setIsPortrait(window.innerHeight > window.innerWidth);
       setReady(true);
     };
@@ -38,35 +35,61 @@ export function OrientationGate({ children }: { children: ReactNode }) {
       <div
         aria-hidden={!isPortrait}
         className={
-          "fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-background px-8 text-center transition-opacity duration-500 " +
+          "fixed inset-0 z-[100] flex flex-col items-center justify-center gap-10 bg-background px-8 text-center transition-opacity duration-500 " +
           (isPortrait ? "opacity-100" : "pointer-events-none opacity-0")
         }
       >
+        {/* Ambient layers */}
         <div className="pointer-events-none absolute inset-0 hud-grid opacity-20" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--background)_75%)]" />
+        <div className="pointer-events-none absolute inset-0 opacity-40 animate-hero-drift-slow bg-[radial-gradient(circle_at_30%_40%,color-mix(in_oklab,var(--neon)_14%,transparent)_0%,transparent_50%)]" />
 
         <Logo className="relative z-10" />
 
-        <div className="relative z-10 flex h-24 w-24 items-center justify-center rounded-md border border-neon/50 bg-panel shadow-[var(--shadow-hud)]">
-          <RotateCw
-            className="h-12 w-12 text-neon animate-hud-pulse"
-            style={{ animation: "hud-pulse 2s ease-in-out infinite, spin 4s linear infinite" }}
-          />
+        {/* Rotating phone illustration */}
+        <div className="relative z-10 flex h-40 w-40 items-center justify-center rounded-md glass-panel">
+          <svg
+            viewBox="0 0 100 100"
+            className="h-24 w-24 animate-phone-rotate text-neon drop-shadow-[0_0_10px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
+            style={{ transformOrigin: "50% 50%" }}
+          >
+            <rect
+              x="34" y="10" width="32" height="80" rx="6"
+              fill="none" stroke="currentColor" strokeWidth="3"
+            />
+            <rect x="40" y="18" width="20" height="60" rx="1" fill="currentColor" opacity="0.15" />
+            <circle cx="50" cy="84" r="2" fill="currentColor" />
+            <rect x="46" y="14" width="8" height="1.5" rx="0.75" fill="currentColor" />
+          </svg>
+          {/* Arrow arc */}
+          <svg
+            viewBox="0 0 100 100"
+            className="pointer-events-none absolute inset-0 h-full w-full text-neon/60"
+          >
+            <path
+              d="M 20 50 A 30 30 0 0 1 80 50"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeDasharray="3 4"
+            />
+            <polygon points="80,50 74,46 74,54" fill="currentColor" />
+          </svg>
         </div>
 
-        <div className="relative z-10 flex flex-col gap-3 max-w-md">
-          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon">
+        <div className="relative z-10 flex max-w-md flex-col gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
             // ACCESS CONDITION
           </span>
-          <h1 className="font-display text-3xl font-black uppercase tracking-[0.15em] text-foreground">
-            Rotate Your Device
+          <h1 className="font-display text-3xl font-black uppercase tracking-[0.18em] text-foreground">
+            Please Rotate Your Device
           </h1>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-display font-bold text-foreground">BLACK&rsquo;S BUNKER</span> is
-            optimized for Landscape Mode.
+          <p className="font-display text-sm uppercase tracking-[0.3em] text-neon">
+            Landscape Mode Required
           </p>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground/70">
-            Rotate your phone to continue.
+          <p className="text-xs text-muted-foreground">
+            <span className="font-display font-bold text-foreground">BLACK&rsquo;S BUNKER</span> is
+            engineered for a widescreen tactical experience.
           </p>
         </div>
       </div>
