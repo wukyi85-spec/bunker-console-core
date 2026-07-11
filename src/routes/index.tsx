@@ -1,15 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/bunker/AppShell";
-import { HeroScene } from "@/components/bunker/HeroScene";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { LoadingScreen } from "@/components/bunker/LoadingScreen";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  return (
-    <AppShell>
-      <HeroScene />
-    </AppShell>
-  );
+  const navigate = useNavigate();
+  return <LoadingScreen onComplete={() => navigate({ to: "/login" })} />;
 }
