@@ -1,18 +1,17 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { RotateCw } from "lucide-react";
+import { Logo } from "./Logo";
 
 export function OrientationGate({ children }: { children: ReactNode }) {
-  const [blocked, setBlocked] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const check = () => {
-      // Only enforce landscape on touch / small screens (mobile phones).
-      // Desktop always allowed.
-      const isPhone =
-        window.matchMedia("(pointer: coarse)").matches &&
-        Math.min(window.innerWidth, window.innerHeight) < 500;
-      const isPortrait = window.innerHeight > window.innerWidth;
-      setBlocked(isPhone && isPortrait);
+      // Universal portrait detection — desktop is virtually always landscape,
+      // so this only meaningfully blocks phones/tablets held upright.
+      setIsPortrait(window.innerHeight > window.innerWidth);
+      setReady(true);
     };
     check();
     window.addEventListener("resize", check);
@@ -23,27 +22,54 @@ export function OrientationGate({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  if (!ready) return null;
+
   return (
     <>
-      {children}
-      {blocked && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-background px-8 text-center">
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-md border border-neon/50 bg-panel">
-            <RotateCw className="h-10 w-10 text-neon animate-hud-pulse" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-neon">
-              // ACCESS CONDITION
-            </span>
-            <h1 className="font-display text-2xl font-black uppercase tracking-widest text-foreground">
-              Rotate Device
-            </h1>
-            <p className="max-w-xs text-sm text-muted-foreground">
-              Black&rsquo;s Bunker is a landscape-only operation. Turn your device sideways to enter.
-            </p>
-          </div>
+      <div
+        className={
+          "transition-opacity duration-500 " +
+          (isPortrait ? "pointer-events-none opacity-0" : "opacity-100")
+        }
+      >
+        {children}
+      </div>
+
+      <div
+        aria-hidden={!isPortrait}
+        className={
+          "fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-background px-8 text-center transition-opacity duration-500 " +
+          (isPortrait ? "opacity-100" : "pointer-events-none opacity-0")
+        }
+      >
+        <div className="pointer-events-none absolute inset-0 hud-grid opacity-20" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,var(--background)_75%)]" />
+
+        <Logo className="relative z-10" />
+
+        <div className="relative z-10 flex h-24 w-24 items-center justify-center rounded-md border border-neon/50 bg-panel shadow-[var(--shadow-hud)]">
+          <RotateCw
+            className="h-12 w-12 text-neon animate-hud-pulse"
+            style={{ animation: "hud-pulse 2s ease-in-out infinite, spin 4s linear infinite" }}
+          />
         </div>
-      )}
+
+        <div className="relative z-10 flex flex-col gap-3 max-w-md">
+          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon">
+            // ACCESS CONDITION
+          </span>
+          <h1 className="font-display text-3xl font-black uppercase tracking-[0.15em] text-foreground">
+            Rotate Your Device
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-display font-bold text-foreground">BLACK&rsquo;S BUNKER</span> is
+            optimized for Landscape Mode.
+          </p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground/70">
+            Rotate your phone to continue.
+          </p>
+        </div>
+      </div>
     </>
   );
 }
