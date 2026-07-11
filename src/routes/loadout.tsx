@@ -75,14 +75,17 @@ function LoadoutPage() {
                   className="flex items-center gap-3 rounded-md border border-border/60 bg-panel-elevated/60 p-2 animate-in fade-in slide-in-from-bottom-2 duration-300"
                 >
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-border/60 bg-hud">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--neon)_15%,transparent)_0%,transparent_65%)]" />
-                    <div className="flex h-full w-full items-center justify-center">
-                      <Package className="h-6 w-6 text-neon/60" />
-                    </div>
+                    {i.productImage ? (
+                      <img src={i.productImage} alt={i.productName} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <Package className="h-6 w-6 text-neon/60" />
+                      </div>
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
-                      {i.product?.name ?? i.productId}
+                      {i.productName ?? i.productId}
                     </div>
                     <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                       SIZE · {i.sizeLabel} · {i.grams}G
