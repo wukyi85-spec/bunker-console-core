@@ -41,7 +41,7 @@ function formatCategoryLabel(id: string): string {
 }
 
 function SupplyPage() {
-  const fetchProducts = useTanStackServerFn(getProducts);
+  const fetchProducts = useServerFn(getProducts);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["supply-products"],
     queryFn: () => fetchProducts(),
