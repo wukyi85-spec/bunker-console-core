@@ -26,9 +26,9 @@ const items: NavItem[] = [
   },
   { to: "/loadout", label: "Loadout", icon: Backpack },
   { to: "/dashboard", label: "Mission", icon: ScrollText, match: () => false },
-  { to: "/dashboard", label: "Rank", icon: Trophy, match: () => false },
+  { to: "/rank", label: "Rank", icon: Trophy },
   { to: "/dashboard", label: "Rewards", icon: Gift, match: () => false },
-  { to: "/dashboard", label: "Mission Log", icon: ClipboardList, match: () => false },
+  { to: "/mission-log", label: "Mission Log", icon: ClipboardList },
 ];
 
 export function GameNav() {
