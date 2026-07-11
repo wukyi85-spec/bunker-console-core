@@ -67,14 +67,13 @@ function DashboardPage() {
           <Logo />
         </div>
 
-        {/* Top right — Player HUD */}
-        <div className="absolute right-4 top-4 z-20 md:right-6 md:top-5 animate-in fade-in slide-in-from-right-4 duration-700">
+        {/* Top right — Player HUD + Bunker Alarm stack (20px gap) */}
+        <div
+          className="absolute right-4 top-4 z-20 md:right-6 md:top-5 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700"
+          style={{ width: 360, gap: 20 }}
+        >
           <PlayerHUD />
-        </div>
-
-        {/* Right side — Bunker Alarm (floating, narrow, transparent) */}
-        <div className="pointer-events-none absolute right-4 top-[130px] bottom-[120px] z-10 hidden w-[260px] md:right-6 sm:flex sm:w-[240px] md:w-[280px] animate-in fade-in slide-in-from-right-6 duration-1000">
-          <div className="pointer-events-auto h-full w-full">
+          <div className="hidden sm:block">
             <BunkerAlarm />
           </div>
         </div>
