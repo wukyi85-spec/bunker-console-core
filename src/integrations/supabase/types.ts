@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      members: {
+        Row: {
+          character_id: string | null
+          created_at: string
+          id: string
+          pass_id: string
+          password: string
+          player_name: string
+          updated_at: string
+        }
+        Insert: {
+          character_id?: string | null
+          created_at?: string
+          id?: string
+          pass_id: string
+          password: string
+          player_name: string
+          updated_at?: string
+        }
+        Update: {
+          character_id?: string | null
+          created_at?: string
+          id?: string
+          pass_id?: string
+          password?: string
+          player_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          display_order: number
+          gold_reward: number
+          id: string
+          metric: string
+          mission_type: string
+          reward_id: string | null
+          target_value: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          gold_reward?: number
+          id: string
+          metric: string
+          mission_type?: string
+          reward_id?: string | null
+          target_value: number
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          gold_reward?: number
+          id?: string
+          metric?: string
+          mission_type?: string
+          reward_id?: string | null
+          target_value?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           address: string
@@ -79,6 +157,76 @@ export type Database = {
           xp_earned?: number
         }
         Relationships: []
+      }
+      player_missions: {
+        Row: {
+          claimed_at: string | null
+          completed_at: string | null
+          mission_id: string
+          player_key: string
+          progress: number
+          updated_at: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          completed_at?: string | null
+          mission_id: string
+          player_key: string
+          progress?: number
+          updated_at?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          completed_at?: string | null
+          mission_id?: string
+          player_key?: string
+          progress?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_rewards: {
+        Row: {
+          claimed_at: string | null
+          earned_at: string
+          id: string
+          player_key: string
+          reward_id: string
+          source: string | null
+        }
+        Insert: {
+          claimed_at?: string | null
+          earned_at?: string
+          id?: string
+          player_key: string
+          reward_id: string
+          source?: string | null
+        }
+        Update: {
+          claimed_at?: string | null
+          earned_at?: string
+          id?: string
+          player_key?: string
+          reward_id?: string
+          source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_rewards_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       player_stats: {
         Row: {
@@ -152,6 +300,36 @@ export type Database = {
           min_xp?: number
           name?: string
           rewards?: Json
+        }
+        Relationships: []
+      }
+      rewards: {
+        Row: {
+          active: boolean
+          description: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          name: string
+          reward_type: string
+        }
+        Insert: {
+          active?: boolean
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id: string
+          name: string
+          reward_type: string
+        }
+        Update: {
+          active?: boolean
+          description?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name?: string
+          reward_type?: string
         }
         Relationships: []
       }
