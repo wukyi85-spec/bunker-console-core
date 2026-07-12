@@ -6,7 +6,9 @@ import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { AccessDenied } from "@/components/bunker/AccessDenied";
-import { getPlayerProfile } from "@/lib/player";
+import { setPlayerProfile } from "@/lib/player";
+import { setPlayerKey } from "@/lib/player-key";
+import { loginMember, ensurePlayerStats } from "@/lib/bunker-supabase";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -25,18 +27,33 @@ function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  // Reserved for future validation flow.
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (verifying) return;
     setVerifying(true);
-    // Placeholder verify animation — no auth yet.
-    window.setTimeout(() => {
-      const profile = getPlayerProfile();
-      navigate({ to: profile.firstLoginCompleted ? "/dashboard" : "/onboarding" });
-    }, 1600);
+    setError(null);
+    try {
+      const member = await loginMember(passId.trim().toUpperCase(), password);
+      if (!member) {
+        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
+        setVerifying(false);
+        return;
+      }
+      setPlayerKey(member.passId);
+      setPlayerProfile({
+        playerName: member.playerName,
+        characterId: member.characterId,
+        firstLoginCompleted: true,
+      });
+      await ensurePlayerStats();
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      console.error(err);
+      setError("TRANSMISSION ERROR — TRY AGAIN");
+      setVerifying(false);
+    }
   }
 
   return (

@@ -44,7 +44,7 @@ function CheckoutPage() {
     if (!canSubmit || !payment) return;
     setSubmitting(true);
     try {
-      const order = await createOrder({
+      const { order, missionRewards } = await createOrder({
         items,
         customer: {
           name: name.trim(),
@@ -57,6 +57,9 @@ function CheckoutPage() {
         totalGrams,
       });
       clearLoadout();
+      if (missionRewards.length) {
+        toast.success(`MISSION COMPLETE — ${missionRewards.map((m) => m.title).join(", ")}`);
+      }
       navigate({ to: "/order-complete", search: { id: order.mission_number } });
     } catch (err) {
       console.error(err);
