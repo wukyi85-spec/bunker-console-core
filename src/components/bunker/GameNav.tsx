@@ -25,9 +25,9 @@ const items: NavItem[] = [
     match: (p) => p.startsWith("/supply"),
   },
   { to: "/loadout", label: "Loadout", icon: Backpack },
-  { to: "/dashboard", label: "Mission", icon: ScrollText, match: () => false },
+  { to: "/missions", label: "Mission", icon: ScrollText },
   { to: "/rank", label: "Rank", icon: Trophy },
-  { to: "/dashboard", label: "Rewards", icon: Gift, match: () => false },
+  { to: "/rewards", label: "Rewards", icon: Gift },
   { to: "/mission-log", label: "Mission Log", icon: ClipboardList },
 ];
 
