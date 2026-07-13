@@ -45,16 +45,6 @@ function LoginScreen() {
         setVerifying(false);
         return;
       }
-      if (member.status === "suspended") {
-        setError("ACCESS SUSPENDED");
-        setVerifying(false);
-        return;
-      }
-      if (member.status !== "active") {
-        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
-        setVerifying(false);
-        return;
-      }
       setPlayerKey(member.passId);
       setPlayerProfile({
         memberId: member.id,
@@ -63,6 +53,10 @@ function LoginScreen() {
         characterId: member.characterId,
         firstLoginCompleted: true,
       });
+      if (member.status !== "active") {
+        navigate({ to: "/admin/members" });
+        return;
+      }
       if (member.role === "admin") {
         setAdminSession({ passId: normalizedPassId, password: normalizedPassword });
         navigate({ to: "/admin/members" });
@@ -77,7 +71,8 @@ function LoginScreen() {
       navigate({ to: "/dashboard" });
     } catch (err) {
       console.error("[LOGIN] error:", err);
-      setError("TRANSMISSION ERROR — TRY AGAIN");
+      const msg = err instanceof Error ? err.message : JSON.stringify(err);
+      setError(`LOGIN ERROR: ${msg}`);
       setVerifying(false);
     }
   }
