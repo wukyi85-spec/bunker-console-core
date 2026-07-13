@@ -358,14 +358,18 @@ function OrderDetailsDrawer({
   order,
   onClose,
   onConfirm,
+  onCancel,
   confirming,
   canConfirm,
+  canCancel,
 }: {
   order: AdminOrderRow;
   onClose: () => void;
   onConfirm: () => void;
+  onCancel: () => void;
   confirming: boolean;
   canConfirm: boolean;
+  canCancel: boolean;
 }) {
   const items = Array.isArray(order.items)
     ? (order.items as LoadoutItem[])
