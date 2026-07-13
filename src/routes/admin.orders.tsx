@@ -620,12 +620,18 @@ function OrderDetailsDrawer({
         </div>
 
 
-        {(canConfirm || canCancel) && (
-          <div className="flex gap-2 border-t border-white/10 p-4">
+        {(canConfirm || canCancel || canMarkDelivered) && (
+          <div className="flex flex-wrap gap-2 border-t border-white/10 p-4">
             {canConfirm && (
               <BunkerButton className="flex-1" onClick={onConfirm} disabled={confirming}>
                 <CheckCircle2 className="h-4 w-4" />
                 {confirming ? "Confirming…" : "Accept Order"}
+              </BunkerButton>
+            )}
+            {canMarkDelivered && (
+              <BunkerButton className="flex-1" onClick={onMarkDelivered}>
+                <PackageCheck className="h-4 w-4" />
+                Mark as Delivered
               </BunkerButton>
             )}
             {canCancel && (
@@ -640,6 +646,7 @@ function OrderDetailsDrawer({
             )}
           </div>
         )}
+
       </div>
     </div>
   );
