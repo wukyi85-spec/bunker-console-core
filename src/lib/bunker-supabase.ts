@@ -271,14 +271,12 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
       // Grant XP + Gold
       const current = await getPlayerStats();
       if (current) {
-        await supabase
-          .from("player_stats")
-          .update({
-            xp: current.xp + m.xp_reward,
-            gold: current.gold + m.gold_reward,
-            level: calcLevel(current.xp + m.xp_reward),
-          })
-          .eq("player_key", playerKey);
+        await supabase.rpc("add_player_stats_rewards", {
+          p_player_key: playerKey,
+          p_xp: m.xp_reward,
+          p_gold: m.gold_reward,
+          p_level: calcLevel(current.xp + m.xp_reward),
+        });
       }
       // Grant reward
       if (m.reward_id) {
