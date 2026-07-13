@@ -31,6 +31,7 @@ import {
   type MemberUpdates,
 } from "@/lib/admin";
 import { cn } from "@/lib/utils";
+import { AdminTabs } from "@/components/bunker/AdminTabs";
 
 export const Route = createFileRoute("/admin/members")({
   head: () => ({
