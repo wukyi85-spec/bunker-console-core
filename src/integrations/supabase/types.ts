@@ -343,6 +343,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -361,6 +362,7 @@ export type Database = {
           gold?: number
           level?: number
           member_since?: string
+          name_change_count?: number
           phone?: string | null
           player_key: string
           player_name?: string | null
@@ -379,6 +381,7 @@ export type Database = {
           gold?: number
           level?: number
           member_since?: string
+          name_change_count?: number
           phone?: string | null
           player_key?: string
           player_name?: string | null
@@ -818,6 +821,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -892,6 +896,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -1032,6 +1037,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -1068,6 +1074,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
