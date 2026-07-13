@@ -22,14 +22,9 @@ function newMissionNumber() {
   return `OP-${t}-${r}`;
 }
 
-// Loose RPC helper — bypasses generated types for our custom SECURITY DEFINER fns.
-const rpc = supabase.rpc as unknown as (
-  fn: string,
-  args?: Record<string, unknown>,
-) => Promise<{ data: unknown; error: unknown }>;
-
 async function callRpc<T = unknown>(fn: string, args?: Record<string, unknown>): Promise<T> {
-  const { data, error } = await rpc(fn, args);
+  // Loose RPC helper — bypasses generated types for our custom SECURITY DEFINER fns.
+  const { data, error } = await supabase.rpc(fn as never, args as never);
   if (error) {
     console.error(`[BLACK'S BUNKER] ${fn} RPC error:`, error);
     throw error;
