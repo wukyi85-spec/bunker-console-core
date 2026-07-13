@@ -465,6 +465,12 @@ function OrderDetailsDrawer({
             <Detail label="Player" value={order.player_name ?? "—"} />
             <Detail label="Total Weight" value={`${order.total_grams}G`} />
             <Detail label="Created" value={new Date(order.created_at).toLocaleString()} />
+            {order.confirmed_at && (
+              <Detail
+                label="Confirmed"
+                value={`${new Date(order.confirmed_at).toLocaleString()}${order.confirmed_by ? ` by ${order.confirmed_by}` : ""}`}
+              />
+            )}
             {order.cancelled_at && (
               <Detail
                 label="Cancelled"
