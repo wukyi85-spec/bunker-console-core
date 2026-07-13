@@ -74,8 +74,6 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         <span className="absolute -bottom-1 -right-1 rounded-sm border border-background bg-neon px-1 py-[1px] font-mono text-[9px] font-bold text-background shadow-[0_0_8px_-1px_var(--neon)]">
           {String(player.level).padStart(2, "0")}
         </span>
-        <span className="absolute left-0 top-0 h-2 w-2 border-l border-t border-neon" />
-        <span className="absolute bottom-0 right-0 h-2 w-2 border-r border-b border-neon" />
       </div>
 
       <div className="flex min-w-0 flex-col justify-between gap-1.5">
