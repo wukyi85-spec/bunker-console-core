@@ -148,6 +148,9 @@ export interface AdminOrderRow {
   gold_earned: number;
   confirmed_at: string | null;
   confirmed_by: string | null;
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  cancellation_reason: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -175,4 +178,20 @@ export async function adminConfirmOrder(orderId: string): Promise<AdminOrderRow>
   }
   return data as unknown as AdminOrderRow;
 }
+
+export async function adminCancelOrder(orderId: string, reason: string): Promise<AdminOrderRow> {
+  const s = requireAdmin();
+  const { data, error } = await supabase.rpc("admin_cancel_order" as never, {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+    p_order_id: orderId,
+    p_reason: reason,
+  } as never);
+  if (error) {
+    console.error("[ADMIN CANCEL ORDER] failed:", error);
+    throw error;
+  }
+  return data as unknown as AdminOrderRow;
+}
+
 

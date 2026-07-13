@@ -8,6 +8,7 @@ import {
   X,
   CheckCircle2,
   Package,
+  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/bunker/Logo";
@@ -19,6 +20,7 @@ import { getAdminSession, clearAdminSession } from "@/lib/admin-session";
 import {
   adminListOrders,
   adminConfirmOrder,
+  adminCancelOrder,
   type AdminOrderRow,
 } from "@/lib/admin";
 import { orderStatusLabel } from "@/lib/bunker-supabase";
@@ -69,6 +71,9 @@ function AdminOrdersPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<AdminOrderRow | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<AdminOrderRow | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     const s = getAdminSession();
@@ -130,6 +135,29 @@ function AdminOrdersPage() {
     }
   }
 
+  async function handleCancelConfirm() {
+    if (!cancelTarget) return;
+    const reason = cancelReason.trim();
+    if (!reason) {
+      toast.error("Cancellation reason is required");
+      return;
+    }
+    setCancelling(true);
+    try {
+      await adminCancelOrder(cancelTarget.id, reason);
+      toast.success("Order cancelled");
+      const id = cancelTarget.id;
+      setCancelTarget(null);
+      setCancelReason("");
+      await refresh();
+      if (selected?.id === id) setSelected(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cancel failed");
+    } finally {
+      setCancelling(false);
+    }
+  }
+
   function handleLogout() {
     clearAdminSession();
     navigate({ to: "/login" });
@@ -138,6 +166,10 @@ function AdminOrdersPage() {
   const canConfirm = (o: AdminOrderRow) => {
     const s = o.status.toLowerCase();
     return s === "waiting_payment" || s === "pending";
+  };
+  const canCancel = (o: AdminOrderRow) => {
+    const s = o.status.toLowerCase();
+    return s !== "cancelled" && s !== "completed" && s !== "delivered";
   };
 
   return (
@@ -253,8 +285,8 @@ function AdminOrdersPage() {
                   <span className="font-mono text-[10px] text-muted-foreground">
                     {new Date(o.created_at).toLocaleString()}
                   </span>
-                  <span className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                    {canConfirm(o) ? (
+                  <span className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    {canConfirm(o) && (
                       <BunkerButton
                         size="sm"
                         onClick={() => void handleConfirm(o.id)}
@@ -263,7 +295,20 @@ function AdminOrdersPage() {
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         {confirming === o.id ? "…" : "Accept"}
                       </BunkerButton>
-                    ) : (
+                    )}
+                    {canCancel(o) && (
+                      <button
+                        onClick={() => {
+                          setCancelReason("");
+                          setCancelTarget(o);
+                        }}
+                        className="inline-flex items-center gap-1 rounded-sm border border-red-500/40 bg-red-500/10 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-red-300 transition-colors hover:bg-red-500/20"
+                      >
+                        <Ban className="h-3 w-3" />
+                        Cancel
+                      </button>
+                    )}
+                    {!canConfirm(o) && !canCancel(o) && (
                       <BunkerButton size="sm" variant="ghost" onClick={() => setSelected(o)}>
                         View
                       </BunkerButton>
@@ -280,8 +325,29 @@ function AdminOrdersPage() {
           order={selected}
           onClose={() => setSelected(null)}
           onConfirm={() => void handleConfirm(selected.id)}
+          onCancel={() => {
+            setCancelReason("");
+            setCancelTarget(selected);
+          }}
           confirming={confirming === selected.id}
           canConfirm={canConfirm(selected)}
+          canCancel={canCancel(selected)}
+        />
+      )}
+
+      {cancelTarget && (
+        <CancelOrderDialog
+          order={cancelTarget}
+          reason={cancelReason}
+          onReasonChange={setCancelReason}
+          onClose={() => {
+            if (!cancelling) {
+              setCancelTarget(null);
+              setCancelReason("");
+            }
+          }}
+          onConfirm={() => void handleCancelConfirm()}
+          submitting={cancelling}
         />
       )}
     </div>
@@ -292,14 +358,18 @@ function OrderDetailsDrawer({
   order,
   onClose,
   onConfirm,
+  onCancel,
   confirming,
   canConfirm,
+  canCancel,
 }: {
   order: AdminOrderRow;
   onClose: () => void;
   onConfirm: () => void;
+  onCancel: () => void;
   confirming: boolean;
   canConfirm: boolean;
+  canCancel: boolean;
 }) {
   const items = Array.isArray(order.items)
     ? (order.items as LoadoutItem[])
@@ -401,15 +471,41 @@ function OrderDetailsDrawer({
                 value={`${new Date(order.confirmed_at).toLocaleString()}${order.confirmed_by ? ` by ${order.confirmed_by}` : ""}`}
               />
             )}
+            {order.cancelled_at && (
+              <Detail
+                label="Cancelled"
+                value={`${new Date(order.cancelled_at).toLocaleString()}${order.cancelled_by ? ` by ${order.cancelled_by}` : ""}`}
+              />
+            )}
           </Section>
+
+          {order.status.toLowerCase() === "cancelled" && order.cancellation_reason && (
+            <Section title="Cancellation Reason">
+              <div className="rounded-sm border border-red-500/30 bg-red-500/5 p-3 text-[12px] text-foreground">
+                {order.cancellation_reason}
+              </div>
+            </Section>
+          )}
         </div>
 
-        {canConfirm && (
-          <div className="border-t border-white/10 p-4">
-            <BunkerButton className="w-full" onClick={onConfirm} disabled={confirming}>
-              <CheckCircle2 className="h-4 w-4" />
-              {confirming ? "Confirming…" : "Accept Order"}
-            </BunkerButton>
+        {(canConfirm || canCancel) && (
+          <div className="flex gap-2 border-t border-white/10 p-4">
+            {canConfirm && (
+              <BunkerButton className="flex-1" onClick={onConfirm} disabled={confirming}>
+                <CheckCircle2 className="h-4 w-4" />
+                {confirming ? "Confirming…" : "Accept Order"}
+              </BunkerButton>
+            )}
+            {canCancel && (
+              <button
+                onClick={onCancel}
+                disabled={confirming}
+                className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/50 bg-red-500/10 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+              >
+                <Ban className="h-4 w-4" />
+                Cancel Order
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -442,6 +538,93 @@ function Detail({ label, value, accent }: { label: string; value: string; accent
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+function CancelOrderDialog({
+  order,
+  reason,
+  onReasonChange,
+  onClose,
+  onConfirm,
+  submitting,
+}: {
+  order: AdminOrderRow;
+  reason: string;
+  onReasonChange: (v: string) => void;
+  onClose: () => void;
+  onConfirm: () => void;
+  submitting: boolean;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
+      <div
+        className="relative w-full max-w-md rounded-md border-2 border-red-500/50 bg-panel p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          disabled={submitting}
+          aria-label="Close"
+          className="absolute right-3 top-3 rounded-sm p-1.5 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-red-500/60 bg-red-500/10">
+            <Ban className="h-5 w-5 text-red-400" />
+          </div>
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-red-400">
+              // Cancel Order
+            </div>
+            <div className="font-display text-lg font-black uppercase tracking-widest text-foreground">
+              {order.mission_number}
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-4 text-sm text-muted-foreground">
+          Provide a cancellation reason. The member will receive a notification with this reason.
+        </p>
+
+        <label className="mt-4 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          Reason
+        </label>
+        <textarea
+          value={reason}
+          onChange={(e) => onReasonChange(e.target.value)}
+          rows={3}
+          disabled={submitting}
+          placeholder="e.g. Out of stock. Please contact support."
+          className="mt-1 w-full resize-none rounded-sm border border-white/15 bg-background/60 p-2 text-sm text-foreground outline-none transition-colors focus:border-red-500/60"
+        />
+
+        <div className="mt-5 flex gap-2">
+          <BunkerButton
+            variant="ghost"
+            className="flex-1"
+            onClick={onClose}
+            disabled={submitting}
+          >
+            Back
+          </BunkerButton>
+          <button
+            onClick={onConfirm}
+            disabled={submitting || reason.trim().length === 0}
+            className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/60 bg-red-500/15 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/25 disabled:opacity-40"
+          >
+            <Ban className="h-4 w-4" />
+            {submitting ? "Cancelling…" : "Confirm Cancel"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

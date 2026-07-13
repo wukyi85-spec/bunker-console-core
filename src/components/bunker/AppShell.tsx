@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Logo } from "./Logo";
 import { GameNav } from "./GameNav";
 import { BackToBunker } from "./BackToBunker";
+import { NotificationPopup } from "./NotificationPopup";
+
 
 interface AppShellProps {
   children: ReactNode;
@@ -40,6 +42,8 @@ export function AppShell({
           <GameNav />
         </footer>
       )}
+
+      <NotificationPopup />
     </div>
   );
 }
