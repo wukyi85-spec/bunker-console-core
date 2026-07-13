@@ -11,6 +11,9 @@ import {
   X,
   Copy,
   Check,
+  Ban,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/bunker/Logo";
@@ -22,6 +25,8 @@ import {
   adminListMembers,
   adminCreateMember,
   adminUpdateMember,
+  adminSuspendMember,
+  adminDeleteMember,
   type MemberRow,
   type MemberUpdates,
 } from "@/lib/admin";
@@ -48,10 +53,18 @@ function AdminMembersPage() {
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<MemberRow | null>(null);
+  const [deleting, setDeleting] = useState<MemberRow | null>(null);
+  const [suspendingId, setSuspendingId] = useState<string | null>(null);
   const [createdCredentials, setCreatedCredentials] = useState<{
     passId: string;
     password: string;
   } | null>(null);
+  const adminSession = getAdminSession();
+  const currentAdminPassId = adminSession?.passId.trim().toUpperCase() ?? "";
+  const activeAdminCount = useMemo(
+    () => members.filter((m) => m.role === "admin" && m.status === "active").length,
+    [members],
+  );
 
   // Guard: must be admin
   useEffect(() => {
@@ -95,6 +108,35 @@ function AdminMembersPage() {
   function handleLogout() {
     clearAdminSession();
     navigate({ to: "/login" });
+  }
+
+  function isSelf(m: MemberRow) {
+    return m.pass_id.trim().toUpperCase() === currentAdminPassId;
+  }
+
+  function isLastActiveAdmin(m: MemberRow) {
+    return m.role === "admin" && m.status === "active" && activeAdminCount <= 1;
+  }
+
+  async function handleSuspend(m: MemberRow) {
+    if (isSelf(m)) {
+      toast.error("You cannot suspend your own account");
+      return;
+    }
+    if (isLastActiveAdmin(m)) {
+      toast.error("Cannot suspend the last remaining admin");
+      return;
+    }
+    setSuspendingId(m.id);
+    try {
+      await adminSuspendMember(m.id);
+      toast.success(`${m.pass_id} suspended`);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Suspend failed");
+    } finally {
+      setSuspendingId(null);
+    }
   }
 
   return (
@@ -155,7 +197,7 @@ function AdminMembersPage() {
       {/* Table */}
       <main className="relative z-10 flex-1 overflow-hidden px-6 pb-6">
         <Panel className="flex h-full flex-col overflow-hidden">
-          <div className="grid grid-cols-[1.3fr_1.3fr_0.9fr_0.7fr_0.7fr_0.9fr_0.9fr_1.2fr_0.9fr] gap-3 border-b border-white/8 bg-black/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          <div className="grid grid-cols-[1.2fr_1.2fr_0.8fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr_1.6fr] gap-3 border-b border-white/8 bg-black/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
             <span>Pass ID</span>
             <span>Player Name</span>
             <span>Rank</span>
@@ -178,10 +220,15 @@ function AdminMembersPage() {
               </div>
             )}
             {!loading &&
-              filtered.map((m) => (
+              filtered.map((m) => {
+                const self = isSelf(m);
+                const lastAdmin = isLastActiveAdmin(m);
+                const canDelete = !self && !lastAdmin;
+                const canSuspend = !self && !lastAdmin && m.status === "active";
+                return (
                 <div
                   key={m.id}
-                  className="grid grid-cols-[1.3fr_1.3fr_0.9fr_0.7fr_0.7fr_0.9fr_0.9fr_1.2fr_0.9fr] items-center gap-3 border-b border-white/5 px-4 py-2.5 text-sm text-foreground hover:bg-white/[0.02]"
+                  className="grid grid-cols-[1.2fr_1.2fr_0.8fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr_1.6fr] items-center gap-3 border-b border-white/5 px-4 py-2.5 text-sm text-foreground hover:bg-white/[0.02]"
                 >
                   <span className="font-mono text-neon">{m.pass_id}</span>
                   <span className="truncate">{m.player_name ?? <em className="text-muted-foreground">— unset —</em>}</span>
@@ -215,7 +262,7 @@ function AdminMembersPage() {
                   <span className="font-mono text-xs text-muted-foreground">
                     {new Date(m.created_at).toLocaleDateString()}
                   </span>
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-1">
                     <BunkerButton
                       variant="ghost"
                       size="sm"
@@ -224,9 +271,44 @@ function AdminMembersPage() {
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
                     </BunkerButton>
+                    <button
+                      type="button"
+                      onClick={() => void handleSuspend(m)}
+                      disabled={!canSuspend || suspendingId === m.id}
+                      title={
+                        self
+                          ? "Cannot suspend your own account"
+                          : lastAdmin
+                            ? "Cannot suspend the last admin"
+                            : m.status !== "active"
+                              ? "Already suspended"
+                              : "Suspend member"
+                      }
+                      className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-amber-300 transition-colors hover:border-amber-400 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      <Ban className="h-3 w-3" />
+                      {suspendingId === m.id ? "…" : "Suspend"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleting(m)}
+                      disabled={!canDelete}
+                      title={
+                        self
+                          ? "Cannot delete your own account"
+                          : lastAdmin
+                            ? "Cannot delete the last admin"
+                            : "Delete member"
+                      }
+                      className="inline-flex items-center gap-1 rounded-md border border-red-500/40 bg-red-500/5 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-red-400 transition-colors hover:border-red-400 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Delete
+                    </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
           </div>
         </Panel>
       </main>
@@ -245,10 +327,22 @@ function AdminMembersPage() {
       {editing && (
         <EditMemberDialog
           member={editing}
+          canSuspend={!isSelf(editing) && !isLastActiveAdmin(editing) && editing.status === "active"}
+          canDelete={!isSelf(editing) && !isLastActiveAdmin(editing)}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
             void refresh();
+          }}
+          onSuspend={async () => {
+            const target = editing;
+            setEditing(null);
+            await handleSuspend(target);
+          }}
+          onDelete={() => {
+            const target = editing;
+            setEditing(null);
+            setDeleting(target);
           }}
         />
       )}
@@ -257,6 +351,17 @@ function AdminMembersPage() {
         <CredentialsDialog
           creds={createdCredentials}
           onClose={() => setCreatedCredentials(null)}
+        />
+      )}
+
+      {deleting && (
+        <DeleteMemberDialog
+          member={deleting}
+          onClose={() => setDeleting(null)}
+          onDeleted={() => {
+            setDeleting(null);
+            void refresh();
+          }}
         />
       )}
     </div>
@@ -350,12 +455,20 @@ function CreateMemberDialog({
 
 function EditMemberDialog({
   member,
+  canSuspend,
+  canDelete,
   onClose,
   onSaved,
+  onSuspend,
+  onDelete,
 }: {
   member: MemberRow;
+  canSuspend: boolean;
+  canDelete: boolean;
   onClose: () => void;
   onSaved: () => void;
+  onSuspend: () => void | Promise<void>;
+  onDelete: () => void;
 }) {
   const [password, setPassword] = useState("");
   const [playerName, setPlayerName] = useState(member.player_name ?? "");
@@ -449,13 +562,35 @@ function EditMemberDialog({
             {error}
           </div>
         )}
-        <div className="flex justify-end gap-2 pt-2">
-          <BunkerButton type="button" variant="ghost" onClick={onClose}>
-            Cancel
-          </BunkerButton>
-          <BunkerButton type="submit" disabled={submitting}>
-            {submitting ? "Saving…" : "Save Changes"}
-          </BunkerButton>
+        <div className="flex items-center justify-between gap-2 pt-2">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => void onSuspend()}
+              disabled={!canSuspend}
+              className="inline-flex items-center gap-1.5 rounded-md border border-amber-500/40 bg-amber-500/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-amber-300 transition-colors hover:border-amber-400 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <Ban className="h-3.5 w-3.5" />
+              Suspend Member
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={!canDelete}
+              className="inline-flex items-center gap-1.5 rounded-md border border-red-500/50 bg-red-500/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-red-400 transition-colors hover:border-red-400 hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete Member
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <BunkerButton type="button" variant="ghost" onClick={onClose}>
+              Cancel
+            </BunkerButton>
+            <BunkerButton type="submit" disabled={submitting}>
+              {submitting ? "Saving…" : "Save Changes"}
+            </BunkerButton>
+          </div>
         </div>
       </form>
     </ModalShell>
@@ -641,5 +776,110 @@ function NumberStepper({
         </button>
       </div>
     </div>
+  );
+}
+
+// -------------- Delete Member Dialog --------------
+
+function DeleteMemberDialog({
+  member,
+  onClose,
+  onDeleted,
+}: {
+  member: MemberRow;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [confirmText, setConfirmText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const canDelete =
+    confirmText.trim().toUpperCase() === member.pass_id.trim().toUpperCase();
+
+  async function handleDelete() {
+    if (!canDelete) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      await adminDeleteMember(member.id);
+      toast.success(`${member.pass_id} deleted`);
+      onDeleted();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Delete failed";
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <ModalShell title="Delete Member?" onClose={onClose}>
+      <div className="flex flex-col gap-4 p-5">
+        <div className="flex items-start gap-3 rounded-md border border-red-500/40 bg-red-500/10 p-3">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+          <div>
+            <div className="font-mono text-sm uppercase tracking-[0.25em] text-red-300">
+              This action cannot be undone.
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              The member row will be permanently removed from the database. Related orders are kept.
+            </p>
+          </div>
+        </div>
+
+        <dl className="grid grid-cols-3 gap-2 rounded-md border border-white/10 bg-black/40 p-3 text-sm">
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Pass ID
+            </dt>
+            <dd className="font-mono text-neon">{member.pass_id}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Player Name
+            </dt>
+            <dd className="truncate">
+              {member.player_name ?? <em className="text-muted-foreground">— unset —</em>}
+            </dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Role
+            </dt>
+            <dd className="font-mono uppercase tracking-widest text-xs">{member.role}</dd>
+          </div>
+        </dl>
+
+        <BunkerInput
+          name="confirm"
+          label={`Type "${member.pass_id}" to confirm`}
+          placeholder={member.pass_id}
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          autoFocus
+        />
+
+        {error && (
+          <div className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 font-mono text-xs uppercase tracking-widest text-red-300">
+            {error}
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 pt-1">
+          <BunkerButton type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </BunkerButton>
+          <button
+            type="button"
+            onClick={() => void handleDelete()}
+            disabled={!canDelete || submitting}
+            className="inline-flex items-center gap-2 rounded-md border border-red-500/60 bg-red-500/20 px-4 py-2 font-mono text-xs uppercase tracking-[0.3em] text-red-300 transition-colors hover:border-red-400 hover:bg-red-500/30 disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            <Trash2 className="h-4 w-4" />
+            {submitting ? "Deleting…" : "Delete"}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
   );
 }

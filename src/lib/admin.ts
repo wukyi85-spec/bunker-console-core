@@ -105,3 +105,20 @@ export async function adminUpdateMember(
   if (error) throw error;
   return data as MemberRow;
 }
+
+export async function adminSuspendMember(memberId: string): Promise<MemberRow> {
+  return adminUpdateMember(memberId, { status: "suspended" });
+}
+
+export async function adminDeleteMember(memberId: string): Promise<void> {
+  const s = requireAdmin();
+  const { error } = await supabase.rpc("admin_delete_member", {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+    p_member_id: memberId,
+  });
+  if (error) {
+    console.error("[ADMIN DELETE] failed:", error);
+    throw error;
+  }
+}

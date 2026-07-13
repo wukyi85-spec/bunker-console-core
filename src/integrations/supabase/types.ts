@@ -428,6 +428,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_delete_member: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_member_id: string
+        }
+        Returns: string
+      }
       admin_list_members: {
         Args: { p_admin_pass_id: string; p_admin_password: string }
         Returns: {
