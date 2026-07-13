@@ -158,16 +158,8 @@ export function BunkerAlarm() {
         })}
       </div>
 
-      {items.length > 3 && (
-        <button
-          type="button"
-          onClick={() => setExpanded((v) => !v)}
-          className="group/va relative mt-2.5 flex items-center justify-center gap-2 overflow-hidden rounded-sm border border-neon/30 bg-panel/50 py-1.5 font-display text-[10px] font-black uppercase tracking-[0.32em] text-neon/90 transition-all hover:border-neon/70 hover:bg-neon/10 hover:text-neon hover:shadow-[0_0_16px_-4px_var(--neon)] active:scale-[0.98]"
-        >
-          {expanded ? "Show Less" : "View All"}
-          <span aria-hidden className="text-neon">›</span>
-        </button>
-      )}
+
+
 
       <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
         <span className="text-neon/70">// LIVE</span>
