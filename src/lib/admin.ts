@@ -151,6 +151,8 @@ export interface AdminOrderRow {
   cancelled_at: string | null;
   cancelled_by: string | null;
   cancellation_reason: string | null;
+  tracking_url: string | null;
+  delivery_fee: number | null;
   created_at: string;
   updated_at: string;
 }
