@@ -53,7 +53,7 @@ function ProfilePage() {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [savingInfo0, _unused] = [false, null]; void _unused; void savingInfo0;
+  
   const [savingInfo, setSavingInfo] = useState(false);
 
   const [changeOpen, setChangeOpen] = useState(false);
