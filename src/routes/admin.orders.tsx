@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   Package,
   Ban,
+  Truck,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/bunker/Logo";
