@@ -358,6 +358,8 @@ function AdminOrdersPage() {
             setCancelReason("");
             setCancelTarget(selected);
           }}
+          onSetTracking={(url) => void handleSetTracking(selected.id, url)}
+          onDelete={() => void handleDeleteOrder(selected.id)}
           confirming={confirming === selected.id}
           canConfirm={canConfirm(selected)}
           canCancel={canCancel(selected)}
