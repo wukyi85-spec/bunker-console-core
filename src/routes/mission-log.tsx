@@ -107,6 +107,7 @@ interface OrderRow {
   status: string;
   xp_earned: number | null;
   gold_earned: number | null;
+  cancellation_reason?: string | null;
 }
 
 function MissionRow({ order }: { order: OrderRow }) {
