@@ -61,6 +61,7 @@ function OnboardingScreen() {
     e.preventDefault();
     if (!canSubmit || saving) return;
     setSaving(true);
+    // Placeholder persistence — swap for Supabase profiles insert later.
     setPlayerProfile({
       characterId,
       playerName,

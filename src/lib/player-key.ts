@@ -1,5 +1,4 @@
-// Player identity — currently the member's pass_id (set at login).
-// Falls back to a device UUID if no login yet (guest flow, never seeded).
+// Device-level player identity. When auth arrives we swap to auth.uid().
 const KEY = "bunker.player_key";
 
 export function getPlayerKey(): string {
@@ -10,14 +9,4 @@ export function getPlayerKey(): string {
     window.localStorage.setItem(KEY, k);
   }
   return k;
-}
-
-export function setPlayerKey(k: string) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(KEY, k);
-}
-
-export function clearPlayerKey() {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(KEY);
 }

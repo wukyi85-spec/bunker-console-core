@@ -1,19 +1,15 @@
-// Current authenticated member session/profile cache.
-// Login data is only populated after the login_member RPC succeeds.
+// Placeholder player profile store — future-ready for Supabase.
+// Swap the localStorage layer for a `profiles` table read/write when auth is wired.
 
 const STORAGE_KEY = "bunker.player";
 
 export interface PlayerProfile {
-  memberId: string | null;
-  passId: string | null;
   characterId: string | null;
   playerName: string | null;
   firstLoginCompleted: boolean;
 }
 
 const DEFAULT_PROFILE: PlayerProfile = {
-  memberId: null,
-  passId: null,
   characterId: null,
   playerName: null,
   firstLoginCompleted: false,

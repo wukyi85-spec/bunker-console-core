@@ -6,9 +6,7 @@ import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { AccessDenied } from "@/components/bunker/AccessDenied";
-import { setPlayerProfile } from "@/lib/player";
-import { setPlayerKey } from "@/lib/player-key";
-import { loginMember, ensurePlayerStats } from "@/lib/bunker-supabase";
+import { getPlayerProfile } from "@/lib/player";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -27,49 +25,18 @@ function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  function getTransmissionError(err: unknown) {
-    if (!import.meta.env.DEV) return "TRANSMISSION ERROR — TRY AGAIN";
-    if (err && typeof err === "object" && "message" in err) {
-      return `TRANSMISSION ERROR — ${String((err as { message?: unknown }).message)}`;
-    }
-    return "TRANSMISSION ERROR — TRY AGAIN";
-  }
+  // Reserved for future validation flow.
+  const [error] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (verifying) return;
     setVerifying(true);
-    setError(null);
-    try {
-      const member = await loginMember(passId.trim(), password);
-      if (!member) {
-        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
-        setVerifying(false);
-        return;
-      }
-      const name = (member.playerName ?? "").trim();
-      const isFirstLogin = !name || name.toUpperCase() === "EMPTY";
-      setPlayerKey(member.passId);
-      setPlayerProfile({
-        memberId: member.id,
-        passId: member.passId,
-        playerName: isFirstLogin ? null : member.playerName,
-        characterId: isFirstLogin ? null : member.characterId,
-        firstLoginCompleted: !isFirstLogin,
-      });
-      if (isFirstLogin) {
-        navigate({ to: "/onboarding" });
-        return;
-      }
-      await ensurePlayerStats();
-      navigate({ to: "/dashboard" });
-    } catch (err) {
-      console.error("[BLACK'S BUNKER] login error:", err);
-      setError(getTransmissionError(err));
-      setVerifying(false);
-    }
+    // Placeholder verify animation — no auth yet.
+    window.setTimeout(() => {
+      const profile = getPlayerProfile();
+      navigate({ to: profile.firstLoginCompleted ? "/dashboard" : "/onboarding" });
+    }, 1600);
   }
 
   return (
