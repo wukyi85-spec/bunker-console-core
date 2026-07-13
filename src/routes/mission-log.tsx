@@ -66,7 +66,7 @@ function OrderDetailsPage() {
   );
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="flex h-full w-full flex-col gap-3 animate-in fade-in duration-500">
         {/* Tab bar */}
         <div className="flex items-center gap-2 rounded-md border border-white/10 bg-panel-elevated/50 p-1">
