@@ -96,13 +96,14 @@ export function BunkerAlarm() {
           </span>
         </div>
         <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          {expanded ? `${items.length} TOTAL` : `LATEST ${visible.length}`}
+          LATEST {visible.length}
         </span>
       </div>
 
       <div className="mx-1 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
-      <div className={cn("mt-2 flex flex-col gap-2", expanded && "max-h-[260px] overflow-y-auto pr-1")}>
+      <div className="mt-2 flex flex-col gap-2">
+
         {visible.length === 0 && (
           <div className="rounded-sm border border-dashed border-white/10 bg-black/30 p-3 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             No transmissions
