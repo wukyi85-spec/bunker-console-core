@@ -121,7 +121,7 @@ function ProfilePage() {
   }
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="flex h-full w-full flex-col gap-3 overflow-y-auto animate-in fade-in duration-500">
         {/* ============ DIGITAL STONER PASS CARD ============ */}
         <Panel
@@ -149,8 +149,8 @@ function ProfilePage() {
               <div className="pointer-events-none absolute -inset-0.5 rounded-md border border-neon/30 shadow-[0_0_25px_-6px_var(--neon)]" />
             </div>
 
-            {/* Identity */}
-            <div className="flex min-w-0 flex-col justify-between">
+            {/* Identity + Personal Info */}
+            <div className="flex min-w-0 flex-col gap-4">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
                   // Digital Stoner Pass
@@ -176,7 +176,7 @@ function ProfilePage() {
                 </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-2 gap-2 font-mono text-[10px] uppercase tracking-widest">
+              <div className="grid grid-cols-4 gap-2 font-mono text-[10px] uppercase tracking-widest">
                 <ReadonlyField label="Pass ID" value={profile.passId ?? "—"} />
                 <ReadonlyField label="Member Since" value={memberSince} />
                 <ReadonlyField
@@ -189,6 +189,52 @@ function ProfilePage() {
                   value={(stats?.gold ?? 0).toLocaleString()}
                   valueClass="text-amber-300"
                 />
+              </div>
+
+              <div className="border-t border-white/10 pt-3">
+                <div className="flex items-center justify-between pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
+                    <span className="font-display text-[11px] font-bold uppercase tracking-widest">
+                      Personal Information
+                    </span>
+                  </div>
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                    Used for auto-fill at checkout
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <BunkerInput
+                    label="Full Name"
+                    icon={<User className="h-3.5 w-3.5" />}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your legal name"
+                  />
+                  <BunkerInput
+                    label="Phone Number"
+                    icon={<Phone className="h-3.5 w-3.5" />}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+66 ..."
+                    inputMode="tel"
+                  />
+                  <BunkerInput
+                    label="Default Delivery Address"
+                    icon={<MapPin className="h-3.5 w-3.5" />}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Drop location"
+                  />
+                </div>
+
+                <div className="mt-3 flex justify-end">
+                  <BunkerButton onClick={saveInfo} disabled={savingInfo}>
+                    <Save className="h-4 w-4" />
+                    {savingInfo ? "Saving..." : "Save Changes"}
+                  </BunkerButton>
+                </div>
               </div>
             </div>
 
@@ -239,11 +285,6 @@ function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-2">
                 <StatChip
-                  icon={<Coins className="h-3.5 w-3.5 text-amber-300" />}
-                  label="Gold"
-                  value={(stats?.gold ?? 0).toLocaleString()}
-                />
-                <StatChip
                   icon={<Star className="h-3.5 w-3.5 fill-neon text-neon" />}
                   label="Stars"
                   value={String(
@@ -262,55 +303,6 @@ function ProfilePage() {
                 />
               </div>
             </div>
-          </div>
-        </Panel>
-
-        {/* ============ PERSONAL INFORMATION ============ */}
-        <Panel variant="default" className="p-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
-              <span className="font-display text-xs font-bold uppercase tracking-widest">
-                Personal Information
-              </span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-              Used for auto-fill at checkout
-            </span>
-          </div>
-
-          <div className="mt-3 grid grid-cols-3 gap-3">
-            <BunkerInput
-              label="Full Name"
-              icon={<User className="h-3.5 w-3.5" />}
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Enter your legal name"
-            />
-            <BunkerInput
-              label="Phone Number"
-              icon={<Phone className="h-3.5 w-3.5" />}
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+66 ..."
-              inputMode="tel"
-            />
-            <div className="col-span-1">
-              <BunkerInput
-                label="Default Delivery Address"
-                icon={<MapPin className="h-3.5 w-3.5" />}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Drop location"
-              />
-            </div>
-          </div>
-
-          <div className="mt-3 flex justify-end">
-            <BunkerButton onClick={saveInfo} disabled={savingInfo}>
-              <Save className="h-4 w-4" />
-              {savingInfo ? "Saving..." : "Save Changes"}
-            </BunkerButton>
           </div>
         </Panel>
       </div>

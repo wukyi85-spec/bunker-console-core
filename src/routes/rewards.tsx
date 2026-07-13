@@ -45,7 +45,7 @@ function RewardsPage() {
   });
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500">
         <Panel variant="elevated" corners className="corner-frame-lines flex min-h-0 flex-col p-4">
           <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
