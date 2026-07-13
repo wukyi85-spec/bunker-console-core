@@ -294,19 +294,22 @@ function StatusPill({ status }: { status: string }) {
         "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest",
         s === "waiting_payment" || s === "pending"
           ? "border-amber-400/50 bg-amber-400/10 text-amber-300"
-          : s === "confirmed"
+          : s === "confirmed" || s === "processing" || s === "packing"
             ? "border-neon/60 bg-neon/10 text-neon"
-            : s === "delivered" || s === "completed"
-              ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
-              : s === "cancelled"
-                ? "border-red-500/60 bg-red-500/10 text-red-300"
-                : "border-white/20 bg-background/40 text-muted-foreground",
+            : s === "out_for_delivery" || s === "delivered"
+              ? "border-sky-400/60 bg-sky-400/10 text-sky-300"
+              : s === "completed"
+                ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
+                : s === "cancelled"
+                  ? "border-red-500/60 bg-red-500/10 text-red-300"
+                  : "border-white/20 bg-background/40 text-muted-foreground",
       )}
     >
       {orderStatusLabel(status)}
     </span>
   );
 }
+
 
 function Detail({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
