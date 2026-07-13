@@ -159,6 +159,29 @@ function AdminOrdersPage() {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
     } finally {
       setCancelling(false);
+  }
+
+  async function handleSetTracking(orderId: string, url: string) {
+    try {
+      await adminSetOrderTracking(orderId, url.trim());
+      toast.success(url.trim() ? "Tracking link saved" : "Tracking link cleared");
+      await refresh();
+      if (selected?.id === orderId) {
+        setSelected((prev) => (prev ? { ...prev, tracking_url: url.trim() || null } : prev));
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save tracking link");
+    }
+  }
+
+  async function handleDeleteOrder(orderId: string) {
+    try {
+      await adminDeleteOrder(orderId);
+      toast.success("Order deleted");
+      if (selected?.id === orderId) setSelected(null);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete order");
     }
   }
 
