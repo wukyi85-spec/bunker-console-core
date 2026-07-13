@@ -22,12 +22,11 @@ import {
   MapPin,
   Save,
   Pencil,
-  Eye,
-  EyeOff,
   Star,
   Trophy,
   Zap,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
