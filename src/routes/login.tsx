@@ -29,13 +29,21 @@ function LoginScreen() {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function getTransmissionError(err: unknown) {
+    if (!import.meta.env.DEV) return "TRANSMISSION ERROR — TRY AGAIN";
+    if (err && typeof err === "object" && "message" in err) {
+      return `TRANSMISSION ERROR — ${String((err as { message?: unknown }).message)}`;
+    }
+    return "TRANSMISSION ERROR — TRY AGAIN";
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (verifying) return;
     setVerifying(true);
     setError(null);
     try {
-      const member = await loginMember(passId.trim().toUpperCase(), password);
+      const member = await loginMember(passId.trim(), password);
       if (!member) {
         setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
         setVerifying(false);
@@ -59,7 +67,7 @@ function LoginScreen() {
       navigate({ to: "/dashboard" });
     } catch (err) {
       console.error("[BLACK'S BUNKER] login error:", err);
-      setError("TRANSMISSION ERROR — TRY AGAIN");
+      setError(getTransmissionError(err));
       setVerifying(false);
     }
   }

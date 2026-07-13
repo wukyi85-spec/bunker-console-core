@@ -1,5 +1,5 @@
-// Placeholder player profile store — future-ready for Supabase.
-// Swap the localStorage layer for a `profiles` table read/write when auth is wired.
+// Current authenticated member session/profile cache.
+// Login data is only populated after the login_member RPC succeeds.
 
 const STORAGE_KEY = "bunker.player";
 
