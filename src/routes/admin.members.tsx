@@ -53,10 +53,18 @@ function AdminMembersPage() {
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<MemberRow | null>(null);
+  const [deleting, setDeleting] = useState<MemberRow | null>(null);
+  const [suspendingId, setSuspendingId] = useState<string | null>(null);
   const [createdCredentials, setCreatedCredentials] = useState<{
     passId: string;
     password: string;
   } | null>(null);
+  const adminSession = getAdminSession();
+  const currentAdminPassId = adminSession?.passId.trim().toUpperCase() ?? "";
+  const activeAdminCount = useMemo(
+    () => members.filter((m) => m.role === "admin" && m.status === "active").length,
+    [members],
+  );
 
   // Guard: must be admin
   useEffect(() => {
