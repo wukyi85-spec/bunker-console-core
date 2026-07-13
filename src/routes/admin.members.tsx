@@ -455,12 +455,20 @@ function CreateMemberDialog({
 
 function EditMemberDialog({
   member,
+  canSuspend,
+  canDelete,
   onClose,
   onSaved,
+  onSuspend,
+  onDelete,
 }: {
   member: MemberRow;
+  canSuspend: boolean;
+  canDelete: boolean;
   onClose: () => void;
   onSaved: () => void;
+  onSuspend: () => void | Promise<void>;
+  onDelete: () => void;
 }) {
   const [password, setPassword] = useState("");
   const [playerName, setPlayerName] = useState(member.player_name ?? "");
