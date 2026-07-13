@@ -465,21 +465,41 @@ function OrderDetailsDrawer({
             <Detail label="Player" value={order.player_name ?? "—"} />
             <Detail label="Total Weight" value={`${order.total_grams}G`} />
             <Detail label="Created" value={new Date(order.created_at).toLocaleString()} />
-            {order.confirmed_at && (
+            {order.cancelled_at && (
               <Detail
-                label="Confirmed"
-                value={`${new Date(order.confirmed_at).toLocaleString()}${order.confirmed_by ? ` by ${order.confirmed_by}` : ""}`}
+                label="Cancelled"
+                value={`${new Date(order.cancelled_at).toLocaleString()}${order.cancelled_by ? ` by ${order.cancelled_by}` : ""}`}
               />
             )}
           </Section>
+
+          {order.status.toLowerCase() === "cancelled" && order.cancellation_reason && (
+            <Section title="Cancellation Reason">
+              <div className="rounded-sm border border-red-500/30 bg-red-500/5 p-3 text-[12px] text-foreground">
+                {order.cancellation_reason}
+              </div>
+            </Section>
+          )}
         </div>
 
-        {canConfirm && (
-          <div className="border-t border-white/10 p-4">
-            <BunkerButton className="w-full" onClick={onConfirm} disabled={confirming}>
-              <CheckCircle2 className="h-4 w-4" />
-              {confirming ? "Confirming…" : "Accept Order"}
-            </BunkerButton>
+        {(canConfirm || canCancel) && (
+          <div className="flex gap-2 border-t border-white/10 p-4">
+            {canConfirm && (
+              <BunkerButton className="flex-1" onClick={onConfirm} disabled={confirming}>
+                <CheckCircle2 className="h-4 w-4" />
+                {confirming ? "Confirming…" : "Accept Order"}
+              </BunkerButton>
+            )}
+            {canCancel && (
+              <button
+                onClick={onCancel}
+                disabled={confirming}
+                className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/50 bg-red-500/10 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+              >
+                <Ban className="h-4 w-4" />
+                Cancel Order
+              </button>
+            )}
           </div>
         )}
       </div>
