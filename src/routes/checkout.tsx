@@ -61,9 +61,9 @@ function CheckoutPage() {
         toast.success(`MISSION COMPLETE — ${missionRewards.map((m) => m.title).join(", ")}`);
       }
       navigate({ to: "/order-complete", search: { id: order.mission_number } });
-    } catch (err) {
+    } catch (err: any) {
       console.error("[BLACK'S BUNKER] Order transmission failed:", err);
-      toast.error("ORDER TRANSMISSION FAILED");
+      toast.error(err?.message || err?.details || "ORDER TRANSMISSION FAILED");
       setSubmitting(false);
     }
   };
