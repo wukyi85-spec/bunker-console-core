@@ -562,13 +562,35 @@ function EditMemberDialog({
             {error}
           </div>
         )}
-        <div className="flex justify-end gap-2 pt-2">
-          <BunkerButton type="button" variant="ghost" onClick={onClose}>
-            Cancel
-          </BunkerButton>
-          <BunkerButton type="submit" disabled={submitting}>
-            {submitting ? "Saving…" : "Save Changes"}
-          </BunkerButton>
+        <div className="flex items-center justify-between gap-2 pt-2">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => void onSuspend()}
+              disabled={!canSuspend}
+              className="inline-flex items-center gap-1.5 rounded-md border border-amber-500/40 bg-amber-500/5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-amber-300 transition-colors hover:border-amber-400 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <Ban className="h-3.5 w-3.5" />
+              Suspend Member
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={!canDelete}
+              className="inline-flex items-center gap-1.5 rounded-md border border-red-500/50 bg-red-500/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-red-400 transition-colors hover:border-red-400 hover:bg-red-500/25 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete Member
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <BunkerButton type="button" variant="ghost" onClick={onClose}>
+              Cancel
+            </BunkerButton>
+            <BunkerButton type="submit" disabled={submitting}>
+              {submitting ? "Saving…" : "Save Changes"}
+            </BunkerButton>
+          </div>
         </div>
       </form>
     </ModalShell>
