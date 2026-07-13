@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
-import { listOrders } from "@/lib/bunker-supabase";
+import { listOrders, orderStatusLabel } from "@/lib/bunker-supabase";
 import type { LoadoutItem } from "@/lib/loadout";
 import { ChevronDown, ChevronRight, ClipboardList, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
