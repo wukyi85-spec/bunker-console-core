@@ -390,6 +390,8 @@ function OrderDetailsDrawer({
   onClose,
   onConfirm,
   onCancel,
+  onSetTracking,
+  onDelete,
   confirming,
   canConfirm,
   canCancel,
@@ -398,10 +400,19 @@ function OrderDetailsDrawer({
   onClose: () => void;
   onConfirm: () => void;
   onCancel: () => void;
+  onSetTracking: (url: string) => void;
+  onDelete: () => void;
   confirming: boolean;
   canConfirm: boolean;
   canCancel: boolean;
 }) {
+  const [trackingDraft, setTrackingDraft] = useState(order.tracking_url ?? "");
+  const [showDelete, setShowDelete] = useState(false);
+  useEffect(() => {
+    setTrackingDraft(order.tracking_url ?? "");
+    setShowDelete(false);
+  }, [order.id]);
+
   const items = Array.isArray(order.items)
     ? (order.items as LoadoutItem[])
     : Array.isArray(order.order_items)
