@@ -11,6 +11,9 @@ import {
   X,
   Copy,
   Check,
+  Ban,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/bunker/Logo";
@@ -22,6 +25,8 @@ import {
   adminListMembers,
   adminCreateMember,
   adminUpdateMember,
+  adminSuspendMember,
+  adminDeleteMember,
   type MemberRow,
   type MemberUpdates,
 } from "@/lib/admin";
