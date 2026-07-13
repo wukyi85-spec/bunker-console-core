@@ -127,6 +127,17 @@ function CheckoutPage() {
                   placeholder="DROP LOCATION"
                 />
               </div>
+              <label className="col-span-2 flex cursor-pointer items-center gap-2 rounded-sm border border-white/10 bg-background/40 px-3 py-2 hover:border-neon/40">
+                <input
+                  type="checkbox"
+                  checked={saveAsDefault}
+                  onChange={(e) => setSaveAsDefault(e.target.checked)}
+                  className="h-3.5 w-3.5 accent-neon"
+                />
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                  Save as my default delivery information
+                </span>
+              </label>
               <div className="col-span-2 flex flex-col gap-1.5">
                 <label className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
                   Optional Notes
