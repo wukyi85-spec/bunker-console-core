@@ -120,6 +120,8 @@ export type Database = {
         Row: {
           address: string
           character_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           customer_name: string
           gold_earned: number
@@ -145,6 +147,8 @@ export type Database = {
         Insert: {
           address: string
           character_id?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           customer_name: string
           gold_earned?: number
@@ -170,6 +174,8 @@ export type Database = {
         Update: {
           address?: string
           character_id?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           created_at?: string
           customer_name?: string
           gold_earned?: number
@@ -236,6 +242,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      player_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          order_id: string | null
+          player_key: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          order_id?: string | null
+          player_key: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          order_id?: string | null
+          player_key?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
       }
       player_rewards: {
         Row: {
@@ -395,6 +434,46 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_confirm_order: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_order_id: string
+        }
+        Returns: {
+          address: string
+          character_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          customer_name: string
+          gold_earned: number
+          grand_total: number
+          id: string
+          items: Json
+          member_id: string | null
+          mission_number: string
+          notes: string | null
+          order_items: Json | null
+          pass_id: string | null
+          payment_method: string
+          phone: string
+          player_key: string
+          player_name: string | null
+          product_total: number
+          status: string
+          total_grams: number
+          total_price: number | null
+          updated_at: string
+          xp_earned: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_create_member: {
         Args: {
           p_admin_pass_id: string
@@ -462,6 +541,42 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_list_orders: {
+        Args: { p_admin_pass_id: string; p_admin_password: string }
+        Returns: {
+          address: string
+          character_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          customer_name: string
+          gold_earned: number
+          grand_total: number
+          id: string
+          items: Json
+          member_id: string | null
+          mission_number: string
+          notes: string | null
+          order_items: Json | null
+          pass_id: string | null
+          payment_method: string
+          phone: string
+          player_key: string
+          player_name: string | null
+          product_total: number
+          status: string
+          total_grams: number
+          total_price: number | null
+          updated_at: string
+          xp_earned: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_update_member: {
         Args: {
           p_admin_pass_id: string
@@ -502,6 +617,8 @@ export type Database = {
         Returns: {
           address: string
           character_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           customer_name: string
           gold_earned: number
@@ -575,11 +692,32 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      list_player_notifications: {
+        Args: { p_player_key: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          order_id: string | null
+          player_key: string
+          title: string
+          type: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "player_notifications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       list_player_orders: {
         Args: { p_player_key: string }
         Returns: {
           address: string
           character_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           created_at: string
           customer_name: string
           gold_earned: number
@@ -625,6 +763,10 @@ export type Database = {
           status: string
           xp: number
         }[]
+      }
+      mark_notification_read: {
+        Args: { p_id: string; p_player_key: string }
+        Returns: undefined
       }
       set_player_activity: {
         Args: { p_activity: number; p_player_key: string }
