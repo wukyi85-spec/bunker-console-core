@@ -1,50 +1,111 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { listOrders, orderStatusLabel } from "@/lib/bunker-supabase";
 import type { LoadoutItem } from "@/lib/loadout";
-import { ChevronDown, ChevronRight, ClipboardList, Package } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ClipboardList,
+  Package,
+  ExternalLink,
+  Truck,
+  CheckCircle2,
+  XCircle,
+  Clock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/mission-log")({
   head: () => ({
     meta: [
-      { title: "Mission Log — BLACK'S BUNKER" },
+      { title: "Order Details — BLACK'S BUNKER" },
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: MissionLogPage,
+  component: OrderDetailsPage,
 });
 
-function MissionLogPage() {
+type TabKey = "pending" | "being_delivered" | "completed" | "cancelled";
+
+const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { key: "pending", label: "Pending", icon: Clock },
+  { key: "being_delivered", label: "Being Delivered", icon: Truck },
+  { key: "completed", label: "Completed", icon: CheckCircle2 },
+  { key: "cancelled", label: "Cancelled", icon: XCircle },
+];
+
+function bucketOf(status: string): TabKey {
+  const s = (status || "").toLowerCase();
+  if (["cancelled", "canceled"].includes(s)) return "cancelled";
+  if (["completed", "delivered"].includes(s)) return "completed";
+  if (["processing", "packing", "shipped", "in_transit"].includes(s)) return "being_delivered";
+  return "pending"; // waiting_payment, pending, confirmed, unknown
+}
+
+function OrderDetailsPage() {
+  const [tab, setTab] = useState<TabKey>("pending");
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["orders"],
     queryFn: listOrders,
   });
 
-  const totalMissions = orders.length;
-  const totalSpent = orders.reduce((s, o) => s + Number(o.grand_total ?? 0), 0);
-  const totalGrams = orders.reduce((s, o) => s + Number(o.total_grams ?? 0), 0);
-  const totalXP = orders.reduce((s, o) => s + (o.xp_earned ?? 0), 0);
+  const counts = useMemo(() => {
+    const c: Record<TabKey, number> = { pending: 0, being_delivered: 0, completed: 0, cancelled: 0 };
+    for (const o of orders) c[bucketOf(o.status)]++;
+    return c;
+  }, [orders]);
+
+  const filtered = useMemo(
+    () => orders.filter((o) => bucketOf(o.status) === tab),
+    [orders, tab],
+  );
 
   return (
     <AppShell>
       <div className="flex h-full w-full flex-col gap-3 animate-in fade-in duration-500">
-        {/* Top stats bar */}
-        <div className="grid grid-cols-4 gap-3">
-          <StatTile label="Missions" value={String(totalMissions)} />
-          <StatTile label="Total Spent" value={`฿${totalSpent.toLocaleString()}`} />
-          <StatTile label="Total Weight" value={`${totalGrams}G`} />
-          <StatTile label="XP Earned" value={totalXP.toLocaleString()} accent />
+        {/* Tab bar */}
+        <div className="flex items-center gap-2 rounded-md border border-white/10 bg-panel-elevated/50 p-1">
+          {TABS.map((t) => {
+            const Icon = t.icon;
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={cn(
+                  "group flex flex-1 items-center justify-center gap-2 rounded-sm px-3 py-2 transition-all",
+                  active
+                    ? "border border-neon/50 bg-neon/10 text-neon shadow-[0_0_18px_-6px_var(--neon)]"
+                    : "border border-transparent text-muted-foreground hover:text-foreground hover:bg-white/[0.03]",
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                <span className="font-display text-[11px] font-bold uppercase tracking-widest">
+                  {t.label}
+                </span>
+                <span
+                  className={cn(
+                    "ml-1 rounded-full px-1.5 py-[1px] font-mono text-[9px] tabular-nums",
+                    active
+                      ? "bg-neon/20 text-neon"
+                      : "bg-white/10 text-muted-foreground",
+                  )}
+                >
+                  {counts[t.key]}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         <Panel variant="default" className="flex min-h-0 flex-1 flex-col p-4">
           <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
             <ClipboardList className="h-4 w-4 text-neon" />
             <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
-              Mission History
+              Order Details
             </span>
           </div>
 
@@ -53,41 +114,20 @@ function MissionLogPage() {
               <div className="py-10 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Loading transmissions...
               </div>
-            ) : orders.length === 0 ? (
+            ) : filtered.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
                 <ClipboardList className="mb-3 h-10 w-10 text-muted-foreground/40" />
                 <div className="font-display text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                  No Missions Yet
+                  No orders in this category
                 </div>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70">
-                  Deploy your first mission from the Supply Room
-                </p>
               </div>
             ) : (
-              orders.map((o) => <MissionRow key={o.id} order={o} />)
+              filtered.map((o) => <OrderRow key={o.id} order={o as OrderRow} />)
             )}
           </div>
         </Panel>
       </div>
     </AppShell>
-  );
-}
-
-function StatTile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="rounded-md border border-white/10 bg-panel-elevated/60 px-4 py-3">
-      <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-        {label}
-      </div>
-      <div
-        className={cn(
-          "mt-1 font-display text-2xl font-bold",
-          accent ? "text-neon" : "text-foreground",
-        )}
-      >
-        {value}
-      </div>
-    </div>
   );
 }
 
@@ -104,16 +144,19 @@ interface OrderRow {
   total_grams: number;
   product_total: number;
   grand_total: number;
+  delivery_fee?: number | null;
   status: string;
   xp_earned: number | null;
   gold_earned: number | null;
   cancellation_reason?: string | null;
+  tracking_url?: string | null;
 }
 
-function MissionRow({ order }: { order: OrderRow }) {
+function OrderRow({ order }: { order: OrderRow }) {
   const [open, setOpen] = useState(false);
   const items = Array.isArray(order.items) ? (order.items as LoadoutItem[]) : [];
   const date = new Date(order.created_at);
+  const bucket = bucketOf(order.status);
 
   return (
     <div className="rounded-md border border-white/10 bg-panel-elevated/40 transition-all">
@@ -142,20 +185,7 @@ function MissionRow({ order }: { order: OrderRow }) {
             ฿{Number(order.grand_total).toLocaleString()}
           </div>
         </div>
-        <span
-          className={cn(
-            "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest",
-            order.status?.toLowerCase() === "waiting_payment" || order.status?.toLowerCase() === "pending"
-              ? "border-amber-400/50 bg-amber-400/10 text-amber-300"
-              : order.status?.toLowerCase() === "confirmed"
-              ? "border-neon/60 bg-neon/10 text-neon"
-              : order.status?.toLowerCase() === "delivered" || order.status?.toLowerCase() === "completed"
-              ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
-              : "border-white/20 bg-background/40 text-muted-foreground",
-          )}
-        >
-          {orderStatusLabel(order.status)}
-        </span>
+        <StatusPill status={order.status} />
       </button>
 
       {open && (
@@ -168,6 +198,34 @@ function MissionRow({ order }: { order: OrderRow }) {
               <div className="mt-1 text-[12px] text-foreground">{order.cancellation_reason}</div>
             </div>
           )}
+
+          {/* Tracking */}
+          {bucket === "being_delivered" || bucket === "completed" ? (
+            <div className="mb-3 rounded-sm border border-white/10 bg-background/40 p-3">
+              <div className="flex items-center gap-2">
+                <Truck className="h-3.5 w-3.5 text-neon" />
+                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  Tracking
+                </span>
+              </div>
+              {order.tracking_url ? (
+                <a
+                  href={order.tracking_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1 inline-flex items-center gap-1.5 truncate font-mono text-[11px] text-neon hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  {order.tracking_url}
+                </a>
+              ) : (
+                <div className="mt-1 font-mono text-[10px] text-muted-foreground">
+                  Tracking information is not available yet. Please wait until your order has been handed to delivery.
+                </div>
+              )}
+            </div>
+          ) : null}
+
           <div className="grid grid-cols-[1fr_240px] gap-4">
             <div className="flex flex-col gap-1.5">
               {items.map((i, idx) => (
@@ -197,6 +255,24 @@ function MissionRow({ order }: { order: OrderRow }) {
               <Detail label="Address" value={order.address ?? "—"} />
               {order.notes && <Detail label="Notes" value={order.notes} />}
               <div className="my-1 h-px bg-white/10" />
+              <Detail
+                label="Product Total"
+                value={`฿${Number(order.product_total).toLocaleString()}`}
+              />
+              <Detail
+                label="Delivery Fee"
+                value={
+                  order.delivery_fee != null
+                    ? `฿${Number(order.delivery_fee).toLocaleString()}`
+                    : "TO BE CONFIRMED"
+                }
+              />
+              <Detail
+                label="Grand Total"
+                value={`฿${Number(order.grand_total).toLocaleString()}`}
+                accent
+              />
+              <div className="my-1 h-px bg-white/10" />
               <Detail label="XP Earned" value={`+${order.xp_earned ?? 0}`} accent />
               <Detail label="Gold Earned" value={`+${order.gold_earned ?? 0}`} accent />
             </div>
@@ -204,6 +280,28 @@ function MissionRow({ order }: { order: OrderRow }) {
         </div>
       )}
     </div>
+  );
+}
+
+function StatusPill({ status }: { status: string }) {
+  const s = status?.toLowerCase();
+  return (
+    <span
+      className={cn(
+        "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest",
+        s === "waiting_payment" || s === "pending"
+          ? "border-amber-400/50 bg-amber-400/10 text-amber-300"
+          : s === "confirmed"
+            ? "border-neon/60 bg-neon/10 text-neon"
+            : s === "delivered" || s === "completed"
+              ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
+              : s === "cancelled"
+                ? "border-red-500/60 bg-red-500/10 text-red-300"
+                : "border-white/20 bg-background/40 text-muted-foreground",
+      )}
+    >
+      {orderStatusLabel(status)}
+    </span>
   );
 }
 
