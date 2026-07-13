@@ -36,9 +36,21 @@ function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [payment, setPayment] = useState<Payment | null>(null);
+  const [saveAsDefault, setSaveAsDefault] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
+  const stats: any = statsQ.data;
+
   useEffect(() => setItems(getLoadout()), []);
+
+  // Autofill from profile when it loads (only if inputs are still empty).
+  useEffect(() => {
+    if (!stats) return;
+    setName((v) => (v ? v : stats.full_name ?? ""));
+    setPhone((v) => (v ? v : stats.phone ?? ""));
+    setAddress((v) => (v ? v : stats.default_address ?? ""));
+  }, [stats?.player_key]);
 
   const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items);
 
