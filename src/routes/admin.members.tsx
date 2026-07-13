@@ -110,6 +110,35 @@ function AdminMembersPage() {
     navigate({ to: "/login" });
   }
 
+  function isSelf(m: MemberRow) {
+    return m.pass_id.trim().toUpperCase() === currentAdminPassId;
+  }
+
+  function isLastActiveAdmin(m: MemberRow) {
+    return m.role === "admin" && m.status === "active" && activeAdminCount <= 1;
+  }
+
+  async function handleSuspend(m: MemberRow) {
+    if (isSelf(m)) {
+      toast.error("You cannot suspend your own account");
+      return;
+    }
+    if (isLastActiveAdmin(m)) {
+      toast.error("Cannot suspend the last remaining admin");
+      return;
+    }
+    setSuspendingId(m.id);
+    try {
+      await adminSuspendMember(m.id);
+      toast.success(`${m.pass_id} suspended`);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Suspend failed");
+    } finally {
+      setSuspendingId(null);
+    }
+  }
+
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
       <div className="pointer-events-none absolute inset-0 hud-grid opacity-[0.08]" />
