@@ -484,6 +484,15 @@ export type Database = {
         }
       }
       list_player_rewards: { Args: { p_player_key: string }; Returns: Json }
+      login_member: {
+        Args: { p_pass_id: string; p_password: string }
+        Returns: {
+          character_id: string
+          member_id: string
+          pass_id: string
+          player_name: string
+        }[]
+      }
       set_player_activity: {
         Args: { p_activity: number; p_player_key: string }
         Returns: undefined
