@@ -62,8 +62,8 @@ function CheckoutPage() {
       }
       navigate({ to: "/order-complete", search: { id: order.mission_number } });
     } catch (err) {
-      console.error(err);
-      toast.error("Transmission failed. Try again.");
+      console.error("[BLACK'S BUNKER] Order transmission failed:", err);
+      toast.error("ORDER TRANSMISSION FAILED");
       setSubmitting(false);
     }
   };
