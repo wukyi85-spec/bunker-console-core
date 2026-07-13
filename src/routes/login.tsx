@@ -37,22 +37,28 @@ function LoginScreen() {
     try {
       const member = await loginMember(passId.trim().toUpperCase(), password);
       if (!member) {
-        setError("Invalid Pass ID or Password.");
+        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
         setVerifying(false);
         return;
       }
+      const name = (member.playerName ?? "").trim();
+      const isFirstLogin = !name || name.toUpperCase() === "EMPTY";
       setPlayerKey(member.passId);
       setPlayerProfile({
         memberId: member.id,
         passId: member.passId,
-        playerName: member.playerName,
-        characterId: member.characterId,
-        firstLoginCompleted: true,
+        playerName: isFirstLogin ? null : member.playerName,
+        characterId: isFirstLogin ? null : member.characterId,
+        firstLoginCompleted: !isFirstLogin,
       });
+      if (isFirstLogin) {
+        navigate({ to: "/onboarding" });
+        return;
+      }
       await ensurePlayerStats();
       navigate({ to: "/dashboard" });
     } catch (err) {
-      console.error(err);
+      console.error("[BLACK'S BUNKER] login error:", err);
       setError("TRANSMISSION ERROR — TRY AGAIN");
       setVerifying(false);
     }
