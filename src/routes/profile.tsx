@@ -332,68 +332,97 @@ function ProfilePage() {
             <h2 className="mt-2 font-display text-2xl font-black uppercase tracking-widest">
               Change Player Name?
             </h2>
-            <div className="mt-3 flex items-center gap-2 rounded-sm border border-amber-400/40 bg-amber-400/10 px-3 py-2">
-              <Coins className="h-4 w-4 text-amber-300" />
-              <span className="font-mono text-[11px] uppercase tracking-widest text-amber-200">
-                Cost: 100 Gold
-              </span>
-              <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Balance: {(stats?.gold ?? 0).toLocaleString()}
-              </span>
-            </div>
+            {(() => {
+              const isFree = (stats?.name_change_count ?? 0) === 0;
+              const cost = isFree ? 0 : 100;
+              return (
+                <>
+                  <div
+                    className={cn(
+                      "mt-3 flex items-center gap-2 rounded-sm border px-3 py-2",
+                      isFree
+                        ? "border-neon/40 bg-neon/10"
+                        : "border-amber-400/40 bg-amber-400/10",
+                    )}
+                  >
+                    <Coins
+                      className={cn("h-4 w-4", isFree ? "text-neon" : "text-amber-300")}
+                    />
+                    <span
+                      className={cn(
+                        "font-mono text-[11px] uppercase tracking-widest",
+                        isFree ? "text-neon" : "text-amber-200",
+                      )}
+                    >
+                      {isFree ? "First change: FREE" : "Cost: 100 Gold"}
+                    </span>
+                    <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      Balance: {(stats?.gold ?? 0).toLocaleString()}
+                    </span>
+                  </div>
 
-            <div className="mt-4">
-              <BunkerInput
-                label="New Player Name"
-                value={newName}
-                onChange={(e) =>
-                  setNewName(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase())
-                }
-                placeholder="3–16 CHARACTERS · A–Z 0–9"
-                maxLength={16}
-                autoFocus
-              />
-              <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                Letters and numbers only. Automatically uppercase.
-              </p>
-            </div>
+                  <div className="mt-4">
+                    <BunkerInput
+                      label="New Player Name"
+                      value={newName}
+                      onChange={(e) =>
+                        setNewName(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase())
+                      }
+                      placeholder="3–16 CHARACTERS · A–Z 0–9"
+                      maxLength={16}
+                      autoFocus
+                    />
+                    <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                      Letters and numbers only. Automatically uppercase.
+                    </p>
+                  </div>
 
-            {confirmStep ? (
-              <div className="mt-4 flex gap-2">
-                <BunkerButton
-                  variant="ghost"
-                  className="flex-1"
-                  disabled={confirming}
-                  onClick={() => setConfirmStep(false)}
-                >
-                  Cancel
-                </BunkerButton>
-                <BunkerButton
-                  className="flex-1"
-                  disabled={confirming}
-                  onClick={submitChangeName}
-                >
-                  {confirming ? "Processing..." : "Confirm · Pay 100 Gold"}
-                </BunkerButton>
-              </div>
-            ) : (
-              <div className="mt-4 flex gap-2">
-                <BunkerButton
-                  variant="ghost"
-                  className="flex-1"
-                  onClick={() => setChangeOpen(false)}
-                >
-                  Cancel
-                </BunkerButton>
-                <BunkerButton
-                  className="flex-1"
-                  disabled={newName.trim().length < 3 || (stats?.gold ?? 0) < 100}
-                  onClick={() => setConfirmStep(true)}
-                >
-                  Continue
-                </BunkerButton>
-              </div>
-            )}
+                  {confirmStep ? (
+                    <div className="mt-4 flex gap-2">
+                      <BunkerButton
+                        variant="ghost"
+                        className="flex-1"
+                        disabled={confirming}
+                        onClick={() => setConfirmStep(false)}
+                      >
+                        Cancel
+                      </BunkerButton>
+                      <BunkerButton
+                        className="flex-1"
+                        disabled={confirming}
+                        onClick={submitChangeName}
+                      >
+                        {confirming
+                          ? "Processing..."
+                          : isFree
+                            ? "Confirm · FREE"
+                            : "Confirm · Pay 100 Gold"}
+                      </BunkerButton>
+                    </div>
+                  ) : (
+                    <div className="mt-4 flex gap-2">
+                      <BunkerButton
+                        variant="ghost"
+                        className="flex-1"
+                        onClick={() => setChangeOpen(false)}
+                      >
+                        Cancel
+                      </BunkerButton>
+                      <BunkerButton
+                        className="flex-1"
+                        disabled={
+                          newName.trim().length < 3 || (stats?.gold ?? 0) < cost
+                        }
+                        onClick={() => setConfirmStep(true)}
+                      >
+                        Continue
+                      </BunkerButton>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+
           </div>
         </div>
       )}
