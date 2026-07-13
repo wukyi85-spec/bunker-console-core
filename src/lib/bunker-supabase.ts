@@ -26,12 +26,13 @@ function newMissionNumber() {
 export async function loginMember(passId: string, password: string) {
   const { data, error } = await supabase
     .from("members")
-    .select("pass_id, player_name, character_id, password")
+    .select("id, pass_id, player_name, character_id, password")
     .eq("pass_id", passId)
     .maybeSingle();
   if (error) throw error;
   if (!data || data.password !== password) return null;
   return {
+    id: data.id,
     passId: data.pass_id,
     playerName: data.player_name,
     characterId: data.character_id,
@@ -50,9 +51,12 @@ export async function createOrder(p: OrderInsertPayload) {
     .insert({
       mission_number,
       player_key: playerKey,
+      member_id: profile.memberId,
+      pass_id: profile.passId,
       player_name: profile.playerName,
       character_id: profile.characterId,
       items: p.items as unknown as never,
+      order_items: p.items as unknown as never,
       customer_name: p.customer.name,
       phone: p.customer.phone,
       address: p.customer.address,
@@ -60,6 +64,7 @@ export async function createOrder(p: OrderInsertPayload) {
       payment_method: p.payment,
       total_grams: p.totalGrams,
       product_total: p.productTotal,
+      total_price: p.productTotal,
       grand_total: p.productTotal,
       status: "Processing",
       xp_earned: xp,
