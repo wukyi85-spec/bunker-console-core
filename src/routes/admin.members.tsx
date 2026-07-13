@@ -197,7 +197,7 @@ function AdminMembersPage() {
       {/* Table */}
       <main className="relative z-10 flex-1 overflow-hidden px-6 pb-6">
         <Panel className="flex h-full flex-col overflow-hidden">
-          <div className="grid grid-cols-[1.3fr_1.3fr_0.9fr_0.7fr_0.7fr_0.9fr_0.9fr_1.2fr_0.9fr] gap-3 border-b border-white/8 bg-black/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          <div className="grid grid-cols-[1.2fr_1.2fr_0.8fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr_1.6fr] gap-3 border-b border-white/8 bg-black/40 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
             <span>Pass ID</span>
             <span>Player Name</span>
             <span>Rank</span>
