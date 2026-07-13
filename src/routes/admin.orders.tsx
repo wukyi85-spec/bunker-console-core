@@ -414,9 +414,11 @@ function OrderDetailsDrawer({
   onCancel,
   onSetTracking,
   onDelete,
+  onMarkDelivered,
   confirming,
   canConfirm,
   canCancel,
+  canMarkDelivered,
 }: {
   order: AdminOrderRow;
   onClose: () => void;
@@ -424,10 +426,13 @@ function OrderDetailsDrawer({
   onCancel: () => void;
   onSetTracking: (url: string) => void;
   onDelete: () => void;
+  onMarkDelivered: () => void;
   confirming: boolean;
   canConfirm: boolean;
   canCancel: boolean;
+  canMarkDelivered: boolean;
 }) {
+
   const [trackingDraft, setTrackingDraft] = useState(order.tracking_url ?? "");
   const [showDelete, setShowDelete] = useState(false);
   useEffect(() => {
