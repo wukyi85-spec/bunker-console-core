@@ -327,10 +327,22 @@ function AdminMembersPage() {
       {editing && (
         <EditMemberDialog
           member={editing}
+          canSuspend={!isSelf(editing) && !isLastActiveAdmin(editing) && editing.status === "active"}
+          canDelete={!isSelf(editing) && !isLastActiveAdmin(editing)}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
             void refresh();
+          }}
+          onSuspend={async () => {
+            const target = editing;
+            setEditing(null);
+            await handleSuspend(target);
+          }}
+          onDelete={() => {
+            const target = editing;
+            setEditing(null);
+            setDeleting(target);
           }}
         />
       )}
@@ -339,6 +351,17 @@ function AdminMembersPage() {
         <CredentialsDialog
           creds={createdCredentials}
           onClose={() => setCreatedCredentials(null)}
+        />
+      )}
+
+      {deleting && (
+        <DeleteMemberDialog
+          member={deleting}
+          onClose={() => setDeleting(null)}
+          onDeleted={() => {
+            setDeleting(null);
+            void refresh();
+          }}
         />
       )}
     </div>
