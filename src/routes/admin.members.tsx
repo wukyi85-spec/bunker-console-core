@@ -154,6 +154,7 @@ function AdminMembersPage() {
               Admin Console
             </span>
           </div>
+          <AdminTabs active="members" />
         </div>
         <div className="flex items-center gap-2">
           <BunkerButton
