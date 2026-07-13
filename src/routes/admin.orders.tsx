@@ -379,11 +379,14 @@ function AdminOrdersPage() {
           }}
           onSetTracking={(url) => void handleSetTracking(selected.id, url)}
           onDelete={() => void handleDeleteOrder(selected.id)}
+          onMarkDelivered={() => void handleMarkDelivered(selected.id)}
           confirming={confirming === selected.id}
           canConfirm={canConfirm(selected)}
           canCancel={canCancel(selected)}
+          canMarkDelivered={canMarkDelivered(selected)}
         />
       )}
+
 
       {cancelTarget && (
         <CancelOrderDialog
