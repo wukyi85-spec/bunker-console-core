@@ -88,7 +88,7 @@ export async function createOrder(p: OrderInsertPayload) {
     gold_earned: gold,
   };
 
-  const data = await callRpc<unknown>("create_player_order", { payload });
+  const data = await callRpc<OrderRecord>("create_player_order", { payload });
 
   await bumpPlayerStats({ xp, gold, productTotal: p.productTotal, totalGrams: p.totalGrams });
   const missionRewards = await bumpMissions({
