@@ -122,3 +122,57 @@ export async function adminDeleteMember(memberId: string): Promise<void> {
     throw error;
   }
 }
+
+// ---------- ORDERS ----------
+export interface AdminOrderRow {
+  id: string;
+  mission_number: string;
+  player_key: string;
+  pass_id: string | null;
+  player_name: string | null;
+  character_id: string | null;
+  member_id: string | null;
+  items: unknown;
+  order_items: unknown;
+  customer_name: string;
+  phone: string;
+  address: string;
+  notes: string | null;
+  payment_method: string;
+  total_grams: number;
+  product_total: number;
+  total_price: number | null;
+  grand_total: number;
+  status: string;
+  xp_earned: number;
+  gold_earned: number;
+  confirmed_at: string | null;
+  confirmed_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function adminListOrders(): Promise<AdminOrderRow[]> {
+  const s = requireAdmin();
+  const { data, error } = await supabase.rpc("admin_list_orders" as never, {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+  } as never);
+  if (error) throw error;
+  return ((data ?? []) as unknown) as AdminOrderRow[];
+}
+
+export async function adminConfirmOrder(orderId: string): Promise<AdminOrderRow> {
+  const s = requireAdmin();
+  const { data, error } = await supabase.rpc("admin_confirm_order" as never, {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+    p_order_id: orderId,
+  } as never);
+  if (error) {
+    console.error("[ADMIN CONFIRM ORDER] failed:", error);
+    throw error;
+  }
+  return data as unknown as AdminOrderRow;
+}
+
