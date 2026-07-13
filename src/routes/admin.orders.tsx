@@ -190,6 +190,17 @@ function AdminOrdersPage() {
     }
   }
 
+  async function handleMarkDelivered(orderId: string) {
+    try {
+      const updated = await adminMarkOrderDelivered(orderId);
+      toast.success("Order marked as delivered");
+      await refresh();
+      if (selected?.id === orderId) setSelected(updated);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to mark delivered");
+    }
+  }
+
   function handleLogout() {
     clearAdminSession();
     navigate({ to: "/login" });
@@ -201,8 +212,13 @@ function AdminOrdersPage() {
   };
   const canCancel = (o: AdminOrderRow) => {
     const s = o.status.toLowerCase();
-    return s !== "cancelled" && s !== "completed" && s !== "delivered";
+    return s !== "cancelled" && s !== "completed";
   };
+  const canMarkDelivered = (o: AdminOrderRow) => {
+    const s = o.status.toLowerCase();
+    return !!o.tracking_url && s !== "completed" && s !== "cancelled";
+  };
+
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
