@@ -309,8 +309,6 @@ function AdminMembersPage() {
                 </div>
                 );
               })}
-                </div>
-              ))}
           </div>
         </Panel>
       </main>
