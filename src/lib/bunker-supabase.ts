@@ -24,18 +24,25 @@ function newMissionNumber() {
 
 // ---------- MEMBERS ----------
 export async function loginMember(passId: string, password: string) {
-  const { data, error } = await supabase
-    .from("members")
-    .select("id, pass_id, player_name, character_id, password")
-    .eq("pass_id", passId)
-    .maybeSingle();
-  if (error) throw error;
-  if (!data || data.password !== password) return null;
+  const { data, error } = await supabase.rpc("login_member", {
+    p_pass_id: passId.trim(),
+    p_password: password,
+  });
+  if (error) {
+    console.error("[BLACK'S BUNKER] login_member RPC error:", error);
+    throw error;
+  }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return null;
+  const r = row as Record<string, unknown>;
+  const id = (r.member_id ?? r.id) as string | undefined;
+  const pid = (r.pass_id ?? passId) as string;
+  if (!id) return null;
   return {
-    id: data.id,
-    passId: data.pass_id,
-    playerName: data.player_name,
-    characterId: data.character_id,
+    id,
+    passId: pid,
+    playerName: (r.player_name ?? null) as string | null,
+    characterId: (r.character_id ?? null) as string | null,
   };
 }
 
