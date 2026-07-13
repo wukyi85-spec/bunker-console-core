@@ -21,6 +21,8 @@ import {
   adminListOrders,
   adminConfirmOrder,
   adminCancelOrder,
+  adminSetOrderTracking,
+  adminDeleteOrder,
   type AdminOrderRow,
 } from "@/lib/admin";
 import { orderStatusLabel } from "@/lib/bunker-supabase";
