@@ -45,8 +45,8 @@ export async function loginMember(passId: string, password: string) {
 export async function createOrder(p: OrderInsertPayload) {
   const playerKey = getPlayerKey();
   const profile = getPlayerProfile();
-  const xp = Math.floor(p.productTotal / 10);
-  const gold = Math.floor(p.productTotal / 20);
+  // XP + Gold are awarded ONLY on delivery (admin_mark_order_delivered).
+  // Persist 0 here so client-side displays reflect the not-yet-earned state.
   const mission_number = newMissionNumber();
 
   const orderPayload = {
@@ -68,8 +68,8 @@ export async function createOrder(p: OrderInsertPayload) {
     total_price: p.productTotal,
     grand_total: p.productTotal,
     status: "waiting_payment",
-    xp_earned: xp,
-    gold_earned: gold,
+    xp_earned: 0,
+    gold_earned: 0,
   };
 
   const { data, error } = await supabase.rpc("create_player_order", {
@@ -80,7 +80,8 @@ export async function createOrder(p: OrderInsertPayload) {
     throw error;
   }
 
-  await bumpPlayerStats({ xp, gold, productTotal: p.productTotal, totalGrams: p.totalGrams });
+  // Progress totals + activity only. XP/Gold reserved for delivery.
+  await bumpPlayerStats({ xp: 0, gold: 0, productTotal: p.productTotal, totalGrams: p.totalGrams });
   const missionRewards = await bumpMissions({
     grams: p.totalGrams,
     thb: p.productTotal,
@@ -89,6 +90,7 @@ export async function createOrder(p: OrderInsertPayload) {
 
   return { order: data, missionRewards };
 }
+
 
 export async function listOrders() {
   const playerKey = getPlayerKey();
