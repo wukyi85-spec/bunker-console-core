@@ -100,9 +100,33 @@ export async function createOrder(p: OrderInsertPayload) {
   return { order: data, missionRewards };
 }
 
-export async function listOrders() {
+export interface OrderRecord {
+  id: string;
+  mission_number: string;
+  created_at: string;
+  items: unknown;
+  order_items?: unknown;
+  customer_name: string | null;
+  phone: string | null;
+  address: string | null;
+  notes: string | null;
+  payment_method: string;
+  total_grams: number;
+  product_total: number;
+  grand_total: number;
+  status: string;
+  xp_earned: number | null;
+  gold_earned: number | null;
+  player_key: string;
+  player_name: string | null;
+  character_id: string | null;
+}
+
+export async function listOrders(): Promise<OrderRecord[]> {
   const playerKey = getPlayerKey();
-  const data = await callRpc<unknown[]>("list_player_orders", { p_player_key: playerKey });
+  const data = await callRpc<OrderRecord[] | null>("list_player_orders", {
+    p_player_key: playerKey,
+  });
   return data ?? [];
 }
 
