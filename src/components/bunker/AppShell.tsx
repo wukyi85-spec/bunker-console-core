@@ -42,6 +42,8 @@ export function AppShell({
           <GameNav />
         </footer>
       )}
+
+      <NotificationPopup />
     </div>
   );
 }
