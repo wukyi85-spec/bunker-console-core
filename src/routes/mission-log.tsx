@@ -144,14 +144,16 @@ function MissionRow({ order }: { order: OrderRow }) {
         <span
           className={cn(
             "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest",
-            order.status === "Processing"
+            order.status?.toLowerCase() === "waiting_payment" || order.status?.toLowerCase() === "pending"
               ? "border-amber-400/50 bg-amber-400/10 text-amber-300"
-              : order.status === "Delivered"
+              : order.status?.toLowerCase() === "confirmed"
               ? "border-neon/60 bg-neon/10 text-neon"
+              : order.status?.toLowerCase() === "delivered" || order.status?.toLowerCase() === "completed"
+              ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
               : "border-white/20 bg-background/40 text-muted-foreground",
           )}
         >
-          {order.status}
+          {orderStatusLabel(order.status)}
         </span>
       </button>
 
