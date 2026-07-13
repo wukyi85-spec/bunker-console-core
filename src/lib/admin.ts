@@ -42,16 +42,36 @@ export async function adminCreateMember(input: {
   status: string;
 }): Promise<MemberRow> {
   const s = requireAdmin();
+  const cleanPassId = input.pass_id.trim().toUpperCase();
+  const cleanPassword = input.password.trim();
   const { data, error } = await supabase.rpc("admin_create_member", {
     p_admin_pass_id: s.passId,
     p_admin_password: s.password,
-    p_pass_id: input.pass_id,
-    p_password: input.password,
+    p_pass_id: cleanPassId,
+    p_password: cleanPassword,
     p_rank: input.rank,
     p_status: input.status,
   });
-  if (error) throw error;
-  return data as MemberRow;
+  if (error) {
+    console.error("[ADMIN CREATE] insert failed:", error);
+    throw error;
+  }
+  // Post-insert verification: re-query members and confirm the row exists.
+  const { data: verifyRows, error: verifyErr } = await supabase.rpc("admin_list_members", {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+  });
+  if (verifyErr) {
+    console.error("[ADMIN CREATE] verify query failed:", verifyErr);
+    throw verifyErr;
+  }
+  const found = (verifyRows as MemberRow[] | null)?.find(
+    (m) => m.pass_id === cleanPassId,
+  );
+  if (!found) {
+    throw new Error("Member insert did not persist. Please try again.");
+  }
+  return (data as MemberRow) ?? found;
 }
 
 export type MemberUpdates = Partial<

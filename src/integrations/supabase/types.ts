@@ -605,12 +605,17 @@ export type Database = {
       login_member: {
         Args: { p_pass_id: string; p_password: string }
         Returns: {
+          activity: number
           character_id: string
+          gold: number
           member_id: string
           pass_id: string
           player_name: string
+          rank: string
           role: string
+          stars: number
           status: string
+          xp: number
         }[]
       }
       set_player_activity: {
