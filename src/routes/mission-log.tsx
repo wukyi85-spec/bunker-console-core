@@ -202,7 +202,7 @@ function OrderRow({ order }: { order: OrderRow }) {
           )}
 
           {/* Tracking */}
-          {bucket === "being_delivered" || bucket === "completed" ? (
+          {bucket === "out_for_delivery" || bucket === "completed" ? (
             <div className="mb-3 rounded-sm border border-white/10 bg-background/40 p-3">
               <div className="flex items-center gap-2">
                 <Truck className="h-3.5 w-3.5 text-neon" />
@@ -214,19 +214,20 @@ function OrderRow({ order }: { order: OrderRow }) {
                 <a
                   href={order.tracking_url}
                   target="_blank"
-                  rel="noreferrer"
-                  className="mt-1 inline-flex items-center gap-1.5 truncate font-mono text-[11px] text-neon hover:underline"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-sm border border-neon/50 bg-neon/10 px-3 py-1.5 font-display text-[10px] font-black uppercase tracking-[0.3em] text-neon shadow-[0_0_18px_-6px_var(--neon)] transition-colors hover:bg-neon/20"
                 >
                   <ExternalLink className="h-3 w-3" />
-                  {order.tracking_url}
+                  Track Order
                 </a>
               ) : (
                 <div className="mt-1 font-mono text-[10px] text-muted-foreground">
-                  Tracking information is not available yet. Please wait until your order has been handed to delivery.
+                  Tracking information is not available yet. Please check again after your order is handed to delivery.
                 </div>
               )}
             </div>
           ) : null}
+
 
           <div className="grid grid-cols-[1fr_240px] gap-4">
             <div className="flex flex-col gap-1.5">
