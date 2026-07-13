@@ -153,9 +153,12 @@ export interface AdminOrderRow {
   cancellation_reason: string | null;
   tracking_url: string | null;
   delivery_fee: number | null;
+  completed_at: string | null;
+  rewards_awarded_at: string | null;
   created_at: string;
   updated_at: string;
 }
+
 
 export async function adminListOrders(): Promise<AdminOrderRow[]> {
   const s = requireAdmin();
