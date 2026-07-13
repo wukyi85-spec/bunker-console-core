@@ -28,11 +28,11 @@ export const Route = createFileRoute("/mission-log")({
   component: OrderDetailsPage,
 });
 
-type TabKey = "pending" | "being_delivered" | "completed" | "cancelled";
+type TabKey = "pending" | "out_for_delivery" | "completed" | "cancelled";
 
 const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: "pending", label: "Pending", icon: Clock },
-  { key: "being_delivered", label: "Being Delivered", icon: Truck },
+  { key: "out_for_delivery", label: "Out for Delivery", icon: Truck },
   { key: "completed", label: "Completed", icon: CheckCircle2 },
   { key: "cancelled", label: "Cancelled", icon: XCircle },
 ];
@@ -40,10 +40,11 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 function bucketOf(status: string): TabKey {
   const s = (status || "").toLowerCase();
   if (["cancelled", "canceled"].includes(s)) return "cancelled";
-  if (["completed", "delivered"].includes(s)) return "completed";
-  if (["processing", "packing", "shipped", "in_transit"].includes(s)) return "being_delivered";
-  return "pending"; // waiting_payment, pending, confirmed, unknown
+  if (["completed"].includes(s)) return "completed";
+  if (["out_for_delivery", "delivered", "shipped", "in_transit"].includes(s)) return "out_for_delivery";
+  return "pending"; // waiting_payment, pending, confirmed, processing, packing
 }
+
 
 function OrderDetailsPage() {
   const [tab, setTab] = useState<TabKey>("pending");
