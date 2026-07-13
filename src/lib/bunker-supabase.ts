@@ -220,13 +220,15 @@ export async function listMissions(): Promise<MissionWithProgress[]> {
   const playerKey = getPlayerKey();
   const [missionsRes, progressRes] = await Promise.all([
     supabase.from("missions").select("*").eq("active", true).order("display_order"),
-    supabase.from("player_missions").select("*").eq("player_key", playerKey),
+    supabase.rpc("list_player_missions", { p_player_key: playerKey }),
   ]);
   if (missionsRes.error) throw missionsRes.error;
   if (progressRes.error) throw progressRes.error;
-  const progressMap = new Map((progressRes.data ?? []).map((p) => [p.mission_id, p]));
+  const progressMap = new Map(
+    ((progressRes.data as any[]) ?? []).map((p: any) => [p.mission_id, p]),
+  );
   return (missionsRes.data ?? []).map((m) => {
-    const p = progressMap.get(m.id);
+    const p: any = progressMap.get(m.id);
     return {
       id: m.id,
       code: m.code,
@@ -245,6 +247,7 @@ export async function listMissions(): Promise<MissionWithProgress[]> {
     };
   });
 }
+
 
 async function bumpMissions(delta: { grams: number; thb: number; orders: number }) {
   const playerKey = getPlayerKey();
