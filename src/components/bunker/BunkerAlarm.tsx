@@ -41,27 +41,26 @@ const toneStyles: Record<AlarmTone, { badge: string; label: string; icon: string
 export function BunkerAlarm() {
   const [items, setItems] = useState<PlayerNotificationRow[]>([]);
   const [mountedCount, setMountedCount] = useState(0);
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
         const rows = await listPlayerNotifications();
-        if (!cancelled) setItems(rows);
+        if (!cancelled) setItems(rows.slice(0, 3));
       } catch {
         /* silent */
       }
     }
     void load();
-    const t = setInterval(load, 30_000);
+    const t = setInterval(load, 15_000);
     return () => {
       cancelled = true;
       clearInterval(t);
     };
   }, []);
 
-  const visible = expanded ? items.slice(0, 20) : items.slice(0, 3);
+  const visible = items;
 
   useEffect(() => {
     let i = 0;
