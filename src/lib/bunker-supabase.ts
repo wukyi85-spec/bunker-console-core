@@ -24,7 +24,10 @@ function newMissionNumber() {
 
 // ---------- MEMBERS ----------
 export async function loginMember(passId: string, password: string) {
-  const { data, error } = await supabase.rpc("login_member", {
+  const { data, error } = await (supabase.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: unknown }>)("login_member", {
     p_pass_id: passId.trim(),
     p_password: password,
   });
