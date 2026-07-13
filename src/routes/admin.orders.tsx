@@ -19,6 +19,7 @@ import { getAdminSession, clearAdminSession } from "@/lib/admin-session";
 import {
   adminListOrders,
   adminConfirmOrder,
+  adminCancelOrder,
   type AdminOrderRow,
 } from "@/lib/admin";
 import { orderStatusLabel } from "@/lib/bunker-supabase";
