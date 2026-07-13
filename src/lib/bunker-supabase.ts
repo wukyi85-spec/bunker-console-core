@@ -22,19 +22,27 @@ function newMissionNumber() {
   return `OP-${t}-${r}`;
 }
 
+// Loose RPC helper — bypasses generated types for our custom SECURITY DEFINER fns.
+const rpc = supabase.rpc as unknown as (
+  fn: string,
+  args?: Record<string, unknown>,
+) => Promise<{ data: unknown; error: unknown }>;
+
+async function callRpc<T = unknown>(fn: string, args?: Record<string, unknown>): Promise<T> {
+  const { data, error } = await rpc(fn, args);
+  if (error) {
+    console.error(`[BLACK'S BUNKER] ${fn} RPC error:`, error);
+    throw error;
+  }
+  return data as T;
+}
+
 // ---------- MEMBERS ----------
 export async function loginMember(passId: string, password: string) {
-  const { data, error } = await (supabase.rpc as unknown as (
-    fn: string,
-    args: Record<string, unknown>,
-  ) => Promise<{ data: unknown; error: unknown }>)("login_member", {
+  const data = await callRpc<unknown>("login_member", {
     p_pass_id: passId.trim(),
     p_password: password,
   });
-  if (error) {
-    console.error("[BLACK'S BUNKER] login_member RPC error:", error);
-    throw error;
-  }
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) return null;
   const r = row as Record<string, unknown>;
@@ -57,15 +65,15 @@ export async function createOrder(p: OrderInsertPayload) {
   const gold = Math.floor(p.productTotal / 20);
   const mission_number = newMissionNumber();
 
-  const orderPayload = {
+  const payload = {
     mission_number,
     player_key: playerKey,
-    member_id: profile.memberId,
+    member_id: profile.memberId ?? "",
     pass_id: profile.passId,
     player_name: profile.playerName,
     character_id: profile.characterId,
-    items: p.items as unknown as never,
-    order_items: p.items as unknown as never,
+    items: p.items,
+    order_items: p.items,
     customer_name: p.customer.name,
     phone: p.customer.phone,
     address: p.customer.address,
@@ -80,15 +88,7 @@ export async function createOrder(p: OrderInsertPayload) {
     gold_earned: gold,
   };
 
-  const { data, error } = await supabase
-    .from("orders")
-    .insert(orderPayload)
-    .select()
-    .single();
-  if (error) {
-    console.error("[BLACK'S BUNKER] Order insert failed:", error);
-    throw error;
-  }
+  const data = await callRpc<unknown>("create_player_order", { payload });
 
   await bumpPlayerStats({ xp, gold, productTotal: p.productTotal, totalGrams: p.totalGrams });
   const missionRewards = await bumpMissions({
@@ -102,25 +102,31 @@ export async function createOrder(p: OrderInsertPayload) {
 
 export async function listOrders() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("player_key", playerKey)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
+  const data = await callRpc<unknown[]>("list_player_orders", { p_player_key: playerKey });
   return data ?? [];
 }
 
 // ---------- PLAYER STATS ----------
-export async function getPlayerStats() {
+type PlayerStatsRow = {
+  player_key: string;
+  player_name: string | null;
+  character_id: string | null;
+  xp: number;
+  gold: number;
+  level: number;
+  activity: number;
+  current_rank: string;
+  total_purchase: number;
+  total_weight: number;
+  updated_at: string;
+};
+
+export async function getPlayerStats(): Promise<PlayerStatsRow | null> {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("player_stats")
-    .select("*")
-    .eq("player_key", playerKey)
-    .maybeSingle();
-  if (error) throw error;
-  return data;
+  const data = await callRpc<PlayerStatsRow | null>("get_player_stats", {
+    p_player_key: playerKey,
+  });
+  return data ?? null;
 }
 
 export async function ensurePlayerStats() {
@@ -128,7 +134,7 @@ export async function ensurePlayerStats() {
   const profile = getPlayerProfile();
   const existing = await getPlayerStats();
   if (existing) return existing;
-  const row = {
+  const payload = {
     player_key: playerKey,
     player_name: profile.playerName,
     character_id: profile.characterId,
@@ -140,9 +146,7 @@ export async function ensurePlayerStats() {
     total_purchase: 0,
     total_weight: 0,
   };
-  const { data, error } = await supabase.from("player_stats").upsert(row).select().single();
-  if (error) throw error;
-  return data;
+  return await callRpc<PlayerStatsRow>("upsert_player_stats", { payload });
 }
 
 async function bumpPlayerStats(delta: {
@@ -166,7 +170,7 @@ async function bumpPlayerStats(delta: {
   const ranks = await listRanks();
   const rank = ranks.find((r) => xp >= r.min_xp && (r.max_xp == null || xp <= r.max_xp));
 
-  const { error } = await supabase.from("player_stats").upsert({
+  const payload = {
     player_key: playerKey,
     player_name: profile.playerName,
     character_id: profile.characterId,
@@ -177,8 +181,8 @@ async function bumpPlayerStats(delta: {
     current_rank: rank?.name ?? "ROOKIE",
     total_purchase,
     total_weight,
-  });
-  if (error) throw error;
+  };
+  await callRpc("upsert_player_stats", { payload });
 }
 
 // Activity decay — call on dashboard mount.
@@ -191,10 +195,7 @@ export async function decayActivityIfNeeded() {
   const decay = Math.floor(hours * PROGRESSION.activityDecayPerHour);
   if (decay <= 0) return;
   const activity = Math.max(0, stats.activity - decay);
-  await supabase
-    .from("player_stats")
-    .update({ activity })
-    .eq("player_key", stats.player_key);
+  await callRpc("set_player_activity", { p_player_key: stats.player_key, p_activity: activity });
 }
 
 // ---------- RANKS ----------
@@ -227,13 +228,15 @@ export interface MissionWithProgress {
 
 export async function listMissions(): Promise<MissionWithProgress[]> {
   const playerKey = getPlayerKey();
-  const [missionsRes, progressRes] = await Promise.all([
+  const [missionsRes, progressData] = await Promise.all([
     supabase.from("missions").select("*").eq("active", true).order("display_order"),
-    supabase.from("player_missions").select("*").eq("player_key", playerKey),
+    callRpc<Array<{ mission_id: string; progress: number; completed_at: string | null; claimed_at: string | null }>>(
+      "list_player_missions",
+      { p_player_key: playerKey },
+    ),
   ]);
   if (missionsRes.error) throw missionsRes.error;
-  if (progressRes.error) throw progressRes.error;
-  const progressMap = new Map((progressRes.data ?? []).map((p) => [p.mission_id, p]));
+  const progressMap = new Map((progressData ?? []).map((p) => [p.mission_id, p]));
   return (missionsRes.data ?? []).map((m) => {
     const p = progressMap.get(m.id);
     return {
@@ -267,32 +270,29 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
     if (inc <= 0) continue;
     const nextProgress = m.progress + inc;
     const isComplete = nextProgress >= m.target_value;
-    await supabase.from("player_missions").upsert({
-      player_key: playerKey,
-      mission_id: m.id,
-      progress: Math.min(nextProgress, m.target_value),
-      completed_at: isComplete ? new Date().toISOString() : null,
+    await callRpc("upsert_player_mission", {
+      p_player_key: playerKey,
+      p_mission_id: m.id,
+      p_progress: Math.min(nextProgress, m.target_value),
+      p_completed_at: isComplete ? new Date().toISOString() : null,
     });
     if (isComplete) {
       completed.push({ ...m, progress: m.target_value, completed_at: new Date().toISOString() });
-      // Grant XP + Gold
       const current = await getPlayerStats();
       if (current) {
-        await supabase
-          .from("player_stats")
-          .update({
-            xp: current.xp + m.xp_reward,
-            gold: current.gold + m.gold_reward,
-            level: calcLevel(current.xp + m.xp_reward),
-          })
-          .eq("player_key", playerKey);
+        const newXp = current.xp + m.xp_reward;
+        await callRpc("add_player_stats_rewards", {
+          p_player_key: playerKey,
+          p_xp: m.xp_reward,
+          p_gold: m.gold_reward,
+          p_level: calcLevel(newXp),
+        });
       }
-      // Grant reward
       if (m.reward_id) {
-        await supabase.from("player_rewards").insert({
-          player_key: playerKey,
-          reward_id: m.reward_id,
-          source: m.id,
+        await callRpc("insert_player_reward", {
+          p_player_key: playerKey,
+          p_reward_id: m.reward_id,
+          p_source: m.id,
         });
       }
     }
@@ -328,19 +328,13 @@ export async function listRewardsCatalog() {
 
 export async function listPlayerRewards() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("player_rewards")
-    .select("*, reward:rewards(*)")
-    .eq("player_key", playerKey)
-    .order("earned_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []) as unknown as PlayerRewardRow[];
+  const data = await callRpc<PlayerRewardRow[] | null>("list_player_rewards", {
+    p_player_key: playerKey,
+  });
+  return (data ?? []) as PlayerRewardRow[];
 }
 
 export async function claimReward(playerRewardId: string) {
-  const { error } = await supabase
-    .from("player_rewards")
-    .update({ claimed_at: new Date().toISOString() })
-    .eq("id", playerRewardId);
-  if (error) throw error;
+  const playerKey = getPlayerKey();
+  await callRpc("claim_player_reward", { p_id: playerRewardId, p_player_key: playerKey });
 }
