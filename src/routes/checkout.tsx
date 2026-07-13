@@ -1,11 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { getLoadout, loadoutTotals, clearLoadout } from "@/lib/loadout";
-import { createOrder } from "@/lib/bunker-supabase";
+import {
+  createOrder,
+  getPlayerStats,
+  updatePlayerProfileInfo,
+} from "@/lib/bunker-supabase";
 import { cn } from "@/lib/utils";
 import { CreditCard, MapPin, Package, Phone, User } from "lucide-react";
 import { toast } from "sonner";
@@ -31,9 +36,21 @@ function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [payment, setPayment] = useState<Payment | null>(null);
+  const [saveAsDefault, setSaveAsDefault] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
+  const stats: any = statsQ.data;
+
   useEffect(() => setItems(getLoadout()), []);
+
+  // Autofill from profile when it loads (only if inputs are still empty).
+  useEffect(() => {
+    if (!stats) return;
+    setName((v) => (v ? v : stats.full_name ?? ""));
+    setPhone((v) => (v ? v : stats.phone ?? ""));
+    setAddress((v) => (v ? v : stats.default_address ?? ""));
+  }, [stats?.player_key]);
 
   const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items);
 
@@ -56,6 +73,17 @@ function CheckoutPage() {
         productTotal,
         totalGrams,
       });
+      if (saveAsDefault) {
+        try {
+          await updatePlayerProfileInfo({
+            fullName: name.trim(),
+            phone: phone.trim(),
+            defaultAddress: address.trim(),
+          });
+        } catch (e) {
+          console.warn("[BLACK'S BUNKER] Could not save default profile info", e);
+        }
+      }
       clearLoadout();
       if (missionRewards.length) {
         toast.success(`MISSION COMPLETE — ${missionRewards.map((m) => m.title).join(", ")}`);
@@ -99,6 +127,17 @@ function CheckoutPage() {
                   placeholder="DROP LOCATION"
                 />
               </div>
+              <label className="col-span-2 flex cursor-pointer items-center gap-2 rounded-sm border border-white/10 bg-background/40 px-3 py-2 hover:border-neon/40">
+                <input
+                  type="checkbox"
+                  checked={saveAsDefault}
+                  onChange={(e) => setSaveAsDefault(e.target.checked)}
+                  className="h-3.5 w-3.5 accent-neon"
+                />
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                  Save as my default delivery information
+                </span>
+              </label>
               <div className="col-span-2 flex flex-col gap-1.5">
                 <label className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
                   Optional Notes

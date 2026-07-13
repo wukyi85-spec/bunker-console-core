@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Logo } from "@/components/bunker/Logo";
 import { PlayerHUD } from "@/components/bunker/PlayerHUD";
 import { GameNav } from "@/components/bunker/GameNav";
@@ -16,7 +16,9 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
+  const navigate = useNavigate();
   return (
+    
     
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
         {/* ============ FULLSCREEN BUNKER SCENE (zoomed ~15%) ============ */}
@@ -72,7 +74,7 @@ function DashboardPage() {
           className="absolute right-4 top-4 z-20 md:right-6 md:top-5 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700"
           style={{ width: 360, gap: 20 }}
         >
-          <PlayerHUD />
+          <PlayerHUD onClick={() => navigate({ to: "/profile" })} />
           <div className="hidden sm:block">
             <BunkerAlarm />
           </div>

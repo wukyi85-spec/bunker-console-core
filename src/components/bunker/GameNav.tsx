@@ -28,7 +28,7 @@ const items: NavItem[] = [
   { to: "/missions", label: "Mission", icon: ScrollText },
   { to: "/rank", label: "Rank", icon: Trophy },
   { to: "/rewards", label: "Rewards", icon: Gift },
-  { to: "/mission-log", label: "Mission Log", icon: ClipboardList },
+  { to: "/mission-log", label: "Order Details", icon: ClipboardList },
 ];
 
 export function GameNav() {

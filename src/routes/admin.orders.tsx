@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   Package,
   Ban,
+  Truck,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/bunker/Logo";
@@ -21,6 +23,8 @@ import {
   adminListOrders,
   adminConfirmOrder,
   adminCancelOrder,
+  adminSetOrderTracking,
+  adminDeleteOrder,
   type AdminOrderRow,
 } from "@/lib/admin";
 import { orderStatusLabel } from "@/lib/bunker-supabase";
@@ -155,6 +159,31 @@ function AdminOrdersPage() {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
     } finally {
       setCancelling(false);
+    }
+  }
+
+
+  async function handleSetTracking(orderId: string, url: string) {
+    try {
+      await adminSetOrderTracking(orderId, url.trim());
+      toast.success(url.trim() ? "Tracking link saved" : "Tracking link cleared");
+      await refresh();
+      if (selected?.id === orderId) {
+        setSelected((prev) => (prev ? { ...prev, tracking_url: url.trim() || null } : prev));
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save tracking link");
+    }
+  }
+
+  async function handleDeleteOrder(orderId: string) {
+    try {
+      await adminDeleteOrder(orderId);
+      toast.success("Order deleted");
+      if (selected?.id === orderId) setSelected(null);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete order");
     }
   }
 
@@ -329,6 +358,8 @@ function AdminOrdersPage() {
             setCancelReason("");
             setCancelTarget(selected);
           }}
+          onSetTracking={(url) => void handleSetTracking(selected.id, url)}
+          onDelete={() => void handleDeleteOrder(selected.id)}
           confirming={confirming === selected.id}
           canConfirm={canConfirm(selected)}
           canCancel={canCancel(selected)}
@@ -359,6 +390,8 @@ function OrderDetailsDrawer({
   onClose,
   onConfirm,
   onCancel,
+  onSetTracking,
+  onDelete,
   confirming,
   canConfirm,
   canCancel,
@@ -367,10 +400,19 @@ function OrderDetailsDrawer({
   onClose: () => void;
   onConfirm: () => void;
   onCancel: () => void;
+  onSetTracking: (url: string) => void;
+  onDelete: () => void;
   confirming: boolean;
   canConfirm: boolean;
   canCancel: boolean;
 }) {
+  const [trackingDraft, setTrackingDraft] = useState(order.tracking_url ?? "");
+  const [showDelete, setShowDelete] = useState(false);
+  useEffect(() => {
+    setTrackingDraft(order.tracking_url ?? "");
+    setShowDelete(false);
+  }, [order.id]);
+
   const items = Array.isArray(order.items)
     ? (order.items as LoadoutItem[])
     : Array.isArray(order.order_items)
@@ -479,6 +521,38 @@ function OrderDetailsDrawer({
             )}
           </Section>
 
+          <Section title="Tracking Link">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Truck className="h-3.5 w-3.5 text-neon" />
+                <input
+                  type="url"
+                  value={trackingDraft}
+                  onChange={(e) => setTrackingDraft(e.target.value)}
+                  placeholder="https://tracking.example.com/..."
+                  className="flex-1 rounded-sm border border-white/15 bg-background/60 px-2 py-1.5 font-mono text-xs text-foreground outline-none focus:border-neon/60"
+                />
+                <BunkerButton
+                  size="sm"
+                  onClick={() => onSetTracking(trackingDraft)}
+                  disabled={trackingDraft === (order.tracking_url ?? "")}
+                >
+                  Save
+                </BunkerButton>
+              </div>
+              {order.tracking_url && (
+                <a
+                  href={order.tracking_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="truncate font-mono text-[10px] text-neon hover:underline"
+                >
+                  Open current link
+                </a>
+              )}
+            </div>
+          </Section>
+
           {order.status.toLowerCase() === "cancelled" && order.cancellation_reason && (
             <Section title="Cancellation Reason">
               <div className="rounded-sm border border-red-500/30 bg-red-500/5 p-3 text-[12px] text-foreground">
@@ -486,7 +560,38 @@ function OrderDetailsDrawer({
               </div>
             </Section>
           )}
+
+          <Section title="Danger Zone">
+            {!showDelete ? (
+              <button
+                onClick={() => setShowDelete(true)}
+                className="inline-flex items-center gap-2 self-start rounded-sm border border-red-500/40 bg-red-500/5 px-3 py-1.5 font-display text-[10px] font-black uppercase tracking-[0.3em] text-red-300 hover:bg-red-500/15"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete Test Order
+              </button>
+            ) : (
+              <div className="rounded-sm border border-red-500/40 bg-red-500/10 p-3">
+                <p className="text-[11px] text-red-200">
+                  This permanently deletes the order. Use only for test data.
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <BunkerButton variant="ghost" size="sm" onClick={() => setShowDelete(false)}>
+                    Cancel
+                  </BunkerButton>
+                  <button
+                    onClick={onDelete}
+                    className="inline-flex items-center gap-1.5 rounded-sm border border-red-500/60 bg-red-500/20 px-3 py-1.5 font-display text-[10px] font-black uppercase tracking-[0.3em] text-red-200 hover:bg-red-500/30"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Permanently Delete
+                  </button>
+                </div>
+              </div>
+            )}
+          </Section>
         </div>
+
 
         {(canConfirm || canCancel) && (
           <div className="flex gap-2 border-t border-white/10 p-4">

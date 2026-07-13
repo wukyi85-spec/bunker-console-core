@@ -130,6 +130,34 @@ export async function ensurePlayerStats() {
   return data;
 }
 
+export async function updatePlayerProfileInfo(input: {
+  fullName: string;
+  phone: string;
+  defaultAddress: string;
+}) {
+  const playerKey = getPlayerKey();
+  const { data, error } = await supabase.rpc("update_player_profile_info" as never, {
+    p_player_key: playerKey,
+    p_full_name: input.fullName,
+    p_phone: input.phone,
+    p_default_address: input.defaultAddress,
+  } as never);
+  if (error) throw error;
+  return data;
+}
+
+export async function changePlayerName(newName: string) {
+  const playerKey = getPlayerKey();
+  const profile = getPlayerProfile();
+  const { data, error } = await supabase.rpc("change_player_name" as never, {
+    p_player_key: playerKey,
+    p_new_name: newName,
+    p_member_id: profile.memberId,
+  } as never);
+  if (error) throw error;
+  return data;
+}
+
 async function bumpPlayerStats(delta: {
   xp: number;
   gold: number;
