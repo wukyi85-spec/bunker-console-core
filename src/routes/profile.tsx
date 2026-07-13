@@ -178,27 +178,20 @@ function ProfilePage() {
 
               <div className="mt-4 grid grid-cols-2 gap-2 font-mono text-[10px] uppercase tracking-widest">
                 <ReadonlyField label="Pass ID" value={profile.passId ?? "—"} />
-                <ReadonlyField
-                  label="Password"
-                  value={showPass ? "•• view disabled ••" : "••••••••"}
-                  trailing={
-                    <button
-                      onClick={() => setShowPass((v) => !v)}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label="Toggle password visibility"
-                    >
-                      {showPass ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                    </button>
-                  }
-                />
                 <ReadonlyField label="Member Since" value={memberSince} />
                 <ReadonlyField
                   label="Status"
                   value="ACTIVE"
                   valueClass="text-neon"
                 />
+                <ReadonlyField
+                  label="Gold"
+                  value={(stats?.gold ?? 0).toLocaleString()}
+                  valueClass="text-amber-300"
+                />
               </div>
             </div>
+
 
             {/* Rank / Stats */}
             <div className="flex flex-col gap-3 rounded-md border border-white/10 bg-black/40 p-3">
