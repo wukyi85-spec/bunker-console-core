@@ -121,7 +121,7 @@ function ProfilePage() {
   }
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="flex h-full w-full flex-col gap-3 overflow-y-auto animate-in fade-in duration-500">
         {/* ============ DIGITAL STONER PASS CARD ============ */}
         <Panel
