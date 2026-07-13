@@ -778,3 +778,108 @@ function NumberStepper({
     </div>
   );
 }
+
+// -------------- Delete Member Dialog --------------
+
+function DeleteMemberDialog({
+  member,
+  onClose,
+  onDeleted,
+}: {
+  member: MemberRow;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [confirmText, setConfirmText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const canDelete =
+    confirmText.trim().toUpperCase() === member.pass_id.trim().toUpperCase();
+
+  async function handleDelete() {
+    if (!canDelete) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      await adminDeleteMember(member.id);
+      toast.success(`${member.pass_id} deleted`);
+      onDeleted();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Delete failed";
+      setError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <ModalShell title="Delete Member?" onClose={onClose}>
+      <div className="flex flex-col gap-4 p-5">
+        <div className="flex items-start gap-3 rounded-md border border-red-500/40 bg-red-500/10 p-3">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+          <div>
+            <div className="font-mono text-sm uppercase tracking-[0.25em] text-red-300">
+              This action cannot be undone.
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              The member row will be permanently removed from the database. Related orders are kept.
+            </p>
+          </div>
+        </div>
+
+        <dl className="grid grid-cols-3 gap-2 rounded-md border border-white/10 bg-black/40 p-3 text-sm">
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Pass ID
+            </dt>
+            <dd className="font-mono text-neon">{member.pass_id}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Player Name
+            </dt>
+            <dd className="truncate">
+              {member.player_name ?? <em className="text-muted-foreground">— unset —</em>}
+            </dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+              Role
+            </dt>
+            <dd className="font-mono uppercase tracking-widest text-xs">{member.role}</dd>
+          </div>
+        </dl>
+
+        <BunkerInput
+          name="confirm"
+          label={`Type "${member.pass_id}" to confirm`}
+          placeholder={member.pass_id}
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          autoFocus
+        />
+
+        {error && (
+          <div className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 font-mono text-xs uppercase tracking-widest text-red-300">
+            {error}
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 pt-1">
+          <BunkerButton type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </BunkerButton>
+          <button
+            type="button"
+            onClick={() => void handleDelete()}
+            disabled={!canDelete || submitting}
+            className="inline-flex items-center gap-2 rounded-md border border-red-500/60 bg-red-500/20 px-4 py-2 font-mono text-xs uppercase tracking-[0.3em] text-red-300 transition-colors hover:border-red-400 hover:bg-red-500/30 disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            <Trash2 className="h-4 w-4" />
+            {submitting ? "Deleting…" : "Delete"}
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
