@@ -37,7 +37,7 @@ function LoginScreen() {
     try {
       const member = await loginMember(passId.trim().toUpperCase(), password);
       if (!member) {
-        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
+        setError("Invalid Pass ID or Password.");
         setVerifying(false);
         return;
       }
