@@ -26,12 +26,13 @@ function newMissionNumber() {
 export async function loginMember(passId: string, password: string) {
   const { data, error } = await supabase
     .from("members")
-    .select("pass_id, player_name, character_id, password")
+    .select("id, pass_id, player_name, character_id, password")
     .eq("pass_id", passId)
     .maybeSingle();
   if (error) throw error;
   if (!data || data.password !== password) return null;
   return {
+    id: data.id,
     passId: data.pass_id,
     playerName: data.player_name,
     characterId: data.character_id,
