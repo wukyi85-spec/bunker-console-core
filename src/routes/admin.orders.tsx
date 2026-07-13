@@ -45,9 +45,7 @@ const STATUS_FILTERS = [
   "all",
   "waiting_payment",
   "confirmed",
-  "processing",
-  "packing",
-  "delivered",
+  "out_for_delivery",
   "completed",
   "cancelled",
 ] as const;
@@ -59,13 +57,15 @@ function statusBadgeClass(status: string) {
   if (s === "waiting_payment" || s === "pending")
     return "bg-amber-500/15 text-amber-300 border-amber-400/40";
   if (s === "confirmed") return "bg-neon/15 text-neon border-neon/40";
-  if (s === "processing") return "bg-sky-500/15 text-sky-300 border-sky-400/40";
-  if (s === "packing") return "bg-indigo-500/15 text-indigo-300 border-indigo-400/40";
-  if (s === "delivered") return "bg-emerald-500/15 text-emerald-300 border-emerald-400/40";
+  if (s === "processing" || s === "packing")
+    return "bg-indigo-500/15 text-indigo-300 border-indigo-400/40";
+  if (s === "out_for_delivery" || s === "delivered")
+    return "bg-sky-500/15 text-sky-300 border-sky-400/40";
   if (s === "completed") return "bg-emerald-600/20 text-emerald-200 border-emerald-500/40";
   if (s === "cancelled") return "bg-red-500/15 text-red-400 border-red-400/40";
   return "bg-white/8 text-muted-foreground border-white/10";
 }
+
 
 function AdminOrdersPage() {
   const navigate = useNavigate();
