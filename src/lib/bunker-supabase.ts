@@ -43,36 +43,42 @@ export async function loginMember(passId: string, password: string) {
 export async function createOrder(p: OrderInsertPayload) {
   const playerKey = getPlayerKey();
   const profile = getPlayerProfile();
-  const { xp, gold } = calcRewards(p.productTotal);
+  const xp = Math.floor(p.productTotal / 10);
+  const gold = Math.floor(p.productTotal / 20);
   const mission_number = newMissionNumber();
+
+  const orderPayload = {
+    mission_number,
+    player_key: playerKey,
+    member_id: profile.memberId,
+    pass_id: profile.passId,
+    player_name: profile.playerName,
+    character_id: profile.characterId,
+    items: p.items as unknown as never,
+    order_items: p.items as unknown as never,
+    customer_name: p.customer.name,
+    phone: p.customer.phone,
+    address: p.customer.address,
+    notes: p.customer.notes ?? null,
+    payment_method: p.payment,
+    total_grams: p.totalGrams,
+    product_total: p.productTotal,
+    total_price: p.productTotal,
+    grand_total: p.productTotal,
+    status: "waiting_payment",
+    xp_earned: xp,
+    gold_earned: gold,
+  };
 
   const { data, error } = await supabase
     .from("orders")
-    .insert({
-      mission_number,
-      player_key: playerKey,
-      member_id: profile.memberId,
-      pass_id: profile.passId,
-      player_name: profile.playerName,
-      character_id: profile.characterId,
-      items: p.items as unknown as never,
-      order_items: p.items as unknown as never,
-      customer_name: p.customer.name,
-      phone: p.customer.phone,
-      address: p.customer.address,
-      notes: p.customer.notes ?? null,
-      payment_method: p.payment,
-      total_grams: p.totalGrams,
-      product_total: p.productTotal,
-      total_price: p.productTotal,
-      grand_total: p.productTotal,
-      status: "Processing",
-      xp_earned: xp,
-      gold_earned: gold,
-    })
+    .insert(orderPayload)
     .select()
     .single();
-  if (error) throw error;
+  if (error) {
+    console.error("[BLACK'S BUNKER] Order insert failed:", error);
+    throw error;
+  }
 
   await bumpPlayerStats({ xp, gold, productTotal: p.productTotal, totalGrams: p.totalGrams });
   const missionRewards = await bumpMissions({
