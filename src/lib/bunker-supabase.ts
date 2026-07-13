@@ -72,11 +72,9 @@ export async function createOrder(p: OrderInsertPayload) {
     gold_earned: gold,
   };
 
-  const { data, error } = await supabase
-    .from("orders")
-    .insert(orderPayload)
-    .select()
-    .single();
+  const { data, error } = await supabase.rpc("create_player_order", {
+    payload: orderPayload as never,
+  });
   if (error) {
     console.error("[BLACK'S BUNKER] Order insert failed:", error);
     throw error;
