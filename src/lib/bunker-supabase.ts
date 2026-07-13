@@ -104,15 +104,14 @@ export async function listOrders() {
 }
 
 // ---------- PLAYER STATS ----------
+// All player_stats reads/writes go through SECURITY DEFINER RPCs so RLS does
+// not block the pass_id-authenticated (non auth.uid) member session.
 export async function getPlayerStats() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("player_stats")
-    .select("*")
-    .eq("player_key", playerKey)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("get_player_stats", { p_player_key: playerKey });
   if (error) throw error;
-  return data;
+  const row = Array.isArray(data) ? data[0] : data;
+  return row ?? null;
 }
 
 export async function ensurePlayerStats() {
@@ -120,7 +119,7 @@ export async function ensurePlayerStats() {
   const profile = getPlayerProfile();
   const existing = await getPlayerStats();
   if (existing) return existing;
-  const row = {
+  const payload = {
     player_key: playerKey,
     player_name: profile.playerName,
     character_id: profile.characterId,
@@ -132,7 +131,7 @@ export async function ensurePlayerStats() {
     total_purchase: 0,
     total_weight: 0,
   };
-  const { data, error } = await supabase.from("player_stats").upsert(row).select().single();
+  const { data, error } = await supabase.rpc("upsert_player_stats", { payload: payload as never });
   if (error) throw error;
   return data;
 }
@@ -158,17 +157,19 @@ async function bumpPlayerStats(delta: {
   const ranks = await listRanks();
   const rank = ranks.find((r) => xp >= r.min_xp && (r.max_xp == null || xp <= r.max_xp));
 
-  const { error } = await supabase.from("player_stats").upsert({
-    player_key: playerKey,
-    player_name: profile.playerName,
-    character_id: profile.characterId,
-    xp,
-    gold,
-    level,
-    activity,
-    current_rank: rank?.name ?? "ROOKIE",
-    total_purchase,
-    total_weight,
+  const { error } = await supabase.rpc("upsert_player_stats", {
+    payload: {
+      player_key: playerKey,
+      player_name: profile.playerName,
+      character_id: profile.characterId,
+      xp,
+      gold,
+      level,
+      activity,
+      current_rank: rank?.name ?? "ROOKIE",
+      total_purchase,
+      total_weight,
+    } as never,
   });
   if (error) throw error;
 }
@@ -183,10 +184,10 @@ export async function decayActivityIfNeeded() {
   const decay = Math.floor(hours * PROGRESSION.activityDecayPerHour);
   if (decay <= 0) return;
   const activity = Math.max(0, stats.activity - decay);
-  await supabase
-    .from("player_stats")
-    .update({ activity })
-    .eq("player_key", stats.player_key);
+  await supabase.rpc("set_player_activity", {
+    p_player_key: stats.player_key,
+    p_activity: activity,
+  });
 }
 
 // ---------- RANKS ----------
