@@ -16,31 +16,55 @@ export type Database = {
     Tables: {
       members: {
         Row: {
+          activity: number
           character_id: string | null
           created_at: string
+          gold: number
           id: string
           pass_id: string
           password: string
-          player_name: string
+          player_name: string | null
+          rank: string
+          role: string
+          stars: number
+          status: string
+          total_purchase: number
           updated_at: string
+          xp: number
         }
         Insert: {
+          activity?: number
           character_id?: string | null
           created_at?: string
+          gold?: number
           id?: string
           pass_id: string
           password: string
-          player_name: string
+          player_name?: string | null
+          rank?: string
+          role?: string
+          stars?: number
+          status?: string
+          total_purchase?: number
           updated_at?: string
+          xp?: number
         }
         Update: {
+          activity?: number
           character_id?: string | null
           created_at?: string
+          gold?: number
           id?: string
           pass_id?: string
           password?: string
-          player_name?: string
+          player_name?: string | null
+          rank?: string
+          role?: string
+          stars?: number
+          status?: string
+          total_purchase?: number
           updated_at?: string
+          xp?: number
         }
         Relationships: []
       }
@@ -367,6 +391,96 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_create_member: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_pass_id: string
+          p_password: string
+          p_rank: string
+          p_status: string
+        }
+        Returns: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          gold: number
+          id: string
+          pass_id: string
+          password: string
+          player_name: string | null
+          rank: string
+          role: string
+          stars: number
+          status: string
+          total_purchase: number
+          updated_at: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_list_members: {
+        Args: { p_admin_pass_id: string; p_admin_password: string }
+        Returns: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          gold: number
+          id: string
+          pass_id: string
+          password: string
+          player_name: string | null
+          rank: string
+          role: string
+          stars: number
+          status: string
+          total_purchase: number
+          updated_at: string
+          xp: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "members"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_update_member: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_member_id: string
+          p_updates: Json
+        }
+        Returns: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          gold: number
+          id: string
+          pass_id: string
+          password: string
+          player_name: string | null
+          rank: string
+          role: string
+          stars: number
+          status: string
+          total_purchase: number
+          updated_at: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       claim_player_reward: {
         Args: { p_id: string; p_player_key: string }
         Returns: undefined
@@ -491,6 +605,8 @@ export type Database = {
           member_id: string
           pass_id: string
           player_name: string
+          role: string
+          status: string
         }[]
       }
       set_player_activity: {
@@ -528,6 +644,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      verify_admin: {
+        Args: { p_pass_id: string; p_password: string }
+        Returns: boolean
       }
     }
     Enums: {
