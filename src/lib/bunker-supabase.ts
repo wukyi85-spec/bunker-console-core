@@ -266,7 +266,7 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
       p_player_key: playerKey,
       p_mission_id: m.id,
       p_progress: Math.min(nextProgress, m.target_value),
-      p_completed_at: completedAt,
+      p_completed_at: completedAt as unknown as string,
     });
     if (isComplete) {
       completed.push({ ...m, progress: m.target_value, completed_at: new Date().toISOString() });
