@@ -261,11 +261,12 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
     if (inc <= 0) continue;
     const nextProgress = m.progress + inc;
     const isComplete = nextProgress >= m.target_value;
-    await supabase.from("player_missions").upsert({
-      player_key: playerKey,
-      mission_id: m.id,
-      progress: Math.min(nextProgress, m.target_value),
-      completed_at: isComplete ? new Date().toISOString() : null,
+    const completedAt = isComplete ? new Date().toISOString() : null;
+    await supabase.rpc("upsert_player_mission", {
+      p_player_key: playerKey,
+      p_mission_id: m.id,
+      p_progress: Math.min(nextProgress, m.target_value),
+      p_completed_at: completedAt,
     });
     if (isComplete) {
       completed.push({ ...m, progress: m.target_value, completed_at: new Date().toISOString() });
@@ -281,10 +282,10 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
       }
       // Grant reward
       if (m.reward_id) {
-        await supabase.from("player_rewards").insert({
-          player_key: playerKey,
-          reward_id: m.reward_id,
-          source: m.id,
+        await supabase.rpc("insert_player_reward", {
+          p_player_key: playerKey,
+          p_reward_id: m.reward_id,
+          p_source: m.id,
         });
       }
     }
