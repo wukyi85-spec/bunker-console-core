@@ -43,6 +43,8 @@ function LoginScreen() {
       }
       setPlayerKey(member.passId);
       setPlayerProfile({
+        memberId: member.id,
+        passId: member.passId,
         playerName: member.playerName,
         characterId: member.characterId,
         firstLoginCompleted: true,
