@@ -541,3 +541,90 @@ function Detail({ label, value, accent }: { label: string; value: string; accent
     </div>
   );
 }
+
+function CancelOrderDialog({
+  order,
+  reason,
+  onReasonChange,
+  onClose,
+  onConfirm,
+  submitting,
+}: {
+  order: AdminOrderRow;
+  reason: string;
+  onReasonChange: (v: string) => void;
+  onClose: () => void;
+  onConfirm: () => void;
+  submitting: boolean;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
+      <div
+        className="relative w-full max-w-md rounded-md border-2 border-red-500/50 bg-panel p-6 shadow-2xl animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          disabled={submitting}
+          aria-label="Close"
+          className="absolute right-3 top-3 rounded-sm p-1.5 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-red-500/60 bg-red-500/10">
+            <Ban className="h-5 w-5 text-red-400" />
+          </div>
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-red-400">
+              // Cancel Order
+            </div>
+            <div className="font-display text-lg font-black uppercase tracking-widest text-foreground">
+              {order.mission_number}
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-4 text-sm text-muted-foreground">
+          Provide a cancellation reason. The member will receive a notification with this reason.
+        </p>
+
+        <label className="mt-4 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          Reason
+        </label>
+        <textarea
+          value={reason}
+          onChange={(e) => onReasonChange(e.target.value)}
+          rows={3}
+          disabled={submitting}
+          placeholder="e.g. Out of stock. Please contact support."
+          className="mt-1 w-full resize-none rounded-sm border border-white/15 bg-background/60 p-2 text-sm text-foreground outline-none transition-colors focus:border-red-500/60"
+        />
+
+        <div className="mt-5 flex gap-2">
+          <BunkerButton
+            variant="ghost"
+            className="flex-1"
+            onClick={onClose}
+            disabled={submitting}
+          >
+            Back
+          </BunkerButton>
+          <button
+            onClick={onConfirm}
+            disabled={submitting || reason.trim().length === 0}
+            className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/60 bg-red-500/15 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/25 disabled:opacity-40"
+          >
+            <Ban className="h-4 w-4" />
+            {submitting ? "Cancelling…" : "Confirm Cancel"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
