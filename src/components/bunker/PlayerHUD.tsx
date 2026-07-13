@@ -59,7 +59,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
       </span>
 
-      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-neon/40 bg-panel-elevated">
+      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neon/50 bg-panel-elevated shadow-[0_0_18px_-4px_var(--neon)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,color-mix(in_oklab,var(--neon)_25%,transparent),transparent_70%)]" />
         <svg viewBox="0 0 64 64" className="relative h-full w-full">
           <defs>
