@@ -23,7 +23,7 @@ function MissionsPage() {
   const special = missions.filter((m) => m.mission_type !== "weekly");
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-2 gap-4 animate-in fade-in duration-500">
         <MissionColumn title="Weekly Missions" icon={<Target className="h-4 w-4 text-neon" />} missions={weekly} />
         <MissionColumn title="Special Missions" icon={<Trophy className="h-4 w-4 text-neon" />} missions={special} />
