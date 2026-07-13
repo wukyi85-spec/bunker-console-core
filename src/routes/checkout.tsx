@@ -1,11 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { getLoadout, loadoutTotals, clearLoadout } from "@/lib/loadout";
-import { createOrder } from "@/lib/bunker-supabase";
+import {
+  createOrder,
+  getPlayerStats,
+  updatePlayerProfileInfo,
+} from "@/lib/bunker-supabase";
 import { cn } from "@/lib/utils";
 import { CreditCard, MapPin, Package, Phone, User } from "lucide-react";
 import { toast } from "sonner";
