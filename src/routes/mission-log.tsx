@@ -54,10 +54,11 @@ function OrderDetailsPage() {
   });
 
   const counts = useMemo(() => {
-    const c: Record<TabKey, number> = { pending: 0, being_delivered: 0, completed: 0, cancelled: 0 };
+    const c: Record<TabKey, number> = { pending: 0, out_for_delivery: 0, completed: 0, cancelled: 0 };
     for (const o of orders) c[bucketOf(o.status)]++;
     return c;
   }, [orders]);
+
 
   const filtered = useMemo(
     () => orders.filter((o) => bucketOf(o.status) === tab),
