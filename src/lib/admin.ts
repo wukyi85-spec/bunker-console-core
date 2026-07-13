@@ -148,6 +148,9 @@ export interface AdminOrderRow {
   gold_earned: number;
   confirmed_at: string | null;
   confirmed_by: string | null;
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  cancellation_reason: string | null;
   created_at: string;
   updated_at: string;
 }
