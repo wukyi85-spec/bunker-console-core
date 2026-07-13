@@ -36,10 +36,22 @@ function LoginScreen() {
     setVerifying(true);
     setError(null);
     try {
-      const trimmedPassId = passId.trim().toUpperCase();
-      const member = await loginMember(trimmedPassId, password);
+      const normalizedPassId = passId.trim().toUpperCase();
+      const normalizedPassword = password.trim();
+      const member = await loginMember(normalizedPassId, normalizedPassword);
+      console.log("[LOGIN] pass_id:", normalizedPassId, "found:", !!member, "role:", member?.role, "status:", member?.status);
       if (!member) {
-        setError("Invalid Pass ID or Password.");
+        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
+        setVerifying(false);
+        return;
+      }
+      if (member.status === "suspended") {
+        setError("ACCESS SUSPENDED");
+        setVerifying(false);
+        return;
+      }
+      if (member.status !== "active") {
+        setError("ACCESS DENIED — INVALID PASS ID OR PASSWORD");
         setVerifying(false);
         return;
       }
@@ -52,15 +64,19 @@ function LoginScreen() {
         firstLoginCompleted: true,
       });
       if (member.role === "admin") {
-        setAdminSession({ passId: trimmedPassId, password });
+        setAdminSession({ passId: normalizedPassId, password: normalizedPassword });
         navigate({ to: "/admin/members" });
         return;
       }
       clearAdminSession();
       await ensurePlayerStats();
+      if (!member.playerName || !member.characterId) {
+        navigate({ to: "/onboarding" });
+        return;
+      }
       navigate({ to: "/dashboard" });
     } catch (err) {
-      console.error(err);
+      console.error("[LOGIN] error:", err);
       setError("TRANSMISSION ERROR — TRY AGAIN");
       setVerifying(false);
     }
