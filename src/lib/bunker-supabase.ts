@@ -330,3 +330,49 @@ export async function claimReward(playerRewardId: string) {
   });
   if (error) throw error;
 }
+
+// ---------- NOTIFICATIONS ----------
+export interface PlayerNotificationRow {
+  id: string;
+  player_key: string;
+  type: string;
+  title: string;
+  message: string;
+  order_id: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export async function listPlayerNotifications(): Promise<PlayerNotificationRow[]> {
+  const playerKey = getPlayerKey();
+  const { data, error } = await supabase.rpc("list_player_notifications" as never, {
+    p_player_key: playerKey,
+  } as never);
+  if (error) throw error;
+  return ((data ?? []) as unknown) as PlayerNotificationRow[];
+}
+
+export async function markNotificationRead(id: string) {
+  const playerKey = getPlayerKey();
+  const { error } = await supabase.rpc("mark_notification_read" as never, {
+    p_id: id,
+    p_player_key: playerKey,
+  } as never);
+  if (error) throw error;
+}
+
+// ---------- STATUS LABELS ----------
+export function orderStatusLabel(status: string): string {
+  const map: Record<string, string> = {
+    waiting_payment: "WAITING PAYMENT",
+    pending: "WAITING PAYMENT",
+    confirmed: "CONFIRMED",
+    processing: "PROCESSING",
+    packing: "PACKING",
+    delivered: "DELIVERED",
+    completed: "COMPLETED",
+    cancelled: "CANCELLED",
+  };
+  return map[status?.toLowerCase?.()] ?? (status || "").toUpperCase();
+}
+

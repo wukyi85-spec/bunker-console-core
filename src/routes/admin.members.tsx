@@ -31,6 +31,7 @@ import {
   type MemberUpdates,
 } from "@/lib/admin";
 import { cn } from "@/lib/utils";
+import { AdminTabs } from "@/components/bunker/AdminTabs";
 
 export const Route = createFileRoute("/admin/members")({
   head: () => ({
@@ -154,6 +155,7 @@ function AdminMembersPage() {
               Admin Console
             </span>
           </div>
+          <AdminTabs active="members" />
         </div>
         <div className="flex items-center gap-2">
           <BunkerButton
