@@ -92,13 +92,9 @@ export async function createOrder(p: OrderInsertPayload) {
 
 export async function listOrders() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("player_key", playerKey)
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.rpc("list_player_orders", { p_player_key: playerKey });
   if (error) throw error;
-  return data ?? [];
+  return (data as any[]) ?? [];
 }
 
 // ---------- PLAYER STATS ----------
