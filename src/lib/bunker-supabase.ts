@@ -24,18 +24,20 @@ function newMissionNumber() {
 
 // ---------- MEMBERS ----------
 export async function loginMember(passId: string, password: string) {
-  const { data, error } = await supabase
-    .from("members")
-    .select("id, pass_id, player_name, character_id, password")
-    .eq("pass_id", passId)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("login_member", {
+    p_pass_id: passId,
+    p_password: password,
+  });
   if (error) throw error;
-  if (!data || data.password !== password) return null;
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return null;
   return {
-    id: data.id,
-    passId: data.pass_id,
-    playerName: data.player_name,
-    characterId: data.character_id,
+    id: row.member_id as string,
+    passId: row.pass_id as string,
+    playerName: (row.player_name as string | null) ?? null,
+    characterId: (row.character_id as string | null) ?? null,
+    role: (row.role as string) ?? "member",
+    status: (row.status as string) ?? "active",
   };
 }
 
