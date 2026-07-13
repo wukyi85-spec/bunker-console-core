@@ -16,7 +16,9 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
+  const navigate = useNavigate();
   return (
+    
     
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
         {/* ============ FULLSCREEN BUNKER SCENE (zoomed ~15%) ============ */}
