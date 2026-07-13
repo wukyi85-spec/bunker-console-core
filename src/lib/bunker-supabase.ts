@@ -321,19 +321,16 @@ export async function listRewardsCatalog() {
 
 export async function listPlayerRewards() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("player_rewards")
-    .select("*, reward:rewards(*)")
-    .eq("player_key", playerKey)
-    .order("earned_at", { ascending: false });
+  const { data, error } = await supabase.rpc("list_player_rewards", { p_player_key: playerKey });
   if (error) throw error;
-  return (data ?? []) as unknown as PlayerRewardRow[];
+  return ((data as unknown as PlayerRewardRow[]) ?? []);
 }
 
 export async function claimReward(playerRewardId: string) {
-  const { error } = await supabase
-    .from("player_rewards")
-    .update({ claimed_at: new Date().toISOString() })
-    .eq("id", playerRewardId);
+  const playerKey = getPlayerKey();
+  const { error } = await supabase.rpc("claim_player_reward", {
+    p_id: playerRewardId,
+    p_player_key: playerKey,
+  });
   if (error) throw error;
 }
