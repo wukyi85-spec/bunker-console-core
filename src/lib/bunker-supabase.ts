@@ -92,13 +92,9 @@ export async function createOrder(p: OrderInsertPayload) {
 
 export async function listOrders() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("player_key", playerKey)
-    .order("created_at", { ascending: false });
+  const { data, error } = await supabase.rpc("list_player_orders", { p_player_key: playerKey });
   if (error) throw error;
-  return data ?? [];
+  return (data as any[]) ?? [];
 }
 
 // ---------- PLAYER STATS ----------
@@ -220,13 +216,15 @@ export async function listMissions(): Promise<MissionWithProgress[]> {
   const playerKey = getPlayerKey();
   const [missionsRes, progressRes] = await Promise.all([
     supabase.from("missions").select("*").eq("active", true).order("display_order"),
-    supabase.from("player_missions").select("*").eq("player_key", playerKey),
+    supabase.rpc("list_player_missions", { p_player_key: playerKey }),
   ]);
   if (missionsRes.error) throw missionsRes.error;
   if (progressRes.error) throw progressRes.error;
-  const progressMap = new Map((progressRes.data ?? []).map((p) => [p.mission_id, p]));
+  const progressMap = new Map(
+    ((progressRes.data as any[]) ?? []).map((p: any) => [p.mission_id, p]),
+  );
   return (missionsRes.data ?? []).map((m) => {
-    const p = progressMap.get(m.id);
+    const p: any = progressMap.get(m.id);
     return {
       id: m.id,
       code: m.code,
@@ -246,6 +244,7 @@ export async function listMissions(): Promise<MissionWithProgress[]> {
   });
 }
 
+
 async function bumpMissions(delta: { grams: number; thb: number; orders: number }) {
   const playerKey = getPlayerKey();
   const missions = await listMissions();
@@ -258,11 +257,12 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
     if (inc <= 0) continue;
     const nextProgress = m.progress + inc;
     const isComplete = nextProgress >= m.target_value;
-    await supabase.from("player_missions").upsert({
-      player_key: playerKey,
-      mission_id: m.id,
-      progress: Math.min(nextProgress, m.target_value),
-      completed_at: isComplete ? new Date().toISOString() : null,
+    const completedAt = isComplete ? new Date().toISOString() : null;
+    await supabase.rpc("upsert_player_mission", {
+      p_player_key: playerKey,
+      p_mission_id: m.id,
+      p_progress: Math.min(nextProgress, m.target_value),
+      p_completed_at: completedAt as unknown as string,
     });
     if (isComplete) {
       completed.push({ ...m, progress: m.target_value, completed_at: new Date().toISOString() });
@@ -278,10 +278,10 @@ async function bumpMissions(delta: { grams: number; thb: number; orders: number 
       }
       // Grant reward
       if (m.reward_id) {
-        await supabase.from("player_rewards").insert({
-          player_key: playerKey,
-          reward_id: m.reward_id,
-          source: m.id,
+        await supabase.rpc("insert_player_reward", {
+          p_player_key: playerKey,
+          p_reward_id: m.reward_id,
+          p_source: m.id,
         });
       }
     }
@@ -317,19 +317,16 @@ export async function listRewardsCatalog() {
 
 export async function listPlayerRewards() {
   const playerKey = getPlayerKey();
-  const { data, error } = await supabase
-    .from("player_rewards")
-    .select("*, reward:rewards(*)")
-    .eq("player_key", playerKey)
-    .order("earned_at", { ascending: false });
+  const { data, error } = await supabase.rpc("list_player_rewards", { p_player_key: playerKey });
   if (error) throw error;
-  return (data ?? []) as unknown as PlayerRewardRow[];
+  return ((data as unknown as PlayerRewardRow[]) ?? []);
 }
 
 export async function claimReward(playerRewardId: string) {
-  const { error } = await supabase
-    .from("player_rewards")
-    .update({ claimed_at: new Date().toISOString() })
-    .eq("id", playerRewardId);
+  const playerKey = getPlayerKey();
+  const { error } = await supabase.rpc("claim_player_reward", {
+    p_id: playerRewardId,
+    p_player_key: playerKey,
+  });
   if (error) throw error;
 }
