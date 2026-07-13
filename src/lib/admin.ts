@@ -221,5 +221,20 @@ export async function adminDeleteOrder(orderId: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function adminMarkOrderDelivered(orderId: string): Promise<AdminOrderRow> {
+  const s = requireAdmin();
+  const { data, error } = await supabase.rpc("admin_mark_order_delivered" as never, {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+    p_order_id: orderId,
+  } as never);
+  if (error) {
+    console.error("[ADMIN MARK DELIVERED] failed:", error);
+    throw error;
+  }
+  return data as unknown as AdminOrderRow;
+}
+
+
 
 
