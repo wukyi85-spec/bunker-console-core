@@ -21,6 +21,7 @@ import { Route as LoadoutRouteImport } from './routes/loadout'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminMembersRouteImport } from './routes/admin.members'
 
 const SupplyRoute = SupplyRouteImport.update({
   id: '/supply',
@@ -82,6 +83,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMembersRoute = AdminMembersRouteImport.update({
+  id: '/admin/members',
+  path: '/admin/members',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/rank': typeof RankRoute
   '/rewards': typeof RewardsRoute
   '/supply': typeof SupplyRoute
+  '/admin/members': typeof AdminMembersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/rank': typeof RankRoute
   '/rewards': typeof RewardsRoute
   '/supply': typeof SupplyRoute
+  '/admin/members': typeof AdminMembersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/rank': typeof RankRoute
   '/rewards': typeof RewardsRoute
   '/supply': typeof SupplyRoute
+  '/admin/members': typeof AdminMembersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/rank'
     | '/rewards'
     | '/supply'
+    | '/admin/members'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/rank'
     | '/rewards'
     | '/supply'
+    | '/admin/members'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/rank'
     | '/rewards'
     | '/supply'
+    | '/admin/members'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   RankRoute: typeof RankRoute
   RewardsRoute: typeof RewardsRoute
   SupplyRoute: typeof SupplyRoute
+  AdminMembersRoute: typeof AdminMembersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/admin/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   RankRoute: RankRoute,
   RewardsRoute: RewardsRoute,
   SupplyRoute: SupplyRoute,
+  AdminMembersRoute: AdminMembersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
