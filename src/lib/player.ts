@@ -4,12 +4,16 @@
 const STORAGE_KEY = "bunker.player";
 
 export interface PlayerProfile {
+  memberId: string | null;
+  passId: string | null;
   characterId: string | null;
   playerName: string | null;
   firstLoginCompleted: boolean;
 }
 
 const DEFAULT_PROFILE: PlayerProfile = {
+  memberId: null,
+  passId: null,
   characterId: null,
   playerName: null,
   firstLoginCompleted: false,

@@ -1,36 +1,44 @@
 import { useEffect, useState } from "react";
 import { Shield, Zap, Coins, Star, Radio } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { getPlayerStats } from "@/lib/bunker-supabase";
+import { getPlayerProfile } from "@/lib/player";
+import { levelProgress } from "@/lib/progression";
 
 interface PlayerHUDProps {
   onClick?: () => void;
   className?: string;
 }
 
-/**
- * Premium top-right game HUD.
- * Layered glass panel with portrait, rank, level, XP, activity, gold, stars,
- * clock and online status. Clickable — wire to Player Room later.
- */
 export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   const [time, setTime] = useState(() => formatTime(new Date()));
-
   useEffect(() => {
     const t = setInterval(() => setTime(formatTime(new Date())), 15_000);
     return () => clearInterval(t);
   }, []);
 
-  // Placeholder values — swap with Supabase member row later.
+  const statsQ = useQuery({
+    queryKey: ["player_stats"],
+    queryFn: getPlayerStats,
+    refetchOnWindowFocus: true,
+    refetchInterval: 8000,
+  });
+  const stats = statsQ.data;
+  const profile = getPlayerProfile();
+
   const player = {
-    name: "BLACK",
-    rank: "OPERATIVE",
-    level: 18,
-    xp: 72,
-    activity: 88,
-    gold: 2450,
-    stars: 4,
+    name: profile.playerName ?? "OPERATOR",
+    rank: (stats?.current_rank ?? "ROOKIE").toUpperCase(),
+    level: stats?.level ?? 1,
+    xp: stats ? levelProgress(stats.xp) : 0,
+    activity: stats?.activity ?? 0,
+    gold: stats?.gold ?? 0,
+    stars: Math.min(5, Math.floor((stats?.level ?? 1) / 4)),
     status: "ONLINE" as const,
   };
+
+  const goldDisplay = useCountUp(player.gold);
 
   return (
     <button
@@ -46,15 +54,11 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
       )}
       aria-label="Open Player Room"
     >
-      {/* Soft top glass highlight */}
       <span className="pointer-events-none absolute inset-x-3 top-0 h-px rounded-md bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-      {/* Sweep highlight on hover */}
       <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-md">
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
       </span>
 
-      {/* Portrait */}
       <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-neon/40 bg-panel-elevated">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,color-mix(in_oklab,var(--neon)_25%,transparent),transparent_70%)]" />
         <svg viewBox="0 0 64 64" className="relative h-full w-full">
@@ -67,20 +71,16 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
           <circle cx="32" cy="24" r="10" fill="url(#hud-p)" />
           <path d="M12 60 C 14 44, 50 44, 52 60 Z" fill="url(#hud-p)" />
         </svg>
-        {/* Rank badge */}
         <span className="absolute -bottom-1 -right-1 rounded-sm border border-background bg-neon px-1 py-[1px] font-mono text-[9px] font-bold text-background shadow-[0_0_8px_-1px_var(--neon)]">
           {String(player.level).padStart(2, "0")}
         </span>
-        {/* Corner tick */}
         <span className="absolute left-0 top-0 h-2 w-2 border-l border-t border-neon" />
         <span className="absolute bottom-0 right-0 h-2 w-2 border-r border-b border-neon" />
       </div>
 
-      {/* Info */}
       <div className="flex min-w-0 flex-col justify-between gap-1.5">
-        {/* Row 1 — name / status */}
         <div className="flex items-center gap-2">
-          <span className="font-display text-sm font-black uppercase tracking-[0.18em] text-foreground">
+          <span className="truncate font-display text-sm font-black uppercase tracking-[0.18em] text-foreground">
             {player.name}
           </span>
           <span className="flex items-center gap-1 rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-neon">
@@ -92,7 +92,6 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
           </span>
         </div>
 
-        {/* Row 2 — rank / level */}
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
           <Shield className="h-3 w-3 text-neon" />
           <span className="text-foreground/80">{player.rank}</span>
@@ -101,16 +100,13 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
           <span className="text-foreground/80">LV {player.level}</span>
         </div>
 
-        {/* Row 3 — XP */}
         <MiniBar label="XP" value={player.xp} tone="neon" />
-        {/* Row 4 — Activity */}
         <MiniBar label="ACT" value={player.activity} tone="dim" />
 
-        {/* Row 5 — gold / stars */}
         <div className="flex items-center gap-3 pt-0.5">
           <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground">
             <Coins className="h-3 w-3 text-neon" />
-            {player.gold.toLocaleString()}
+            <span className="tabular-nums transition-all">{goldDisplay.toLocaleString()}</span>
           </span>
           <span className="flex items-center gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -135,15 +131,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   );
 }
 
-function MiniBar({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "neon" | "dim";
-}) {
+function MiniBar({ label, value, tone }: { label: string; value: number; tone: "neon" | "dim" }) {
   const pct = Math.max(0, Math.min(100, value));
   return (
     <div className="flex items-center gap-2">
@@ -153,7 +141,7 @@ function MiniBar({
       <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40">
         <div
           className={cn(
-            "h-full transition-[width] duration-700 ease-out",
+            "h-full transition-[width] duration-1000 ease-out",
             tone === "neon"
               ? "bg-gradient-to-r from-neon-dim via-neon to-neon shadow-[0_0_8px_-1px_var(--neon)]"
               : "bg-gradient-to-r from-muted-foreground/40 via-muted-foreground/70 to-neon-dim",
@@ -166,6 +154,27 @@ function MiniBar({
       </span>
     </div>
   );
+}
+
+function useCountUp(target: number, duration = 800) {
+  const [value, setValue] = useState(target);
+  useEffect(() => {
+    const start = value;
+    const delta = target - start;
+    if (delta === 0) return;
+    const startAt = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startAt) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(start + delta * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
+  return value;
 }
 
 function formatTime(d: Date) {

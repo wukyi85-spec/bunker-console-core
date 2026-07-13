@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupplyRouteImport } from './routes/supply'
+import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as RankRouteImport } from './routes/rank'
 import { Route as OrderCompleteRouteImport } from './routes/order-complete'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as MissionLogRouteImport } from './routes/mission-log'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LoadoutRouteImport } from './routes/loadout'
@@ -23,6 +25,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SupplyRoute = SupplyRouteImport.update({
   id: '/supply',
   path: '/supply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RewardsRoute = RewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RankRoute = RankRouteImport.update({
@@ -38,6 +45,11 @@ const OrderCompleteRoute = OrderCompleteRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissionsRoute = MissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MissionLogRoute = MissionLogRouteImport.update({
@@ -78,9 +90,11 @@ export interface FileRoutesByFullPath {
   '/loadout': typeof LoadoutRoute
   '/login': typeof LoginRoute
   '/mission-log': typeof MissionLogRoute
+  '/missions': typeof MissionsRoute
   '/onboarding': typeof OnboardingRoute
   '/order-complete': typeof OrderCompleteRoute
   '/rank': typeof RankRoute
+  '/rewards': typeof RewardsRoute
   '/supply': typeof SupplyRoute
 }
 export interface FileRoutesByTo {
@@ -90,9 +104,11 @@ export interface FileRoutesByTo {
   '/loadout': typeof LoadoutRoute
   '/login': typeof LoginRoute
   '/mission-log': typeof MissionLogRoute
+  '/missions': typeof MissionsRoute
   '/onboarding': typeof OnboardingRoute
   '/order-complete': typeof OrderCompleteRoute
   '/rank': typeof RankRoute
+  '/rewards': typeof RewardsRoute
   '/supply': typeof SupplyRoute
 }
 export interface FileRoutesById {
@@ -103,9 +119,11 @@ export interface FileRoutesById {
   '/loadout': typeof LoadoutRoute
   '/login': typeof LoginRoute
   '/mission-log': typeof MissionLogRoute
+  '/missions': typeof MissionsRoute
   '/onboarding': typeof OnboardingRoute
   '/order-complete': typeof OrderCompleteRoute
   '/rank': typeof RankRoute
+  '/rewards': typeof RewardsRoute
   '/supply': typeof SupplyRoute
 }
 export interface FileRouteTypes {
@@ -117,9 +135,11 @@ export interface FileRouteTypes {
     | '/loadout'
     | '/login'
     | '/mission-log'
+    | '/missions'
     | '/onboarding'
     | '/order-complete'
     | '/rank'
+    | '/rewards'
     | '/supply'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -129,9 +149,11 @@ export interface FileRouteTypes {
     | '/loadout'
     | '/login'
     | '/mission-log'
+    | '/missions'
     | '/onboarding'
     | '/order-complete'
     | '/rank'
+    | '/rewards'
     | '/supply'
   id:
     | '__root__'
@@ -141,9 +163,11 @@ export interface FileRouteTypes {
     | '/loadout'
     | '/login'
     | '/mission-log'
+    | '/missions'
     | '/onboarding'
     | '/order-complete'
     | '/rank'
+    | '/rewards'
     | '/supply'
   fileRoutesById: FileRoutesById
 }
@@ -154,9 +178,11 @@ export interface RootRouteChildren {
   LoadoutRoute: typeof LoadoutRoute
   LoginRoute: typeof LoginRoute
   MissionLogRoute: typeof MissionLogRoute
+  MissionsRoute: typeof MissionsRoute
   OnboardingRoute: typeof OnboardingRoute
   OrderCompleteRoute: typeof OrderCompleteRoute
   RankRoute: typeof RankRoute
+  RewardsRoute: typeof RewardsRoute
   SupplyRoute: typeof SupplyRoute
 }
 
@@ -167,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/supply'
       fullPath: '/supply'
       preLoaderRoute: typeof SupplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rewards': {
+      id: '/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof RewardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rank': {
@@ -188,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/missions': {
+      id: '/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof MissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mission-log': {
@@ -242,9 +282,11 @@ const rootRouteChildren: RootRouteChildren = {
   LoadoutRoute: LoadoutRoute,
   LoginRoute: LoginRoute,
   MissionLogRoute: MissionLogRoute,
+  MissionsRoute: MissionsRoute,
   OnboardingRoute: OnboardingRoute,
   OrderCompleteRoute: OrderCompleteRoute,
   RankRoute: RankRoute,
+  RewardsRoute: RewardsRoute,
   SupplyRoute: SupplyRoute,
 }
 export const routeTree = rootRouteImport
