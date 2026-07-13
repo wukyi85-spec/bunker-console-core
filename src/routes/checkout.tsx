@@ -73,6 +73,17 @@ function CheckoutPage() {
         productTotal,
         totalGrams,
       });
+      if (saveAsDefault) {
+        try {
+          await updatePlayerProfileInfo({
+            fullName: name.trim(),
+            phone: phone.trim(),
+            defaultAddress: address.trim(),
+          });
+        } catch (e) {
+          console.warn("[BLACK'S BUNKER] Could not save default profile info", e);
+        }
+      }
       clearLoadout();
       if (missionRewards.length) {
         toast.success(`MISSION COMPLETE — ${missionRewards.map((m) => m.title).join(", ")}`);
