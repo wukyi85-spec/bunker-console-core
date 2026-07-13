@@ -102,8 +102,11 @@ export type Database = {
           grand_total: number
           id: string
           items: Json
+          member_id: string | null
           mission_number: string
           notes: string | null
+          order_items: Json | null
+          pass_id: string | null
           payment_method: string
           phone: string
           player_key: string
@@ -111,6 +114,7 @@ export type Database = {
           product_total: number
           status: string
           total_grams: number
+          total_price: number | null
           updated_at: string
           xp_earned: number
         }
@@ -123,8 +127,11 @@ export type Database = {
           grand_total?: number
           id?: string
           items?: Json
+          member_id?: string | null
           mission_number: string
           notes?: string | null
+          order_items?: Json | null
+          pass_id?: string | null
           payment_method: string
           phone: string
           player_key: string
@@ -132,6 +139,7 @@ export type Database = {
           product_total?: number
           status?: string
           total_grams?: number
+          total_price?: number | null
           updated_at?: string
           xp_earned?: number
         }
@@ -144,8 +152,11 @@ export type Database = {
           grand_total?: number
           id?: string
           items?: Json
+          member_id?: string | null
           mission_number?: string
           notes?: string | null
+          order_items?: Json | null
+          pass_id?: string | null
           payment_method?: string
           phone?: string
           player_key?: string
@@ -153,10 +164,19 @@ export type Database = {
           product_total?: number
           status?: string
           total_grams?: number
+          total_price?: number | null
           updated_at?: string
           xp_earned?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       player_missions: {
         Row: {
