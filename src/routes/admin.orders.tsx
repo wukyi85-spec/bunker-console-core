@@ -159,7 +159,9 @@ function AdminOrdersPage() {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
     } finally {
       setCancelling(false);
+    }
   }
+
 
   async function handleSetTracking(orderId: string, url: string) {
     try {
