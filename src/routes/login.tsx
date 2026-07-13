@@ -36,7 +36,8 @@ function LoginScreen() {
     setVerifying(true);
     setError(null);
     try {
-      const member = await loginMember(passId.trim().toUpperCase(), password);
+      const trimmedPassId = passId.trim().toUpperCase();
+      const member = await loginMember(trimmedPassId, password);
       if (!member) {
         setError("Invalid Pass ID or Password.");
         setVerifying(false);
@@ -50,6 +51,12 @@ function LoginScreen() {
         characterId: member.characterId,
         firstLoginCompleted: true,
       });
+      if (member.role === "admin") {
+        setAdminSession({ passId: trimmedPassId, password });
+        navigate({ to: "/admin/members" });
+        return;
+      }
+      clearAdminSession();
       await ensurePlayerStats();
       navigate({ to: "/dashboard" });
     } catch (err) {
