@@ -41,18 +41,19 @@ function OrderCompletePage() {
           </div>
 
           <div className="relative font-mono text-[10px] uppercase tracking-[0.5em] text-neon">
-            // Transmission Complete
+            // Transmission Received
           </div>
           <h1 className="relative mt-2 font-display text-3xl font-bold uppercase tracking-widest text-foreground">
-            Order Transmitted
+            Order Submitted
           </h1>
-          <div className="relative mt-1 font-display text-lg font-semibold uppercase tracking-widest text-neon">
-            Mission Accepted
+          <div className="relative mt-2 inline-flex items-center gap-2 rounded-sm border border-amber-400/50 bg-amber-400/10 px-3 py-1 font-display text-[11px] font-black uppercase tracking-[0.3em] text-amber-300">
+            <span className="h-1.5 w-1.5 animate-hud-pulse rounded-full bg-amber-300" />
+            Waiting for Confirmation
           </div>
 
-          <p className="relative mt-3 max-w-sm text-xs text-muted-foreground">
-            Your Supply Request has been sent successfully. The order has been logged in your
-            Mission Log.
+          <p className="relative mt-4 max-w-sm text-sm text-muted-foreground">
+            Please wait for BLACK'S BUNKER to confirm your order. You will be notified in your
+            Bunker Alarm once confirmed.
           </p>
 
           {id && (
