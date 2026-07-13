@@ -399,10 +399,12 @@ export function orderStatusLabel(status: string): string {
     confirmed: "CONFIRMED",
     processing: "PROCESSING",
     packing: "PACKING",
-    delivered: "DELIVERED",
+    out_for_delivery: "OUT FOR DELIVERY",
+    delivered: "OUT FOR DELIVERY",
     completed: "COMPLETED",
     cancelled: "CANCELLED",
   };
   return map[status?.toLowerCase?.()] ?? (status || "").toUpperCase();
 }
+
 
