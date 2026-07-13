@@ -196,4 +196,27 @@ export async function adminCancelOrder(orderId: string, reason: string): Promise
   return data as unknown as AdminOrderRow;
 }
 
+export async function adminSetOrderTracking(orderId: string, url: string): Promise<AdminOrderRow> {
+  const s = requireAdmin();
+  const { data, error } = await supabase.rpc("admin_set_order_tracking" as never, {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+    p_order_id: orderId,
+    p_url: url,
+  } as never);
+  if (error) throw error;
+  return data as unknown as AdminOrderRow;
+}
+
+export async function adminDeleteOrder(orderId: string): Promise<void> {
+  const s = requireAdmin();
+  const { error } = await supabase.rpc("admin_delete_order" as never, {
+    p_admin_pass_id: s.passId,
+    p_admin_password: s.password,
+    p_order_id: orderId,
+  } as never);
+  if (error) throw error;
+}
+
+
 
