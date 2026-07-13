@@ -160,6 +160,14 @@ function MissionRow({ order }: { order: OrderRow }) {
 
       {open && (
         <div className="border-t border-white/10 px-4 py-3 animate-in fade-in slide-in-from-top-1 duration-200">
+          {order.status?.toLowerCase() === "cancelled" && order.cancellation_reason && (
+            <div className="mb-3 rounded-sm border border-red-500/40 bg-red-500/5 p-3">
+              <div className="font-mono text-[9px] uppercase tracking-widest text-red-400/80">
+                Cancellation Reason
+              </div>
+              <div className="mt-1 text-[12px] text-foreground">{order.cancellation_reason}</div>
+            </div>
+          )}
           <div className="grid grid-cols-[1fr_240px] gap-4">
             <div className="flex flex-col gap-1.5">
               {items.map((i, idx) => (
