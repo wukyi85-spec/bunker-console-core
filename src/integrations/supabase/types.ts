@@ -382,6 +382,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _verify_admin: {
+        Args: { p_pass_id: string; p_password: string }
+        Returns: boolean
+      }
       add_player_stats_rewards: {
         Args: {
           p_gold: number
