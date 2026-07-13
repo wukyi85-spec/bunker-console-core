@@ -22,14 +22,9 @@ function newMissionNumber() {
   return `OP-${t}-${r}`;
 }
 
-// Loose RPC helper — bypasses generated types for our custom SECURITY DEFINER fns.
-const rpc = supabase.rpc as unknown as (
-  fn: string,
-  args?: Record<string, unknown>,
-) => Promise<{ data: unknown; error: unknown }>;
-
 async function callRpc<T = unknown>(fn: string, args?: Record<string, unknown>): Promise<T> {
-  const { data, error } = await rpc(fn, args);
+  // Loose RPC helper — bypasses generated types for our custom SECURITY DEFINER fns.
+  const { data, error } = await supabase.rpc(fn as never, args as never);
   if (error) {
     console.error(`[BLACK'S BUNKER] ${fn} RPC error:`, error);
     throw error;
@@ -39,15 +34,16 @@ async function callRpc<T = unknown>(fn: string, args?: Record<string, unknown>):
 
 // ---------- MEMBERS ----------
 export async function loginMember(passId: string, password: string) {
+  const normalizedPassId = passId.trim();
   const data = await callRpc<unknown>("login_member", {
-    p_pass_id: passId.trim(),
+    p_pass_id: normalizedPassId,
     p_password: password,
   });
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) return null;
   const r = row as Record<string, unknown>;
   const id = (r.member_id ?? r.id) as string | undefined;
-  const pid = (r.pass_id ?? passId) as string;
+  const pid = (r.pass_id ?? normalizedPassId) as string;
   if (!id) return null;
   return {
     id,
