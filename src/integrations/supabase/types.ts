@@ -123,6 +123,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -142,6 +143,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -155,6 +157,7 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           character_id?: string | null
+          completed_at?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
@@ -174,6 +177,7 @@ export type Database = {
           player_key: string
           player_name?: string | null
           product_total?: number
+          rewards_awarded_at?: string | null
           status?: string
           total_grams?: number
           total_price?: number | null
@@ -187,6 +191,7 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           character_id?: string | null
+          completed_at?: string | null
           confirmed_at?: string | null
           confirmed_by?: string | null
           created_at?: string
@@ -206,6 +211,7 @@ export type Database = {
           player_key?: string
           player_name?: string | null
           product_total?: number
+          rewards_awarded_at?: string | null
           status?: string
           total_grams?: number
           total_price?: number | null
@@ -337,6 +343,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -355,6 +362,7 @@ export type Database = {
           gold?: number
           level?: number
           member_since?: string
+          name_change_count?: number
           phone?: string | null
           player_key: string
           player_name?: string | null
@@ -373,6 +381,7 @@ export type Database = {
           gold?: number
           level?: number
           member_since?: string
+          name_change_count?: number
           phone?: string | null
           player_key?: string
           player_name?: string | null
@@ -474,6 +483,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -493,6 +503,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -519,6 +530,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -538,6 +550,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -635,6 +648,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -654,6 +668,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -666,6 +681,53 @@ export type Database = {
           to: "orders"
           isOneToOne: false
           isSetofReturn: true
+        }
+      }
+      admin_mark_order_delivered: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_order_id: string
+        }
+        Returns: {
+          address: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          character_id: string | null
+          completed_at: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          customer_name: string
+          delivery_fee: number
+          gold_earned: number
+          grand_total: number
+          id: string
+          items: Json
+          member_id: string | null
+          mission_number: string
+          notes: string | null
+          order_items: Json | null
+          pass_id: string | null
+          payment_method: string
+          phone: string
+          player_key: string
+          player_name: string | null
+          product_total: number
+          rewards_awarded_at: string | null
+          status: string
+          total_grams: number
+          total_price: number | null
+          tracking_url: string | null
+          updated_at: string
+          xp_earned: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       admin_set_order_tracking: {
@@ -681,6 +743,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -700,6 +763,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -757,6 +821,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -784,6 +849,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -803,6 +869,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -829,6 +896,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -892,6 +960,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           character_id: string | null
+          completed_at: string | null
           confirmed_at: string | null
           confirmed_by: string | null
           created_at: string
@@ -911,6 +980,7 @@ export type Database = {
           player_key: string
           player_name: string | null
           product_total: number
+          rewards_awarded_at: string | null
           status: string
           total_grams: number
           total_price: number | null
@@ -967,6 +1037,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null
@@ -1003,6 +1074,7 @@ export type Database = {
           gold: number
           level: number
           member_since: string
+          name_change_count: number
           phone: string | null
           player_key: string
           player_name: string | null

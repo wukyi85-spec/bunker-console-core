@@ -11,6 +11,7 @@ import {
   Ban,
   Truck,
   Trash2,
+  PackageCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/bunker/Logo";
@@ -25,11 +26,13 @@ import {
   adminCancelOrder,
   adminSetOrderTracking,
   adminDeleteOrder,
+  adminMarkOrderDelivered,
   type AdminOrderRow,
 } from "@/lib/admin";
 import { orderStatusLabel } from "@/lib/bunker-supabase";
 import type { LoadoutItem } from "@/lib/loadout";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/admin/orders")({
   head: () => ({
@@ -45,9 +48,7 @@ const STATUS_FILTERS = [
   "all",
   "waiting_payment",
   "confirmed",
-  "processing",
-  "packing",
-  "delivered",
+  "out_for_delivery",
   "completed",
   "cancelled",
 ] as const;
@@ -59,13 +60,15 @@ function statusBadgeClass(status: string) {
   if (s === "waiting_payment" || s === "pending")
     return "bg-amber-500/15 text-amber-300 border-amber-400/40";
   if (s === "confirmed") return "bg-neon/15 text-neon border-neon/40";
-  if (s === "processing") return "bg-sky-500/15 text-sky-300 border-sky-400/40";
-  if (s === "packing") return "bg-indigo-500/15 text-indigo-300 border-indigo-400/40";
-  if (s === "delivered") return "bg-emerald-500/15 text-emerald-300 border-emerald-400/40";
+  if (s === "processing" || s === "packing")
+    return "bg-indigo-500/15 text-indigo-300 border-indigo-400/40";
+  if (s === "out_for_delivery" || s === "delivered")
+    return "bg-sky-500/15 text-sky-300 border-sky-400/40";
   if (s === "completed") return "bg-emerald-600/20 text-emerald-200 border-emerald-500/40";
   if (s === "cancelled") return "bg-red-500/15 text-red-400 border-red-400/40";
   return "bg-white/8 text-muted-foreground border-white/10";
 }
+
 
 function AdminOrdersPage() {
   const navigate = useNavigate();
@@ -187,6 +190,17 @@ function AdminOrdersPage() {
     }
   }
 
+  async function handleMarkDelivered(orderId: string) {
+    try {
+      const updated = await adminMarkOrderDelivered(orderId);
+      toast.success("Order marked as delivered");
+      await refresh();
+      if (selected?.id === orderId) setSelected(updated);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to mark delivered");
+    }
+  }
+
   function handleLogout() {
     clearAdminSession();
     navigate({ to: "/login" });
@@ -198,8 +212,13 @@ function AdminOrdersPage() {
   };
   const canCancel = (o: AdminOrderRow) => {
     const s = o.status.toLowerCase();
-    return s !== "cancelled" && s !== "completed" && s !== "delivered";
+    return s !== "cancelled" && s !== "completed";
   };
+  const canMarkDelivered = (o: AdminOrderRow) => {
+    const s = o.status.toLowerCase();
+    return !!o.tracking_url && s !== "completed" && s !== "cancelled";
+  };
+
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
@@ -360,11 +379,14 @@ function AdminOrdersPage() {
           }}
           onSetTracking={(url) => void handleSetTracking(selected.id, url)}
           onDelete={() => void handleDeleteOrder(selected.id)}
+          onMarkDelivered={() => void handleMarkDelivered(selected.id)}
           confirming={confirming === selected.id}
           canConfirm={canConfirm(selected)}
           canCancel={canCancel(selected)}
+          canMarkDelivered={canMarkDelivered(selected)}
         />
       )}
+
 
       {cancelTarget && (
         <CancelOrderDialog
@@ -392,9 +414,11 @@ function OrderDetailsDrawer({
   onCancel,
   onSetTracking,
   onDelete,
+  onMarkDelivered,
   confirming,
   canConfirm,
   canCancel,
+  canMarkDelivered,
 }: {
   order: AdminOrderRow;
   onClose: () => void;
@@ -402,10 +426,13 @@ function OrderDetailsDrawer({
   onCancel: () => void;
   onSetTracking: (url: string) => void;
   onDelete: () => void;
+  onMarkDelivered: () => void;
   confirming: boolean;
   canConfirm: boolean;
   canCancel: boolean;
+  canMarkDelivered: boolean;
 }) {
+
   const [trackingDraft, setTrackingDraft] = useState(order.tracking_url ?? "");
   const [showDelete, setShowDelete] = useState(false);
   useEffect(() => {
@@ -593,12 +620,18 @@ function OrderDetailsDrawer({
         </div>
 
 
-        {(canConfirm || canCancel) && (
-          <div className="flex gap-2 border-t border-white/10 p-4">
+        {(canConfirm || canCancel || canMarkDelivered) && (
+          <div className="flex flex-wrap gap-2 border-t border-white/10 p-4">
             {canConfirm && (
               <BunkerButton className="flex-1" onClick={onConfirm} disabled={confirming}>
                 <CheckCircle2 className="h-4 w-4" />
                 {confirming ? "Confirming…" : "Accept Order"}
+              </BunkerButton>
+            )}
+            {canMarkDelivered && (
+              <BunkerButton className="flex-1" onClick={onMarkDelivered}>
+                <PackageCheck className="h-4 w-4" />
+                Mark as Delivered
               </BunkerButton>
             )}
             {canCancel && (
@@ -613,6 +646,7 @@ function OrderDetailsDrawer({
             )}
           </div>
         )}
+
       </div>
     </div>
   );

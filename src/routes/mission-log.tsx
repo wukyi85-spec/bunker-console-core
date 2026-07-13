@@ -28,11 +28,11 @@ export const Route = createFileRoute("/mission-log")({
   component: OrderDetailsPage,
 });
 
-type TabKey = "pending" | "being_delivered" | "completed" | "cancelled";
+type TabKey = "pending" | "out_for_delivery" | "completed" | "cancelled";
 
 const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: "pending", label: "Pending", icon: Clock },
-  { key: "being_delivered", label: "Being Delivered", icon: Truck },
+  { key: "out_for_delivery", label: "Out for Delivery", icon: Truck },
   { key: "completed", label: "Completed", icon: CheckCircle2 },
   { key: "cancelled", label: "Cancelled", icon: XCircle },
 ];
@@ -40,10 +40,11 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
 function bucketOf(status: string): TabKey {
   const s = (status || "").toLowerCase();
   if (["cancelled", "canceled"].includes(s)) return "cancelled";
-  if (["completed", "delivered"].includes(s)) return "completed";
-  if (["processing", "packing", "shipped", "in_transit"].includes(s)) return "being_delivered";
-  return "pending"; // waiting_payment, pending, confirmed, unknown
+  if (["completed"].includes(s)) return "completed";
+  if (["out_for_delivery", "delivered", "shipped", "in_transit"].includes(s)) return "out_for_delivery";
+  return "pending"; // waiting_payment, pending, confirmed, processing, packing
 }
+
 
 function OrderDetailsPage() {
   const [tab, setTab] = useState<TabKey>("pending");
@@ -53,10 +54,11 @@ function OrderDetailsPage() {
   });
 
   const counts = useMemo(() => {
-    const c: Record<TabKey, number> = { pending: 0, being_delivered: 0, completed: 0, cancelled: 0 };
+    const c: Record<TabKey, number> = { pending: 0, out_for_delivery: 0, completed: 0, cancelled: 0 };
     for (const o of orders) c[bucketOf(o.status)]++;
     return c;
   }, [orders]);
+
 
   const filtered = useMemo(
     () => orders.filter((o) => bucketOf(o.status) === tab),
@@ -200,7 +202,7 @@ function OrderRow({ order }: { order: OrderRow }) {
           )}
 
           {/* Tracking */}
-          {bucket === "being_delivered" || bucket === "completed" ? (
+          {bucket === "out_for_delivery" || bucket === "completed" ? (
             <div className="mb-3 rounded-sm border border-white/10 bg-background/40 p-3">
               <div className="flex items-center gap-2">
                 <Truck className="h-3.5 w-3.5 text-neon" />
@@ -212,19 +214,20 @@ function OrderRow({ order }: { order: OrderRow }) {
                 <a
                   href={order.tracking_url}
                   target="_blank"
-                  rel="noreferrer"
-                  className="mt-1 inline-flex items-center gap-1.5 truncate font-mono text-[11px] text-neon hover:underline"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-sm border border-neon/50 bg-neon/10 px-3 py-1.5 font-display text-[10px] font-black uppercase tracking-[0.3em] text-neon shadow-[0_0_18px_-6px_var(--neon)] transition-colors hover:bg-neon/20"
                 >
                   <ExternalLink className="h-3 w-3" />
-                  {order.tracking_url}
+                  Track Order
                 </a>
               ) : (
                 <div className="mt-1 font-mono text-[10px] text-muted-foreground">
-                  Tracking information is not available yet. Please wait until your order has been handed to delivery.
+                  Tracking information is not available yet. Please check again after your order is handed to delivery.
                 </div>
               )}
             </div>
           ) : null}
+
 
           <div className="grid grid-cols-[1fr_240px] gap-4">
             <div className="flex flex-col gap-1.5">
@@ -291,19 +294,22 @@ function StatusPill({ status }: { status: string }) {
         "rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest",
         s === "waiting_payment" || s === "pending"
           ? "border-amber-400/50 bg-amber-400/10 text-amber-300"
-          : s === "confirmed"
+          : s === "confirmed" || s === "processing" || s === "packing"
             ? "border-neon/60 bg-neon/10 text-neon"
-            : s === "delivered" || s === "completed"
-              ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
-              : s === "cancelled"
-                ? "border-red-500/60 bg-red-500/10 text-red-300"
-                : "border-white/20 bg-background/40 text-muted-foreground",
+            : s === "out_for_delivery" || s === "delivered"
+              ? "border-sky-400/60 bg-sky-400/10 text-sky-300"
+              : s === "completed"
+                ? "border-emerald-400/60 bg-emerald-400/10 text-emerald-300"
+                : s === "cancelled"
+                  ? "border-red-500/60 bg-red-500/10 text-red-300"
+                  : "border-white/20 bg-background/40 text-muted-foreground",
       )}
     >
       {orderStatusLabel(status)}
     </span>
   );
 }
+
 
 function Detail({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
