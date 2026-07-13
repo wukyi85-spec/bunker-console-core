@@ -220,10 +220,15 @@ function AdminMembersPage() {
               </div>
             )}
             {!loading &&
-              filtered.map((m) => (
+              filtered.map((m) => {
+                const self = isSelf(m);
+                const lastAdmin = isLastActiveAdmin(m);
+                const canDelete = !self && !lastAdmin;
+                const canSuspend = !self && !lastAdmin && m.status === "active";
+                return (
                 <div
                   key={m.id}
-                  className="grid grid-cols-[1.3fr_1.3fr_0.9fr_0.7fr_0.7fr_0.9fr_0.9fr_1.2fr_0.9fr] items-center gap-3 border-b border-white/5 px-4 py-2.5 text-sm text-foreground hover:bg-white/[0.02]"
+                  className="grid grid-cols-[1.2fr_1.2fr_0.8fr_0.6fr_0.6fr_0.8fr_0.8fr_1fr_1.6fr] items-center gap-3 border-b border-white/5 px-4 py-2.5 text-sm text-foreground hover:bg-white/[0.02]"
                 >
                   <span className="font-mono text-neon">{m.pass_id}</span>
                   <span className="truncate">{m.player_name ?? <em className="text-muted-foreground">— unset —</em>}</span>
@@ -257,7 +262,7 @@ function AdminMembersPage() {
                   <span className="font-mono text-xs text-muted-foreground">
                     {new Date(m.created_at).toLocaleDateString()}
                   </span>
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-1">
                     <BunkerButton
                       variant="ghost"
                       size="sm"
@@ -266,7 +271,44 @@ function AdminMembersPage() {
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
                     </BunkerButton>
+                    <button
+                      type="button"
+                      onClick={() => void handleSuspend(m)}
+                      disabled={!canSuspend || suspendingId === m.id}
+                      title={
+                        self
+                          ? "Cannot suspend your own account"
+                          : lastAdmin
+                            ? "Cannot suspend the last admin"
+                            : m.status !== "active"
+                              ? "Already suspended"
+                              : "Suspend member"
+                      }
+                      className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-amber-300 transition-colors hover:border-amber-400 hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      <Ban className="h-3 w-3" />
+                      {suspendingId === m.id ? "…" : "Suspend"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleting(m)}
+                      disabled={!canDelete}
+                      title={
+                        self
+                          ? "Cannot delete your own account"
+                          : lastAdmin
+                            ? "Cannot delete the last admin"
+                            : "Delete member"
+                      }
+                      className="inline-flex items-center gap-1 rounded-md border border-red-500/40 bg-red-500/5 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-red-400 transition-colors hover:border-red-400 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Delete
+                    </button>
                   </div>
+                </div>
+                );
+              })}
                 </div>
               ))}
           </div>
