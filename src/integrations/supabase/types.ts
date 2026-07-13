@@ -127,6 +127,7 @@ export type Database = {
           confirmed_by: string | null
           created_at: string
           customer_name: string
+          delivery_fee: number
           gold_earned: number
           grand_total: number
           id: string
@@ -144,6 +145,7 @@ export type Database = {
           status: string
           total_grams: number
           total_price: number | null
+          tracking_url: string | null
           updated_at: string
           xp_earned: number
         }
@@ -157,6 +159,7 @@ export type Database = {
           confirmed_by?: string | null
           created_at?: string
           customer_name: string
+          delivery_fee?: number
           gold_earned?: number
           grand_total?: number
           id?: string
@@ -174,6 +177,7 @@ export type Database = {
           status?: string
           total_grams?: number
           total_price?: number | null
+          tracking_url?: string | null
           updated_at?: string
           xp_earned?: number
         }
@@ -187,6 +191,7 @@ export type Database = {
           confirmed_by?: string | null
           created_at?: string
           customer_name?: string
+          delivery_fee?: number
           gold_earned?: number
           grand_total?: number
           id?: string
@@ -204,6 +209,7 @@ export type Database = {
           status?: string
           total_grams?: number
           total_price?: number | null
+          tracking_url?: string | null
           updated_at?: string
           xp_earned?: number
         }
@@ -326,8 +332,12 @@ export type Database = {
           character_id: string | null
           created_at: string
           current_rank: string
+          default_address: string | null
+          full_name: string | null
           gold: number
           level: number
+          member_since: string
+          phone: string | null
           player_key: string
           player_name: string | null
           total_purchase: number
@@ -340,8 +350,12 @@ export type Database = {
           character_id?: string | null
           created_at?: string
           current_rank?: string
+          default_address?: string | null
+          full_name?: string | null
           gold?: number
           level?: number
+          member_since?: string
+          phone?: string | null
           player_key: string
           player_name?: string | null
           total_purchase?: number
@@ -354,8 +368,12 @@ export type Database = {
           character_id?: string | null
           created_at?: string
           current_rank?: string
+          default_address?: string | null
+          full_name?: string | null
           gold?: number
           level?: number
+          member_since?: string
+          phone?: string | null
           player_key?: string
           player_name?: string | null
           total_purchase?: number
@@ -460,6 +478,7 @@ export type Database = {
           confirmed_by: string | null
           created_at: string
           customer_name: string
+          delivery_fee: number
           gold_earned: number
           grand_total: number
           id: string
@@ -477,6 +496,7 @@ export type Database = {
           status: string
           total_grams: number
           total_price: number | null
+          tracking_url: string | null
           updated_at: string
           xp_earned: number
         }
@@ -503,6 +523,7 @@ export type Database = {
           confirmed_by: string | null
           created_at: string
           customer_name: string
+          delivery_fee: number
           gold_earned: number
           grand_total: number
           id: string
@@ -520,6 +541,7 @@ export type Database = {
           status: string
           total_grams: number
           total_price: number | null
+          tracking_url: string | null
           updated_at: string
           xp_earned: number
         }
@@ -571,6 +593,14 @@ export type Database = {
         }
         Returns: string
       }
+      admin_delete_order: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_order_id: string
+        }
+        Returns: string
+      }
       admin_list_members: {
         Args: { p_admin_pass_id: string; p_admin_password: string }
         Returns: {
@@ -609,6 +639,7 @@ export type Database = {
           confirmed_by: string | null
           created_at: string
           customer_name: string
+          delivery_fee: number
           gold_earned: number
           grand_total: number
           id: string
@@ -626,6 +657,7 @@ export type Database = {
           status: string
           total_grams: number
           total_price: number | null
+          tracking_url: string | null
           updated_at: string
           xp_earned: number
         }[]
@@ -634,6 +666,52 @@ export type Database = {
           to: "orders"
           isOneToOne: false
           isSetofReturn: true
+        }
+      }
+      admin_set_order_tracking: {
+        Args: {
+          p_admin_pass_id: string
+          p_admin_password: string
+          p_order_id: string
+          p_url: string
+        }
+        Returns: {
+          address: string
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          character_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          customer_name: string
+          delivery_fee: number
+          gold_earned: number
+          grand_total: number
+          id: string
+          items: Json
+          member_id: string | null
+          mission_number: string
+          notes: string | null
+          order_items: Json | null
+          pass_id: string | null
+          payment_method: string
+          phone: string
+          player_key: string
+          player_name: string | null
+          product_total: number
+          status: string
+          total_grams: number
+          total_price: number | null
+          tracking_url: string | null
+          updated_at: string
+          xp_earned: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       admin_update_member: {
@@ -667,6 +745,33 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      change_player_name: {
+        Args: { p_member_id: string; p_new_name: string; p_player_key: string }
+        Returns: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          current_rank: string
+          default_address: string | null
+          full_name: string | null
+          gold: number
+          level: number
+          member_since: string
+          phone: string | null
+          player_key: string
+          player_name: string | null
+          total_purchase: number
+          total_weight: number
+          updated_at: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "player_stats"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       claim_player_reward: {
         Args: { p_id: string; p_player_key: string }
         Returns: undefined
@@ -683,6 +788,7 @@ export type Database = {
           confirmed_by: string | null
           created_at: string
           customer_name: string
+          delivery_fee: number
           gold_earned: number
           grand_total: number
           id: string
@@ -700,6 +806,7 @@ export type Database = {
           status: string
           total_grams: number
           total_price: number | null
+          tracking_url: string | null
           updated_at: string
           xp_earned: number
         }
@@ -717,8 +824,12 @@ export type Database = {
           character_id: string | null
           created_at: string
           current_rank: string
+          default_address: string | null
+          full_name: string | null
           gold: number
           level: number
+          member_since: string
+          phone: string | null
           player_key: string
           player_name: string | null
           total_purchase: number
@@ -785,6 +896,7 @@ export type Database = {
           confirmed_by: string | null
           created_at: string
           customer_name: string
+          delivery_fee: number
           gold_earned: number
           grand_total: number
           id: string
@@ -802,6 +914,7 @@ export type Database = {
           status: string
           total_grams: number
           total_price: number | null
+          tracking_url: string | null
           updated_at: string
           xp_earned: number
         }[]
@@ -837,6 +950,38 @@ export type Database = {
         Args: { p_activity: number; p_player_key: string }
         Returns: undefined
       }
+      update_player_profile_info: {
+        Args: {
+          p_default_address: string
+          p_full_name: string
+          p_phone: string
+          p_player_key: string
+        }
+        Returns: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          current_rank: string
+          default_address: string | null
+          full_name: string | null
+          gold: number
+          level: number
+          member_since: string
+          phone: string | null
+          player_key: string
+          player_name: string | null
+          total_purchase: number
+          total_weight: number
+          updated_at: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "player_stats"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       upsert_player_mission: {
         Args: {
           p_completed_at: string
@@ -853,8 +998,12 @@ export type Database = {
           character_id: string | null
           created_at: string
           current_rank: string
+          default_address: string | null
+          full_name: string | null
           gold: number
           level: number
+          member_since: string
+          phone: string | null
           player_key: string
           player_name: string | null
           total_purchase: number
