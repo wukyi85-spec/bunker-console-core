@@ -285,8 +285,8 @@ function AdminOrdersPage() {
                   <span className="font-mono text-[10px] text-muted-foreground">
                     {new Date(o.created_at).toLocaleString()}
                   </span>
-                  <span className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                    {canConfirm(o) ? (
+                  <span className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    {canConfirm(o) && (
                       <BunkerButton
                         size="sm"
                         onClick={() => void handleConfirm(o.id)}
@@ -295,7 +295,20 @@ function AdminOrdersPage() {
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         {confirming === o.id ? "…" : "Accept"}
                       </BunkerButton>
-                    ) : (
+                    )}
+                    {canCancel(o) && (
+                      <button
+                        onClick={() => {
+                          setCancelReason("");
+                          setCancelTarget(o);
+                        }}
+                        className="inline-flex items-center gap-1 rounded-sm border border-red-500/40 bg-red-500/10 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-red-300 transition-colors hover:bg-red-500/20"
+                      >
+                        <Ban className="h-3 w-3" />
+                        Cancel
+                      </button>
+                    )}
+                    {!canConfirm(o) && !canCancel(o) && (
                       <BunkerButton size="sm" variant="ghost" onClick={() => setSelected(o)}>
                         View
                       </BunkerButton>
@@ -312,8 +325,29 @@ function AdminOrdersPage() {
           order={selected}
           onClose={() => setSelected(null)}
           onConfirm={() => void handleConfirm(selected.id)}
+          onCancel={() => {
+            setCancelReason("");
+            setCancelTarget(selected);
+          }}
           confirming={confirming === selected.id}
           canConfirm={canConfirm(selected)}
+          canCancel={canCancel(selected)}
+        />
+      )}
+
+      {cancelTarget && (
+        <CancelOrderDialog
+          order={cancelTarget}
+          reason={cancelReason}
+          onReasonChange={setCancelReason}
+          onClose={() => {
+            if (!cancelling) {
+              setCancelTarget(null);
+              setCancelReason("");
+            }
+          }}
+          onConfirm={() => void handleCancelConfirm()}
+          submitting={cancelling}
         />
       )}
     </div>
