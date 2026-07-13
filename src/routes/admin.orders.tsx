@@ -71,6 +71,9 @@ function AdminOrdersPage() {
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<AdminOrderRow | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<AdminOrderRow | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     const s = getAdminSession();
