@@ -135,6 +135,29 @@ function AdminOrdersPage() {
     }
   }
 
+  async function handleCancelConfirm() {
+    if (!cancelTarget) return;
+    const reason = cancelReason.trim();
+    if (!reason) {
+      toast.error("Cancellation reason is required");
+      return;
+    }
+    setCancelling(true);
+    try {
+      await adminCancelOrder(cancelTarget.id, reason);
+      toast.success("Order cancelled");
+      const id = cancelTarget.id;
+      setCancelTarget(null);
+      setCancelReason("");
+      await refresh();
+      if (selected?.id === id) setSelected(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cancel failed");
+    } finally {
+      setCancelling(false);
+    }
+  }
+
   function handleLogout() {
     clearAdminSession();
     navigate({ to: "/login" });
@@ -143,6 +166,10 @@ function AdminOrdersPage() {
   const canConfirm = (o: AdminOrderRow) => {
     const s = o.status.toLowerCase();
     return s === "waiting_payment" || s === "pending";
+  };
+  const canCancel = (o: AdminOrderRow) => {
+    const s = o.status.toLowerCase();
+    return s !== "cancelled" && s !== "completed" && s !== "delivered";
   };
 
   return (
