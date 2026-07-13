@@ -1,0 +1,1 @@
+UPDATE public.members SET password='12345678', updated_at=now() WHERE pass_id='TEST002';
