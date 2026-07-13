@@ -32,7 +32,7 @@ function RankPage() {
     : 100;
 
   return (
-    <AppShell>
+    <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-[360px_1fr] gap-4 animate-in fade-in duration-500">
         {/* LEFT — Current rank + stats */}
         <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-4">
