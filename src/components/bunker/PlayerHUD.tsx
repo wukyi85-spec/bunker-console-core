@@ -30,9 +30,15 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   const stats = statsQ.data;
   const profile = getPlayerProfile();
 
+  const fetchRanks = useServerFn(getRankSettings);
+  const ranksQ = useQuery({ queryKey: ["sheet_ranks"], queryFn: fetchRanks, staleTime: 60_000 });
+  const xp = stats?.xp ?? 0;
+  const currentRank = (ranksQ.data ?? []).find((r) => xp >= r.minXp && xp <= r.maxXp);
+
   const player = {
     name: profile.playerName ?? "OPERATOR",
-    rank: (stats?.current_rank ?? "ROOKIE").toUpperCase(),
+    rank: (currentRank?.name ?? stats?.current_rank ?? "ROOKIE").toUpperCase(),
+    badge: currentRank?.badgeImage ?? "",
     level: stats?.level ?? 1,
     xp: stats ? levelProgress(stats.xp) : 0,
     activity: stats?.activity ?? 0,
@@ -40,6 +46,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
     stars: Math.min(5, Math.floor((stats?.level ?? 1) / 4)),
     status: "ONLINE" as const,
   };
+
 
   const goldDisplay = useCountUp(player.gold);
 
