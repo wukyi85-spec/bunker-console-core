@@ -1,8 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getGameSettings, DEFAULT_SETTINGS } from "@/lib/sheets.functions";
 
 interface ContactHQProps {
   orderId?: string;
@@ -13,9 +10,6 @@ interface ContactHQProps {
 
 export function ContactHQ({ orderId, className, label = "CONTACT HQ", compact }: ContactHQProps) {
   // Always route Contact HQ to the official Telegram operator.
-  const fetchSettings = useServerFn(getGameSettings);
-  useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
-  void DEFAULT_SETTINGS;
   const baseUrl = "https://t.me/BlackBunker21";
 
   function open() {
