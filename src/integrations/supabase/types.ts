@@ -139,6 +139,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -149,6 +150,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }
         Insert: {
@@ -173,6 +176,7 @@ export type Database = {
           order_items?: Json | null
           pass_id?: string | null
           payment_method: string
+          payment_reference?: string | null
           phone: string
           player_key: string
           player_name?: string | null
@@ -183,6 +187,8 @@ export type Database = {
           total_price?: number | null
           tracking_url?: string | null
           updated_at?: string
+          voucher_code?: string | null
+          voucher_discount?: number | null
           xp_earned?: number
         }
         Update: {
@@ -207,6 +213,7 @@ export type Database = {
           order_items?: Json | null
           pass_id?: string | null
           payment_method?: string
+          payment_reference?: string | null
           phone?: string
           player_key?: string
           player_name?: string | null
@@ -217,6 +224,8 @@ export type Database = {
           total_price?: number | null
           tracking_url?: string | null
           updated_at?: string
+          voucher_code?: string | null
+          voucher_discount?: number | null
           xp_earned?: number
         }
         Relationships: [
@@ -538,6 +547,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -548,6 +558,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -585,6 +597,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -595,6 +608,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -703,6 +718,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -713,6 +729,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }[]
         SetofOptions: {
@@ -750,6 +768,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -760,6 +779,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -798,6 +819,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -808,6 +830,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -904,6 +928,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -914,6 +939,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -1015,6 +1042,7 @@ export type Database = {
           order_items: Json | null
           pass_id: string | null
           payment_method: string
+          payment_reference: string | null
           phone: string
           player_key: string
           player_name: string | null
@@ -1025,6 +1053,8 @@ export type Database = {
           total_price: number | null
           tracking_url: string | null
           updated_at: string
+          voucher_code: string | null
+          voucher_discount: number | null
           xp_earned: number
         }[]
         SetofOptions: {
