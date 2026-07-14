@@ -199,6 +199,11 @@ function LoadoutPage() {
                 <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-200/80">
                   Minimum Order: {minWeight}G or ฿{minAmount.toLocaleString()}
                 </div>
+              </div>
+            </div>
+          )}
+
+
 
 
           <BunkerButton
