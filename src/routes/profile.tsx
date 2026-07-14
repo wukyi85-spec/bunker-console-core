@@ -307,7 +307,11 @@ function ProfilePage() {
             </div>
           </div>
         </Panel>
+        <div className="flex justify-end">
+          <ContactHQ label="Contact HQ on Telegram" />
+        </div>
       </div>
+
 
       {/* ========== Change Name Confirmation ========== */}
       {changeOpen && (
