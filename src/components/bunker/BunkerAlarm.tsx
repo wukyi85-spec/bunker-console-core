@@ -195,7 +195,7 @@ export function BunkerAlarm() {
                       {styles.label}
                     </span>
                     <span className="ml-auto font-mono text-[9px] tabular-nums text-muted-foreground">
-                      {timeAgo(a.created_at)}
+                      {timeAgo(a.createdAt)}
                     </span>
                   </div>
                   <div className="mt-1 truncate font-display text-[12px] font-bold uppercase tracking-wider text-foreground">
