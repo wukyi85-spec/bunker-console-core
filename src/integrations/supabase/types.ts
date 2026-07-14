@@ -137,6 +137,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -152,6 +153,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }
         Insert: {
@@ -174,6 +177,7 @@ export type Database = {
           mission_number: string
           notes?: string | null
           order_items?: Json | null
+          order_type?: string
           pass_id?: string | null
           payment_method: string
           payment_reference?: string | null
@@ -189,6 +193,8 @@ export type Database = {
           updated_at?: string
           voucher_code?: string | null
           voucher_discount?: number | null
+          voucher_max_discount?: number | null
+          voucher_percent?: number | null
           xp_earned?: number
         }
         Update: {
@@ -211,6 +217,7 @@ export type Database = {
           mission_number?: string
           notes?: string | null
           order_items?: Json | null
+          order_type?: string
           pass_id?: string | null
           payment_method?: string
           payment_reference?: string | null
@@ -226,6 +233,8 @@ export type Database = {
           updated_at?: string
           voucher_code?: string | null
           voucher_discount?: number | null
+          voucher_max_discount?: number | null
+          voucher_percent?: number | null
           xp_earned?: number
         }
         Relationships: [
@@ -406,6 +415,7 @@ export type Database = {
           code: string
           created_at: string
           discount_amount: number | null
+          discount_percent: number
           expires_at: string | null
           gold_cost: number
           id: string
@@ -418,6 +428,7 @@ export type Database = {
           code: string
           created_at?: string
           discount_amount?: number | null
+          discount_percent?: number
           expires_at?: string | null
           gold_cost?: number
           id?: string
@@ -430,6 +441,7 @@ export type Database = {
           code?: string
           created_at?: string
           discount_amount?: number | null
+          discount_percent?: number
           expires_at?: string | null
           gold_cost?: number
           id?: string
@@ -545,6 +557,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -560,6 +573,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -595,6 +610,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -610,6 +626,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -716,6 +734,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -731,6 +750,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }[]
         SetofOptions: {
@@ -766,6 +787,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -781,6 +803,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -817,6 +841,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -832,6 +857,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -934,6 +961,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -949,6 +977,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }
         SetofOptions: {
@@ -1048,6 +1078,7 @@ export type Database = {
           mission_number: string
           notes: string | null
           order_items: Json | null
+          order_type: string
           pass_id: string | null
           payment_method: string
           payment_reference: string | null
@@ -1063,6 +1094,8 @@ export type Database = {
           updated_at: string
           voucher_code: string | null
           voucher_discount: number | null
+          voucher_max_discount: number | null
+          voucher_percent: number | null
           xp_earned: number
         }[]
         SetofOptions: {
@@ -1079,6 +1112,7 @@ export type Database = {
           code: string
           created_at: string
           discount_amount: number | null
+          discount_percent: number
           expires_at: string | null
           gold_cost: number
           id: string
