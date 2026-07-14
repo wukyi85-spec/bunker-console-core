@@ -36,37 +36,7 @@ function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  useEffect(() => {
-    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
-
-  async function toggleFullscreen() {
-    const doc = document as Document & {
-      webkitExitFullscreen?: () => Promise<void> | void;
-      msExitFullscreen?: () => Promise<void> | void;
-    };
-    const el = document.documentElement as HTMLElement & {
-      webkitRequestFullscreen?: () => Promise<void> | void;
-      msRequestFullscreen?: () => Promise<void> | void;
-    };
-    try {
-      if (document.fullscreenElement) {
-        if (document.exitFullscreen) await document.exitFullscreen();
-        else if (doc.webkitExitFullscreen) await doc.webkitExitFullscreen();
-        else if (doc.msExitFullscreen) await doc.msExitFullscreen();
-      } else {
-        if (el.requestFullscreen) await el.requestFullscreen();
-        else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-        else if (el.msRequestFullscreen) await el.msRequestFullscreen();
-      }
-    } catch {
-      // Fullscreen not allowed or unsupported — silently ignore.
-    }
-  }
+  // Fullscreen is controlled globally by double-tap gesture in SoundProvider.
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
