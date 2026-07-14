@@ -988,6 +988,41 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      edit_player_profile_paid: {
+        Args: {
+          p_address: string
+          p_cost: number
+          p_member_id: string
+          p_new_name: string
+          p_phone: string
+          p_player_key: string
+        }
+        Returns: {
+          activity: number
+          character_id: string | null
+          created_at: string
+          current_rank: string
+          default_address: string | null
+          full_name: string | null
+          gold: number
+          level: number
+          member_since: string
+          name_change_count: number
+          phone: string | null
+          player_key: string
+          player_name: string | null
+          total_purchase: number
+          total_weight: number
+          updated_at: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "player_stats"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_player_stats: {
         Args: { p_player_key: string }
         Returns: {
