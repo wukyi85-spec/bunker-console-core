@@ -462,21 +462,42 @@ function CheckoutPage() {
             </div>
           </div>
 
-          <BunkerButton
-            variant="primary"
-            size="lg"
-            disabled={!canSubmit}
-            onClick={handleConfirm}
-            className="mt-4 w-full"
-          >
-            {submitting
-              ? "Transmitting..."
-              : !payment
-                ? "Select Payment"
+          {step !== "verify" ? (
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={
+                (step === "delivery" && !deliveryValid) ||
+                (step === "method" && (!payment || !qrReady))
+              }
+              onClick={goNext}
+              className="mt-4 w-full"
+            >
+              {step === "delivery"
+                ? deliveryValid
+                  ? "Continue to Payment"
+                  : "Complete Delivery Info"
+                : !payment
+                  ? "Select a Method"
+                  : !qrReady
+                    ? "Loading QR..."
+                    : "Continue to Payment"}
+            </BunkerButton>
+          ) : (
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={!canSubmit}
+              onClick={handleConfirm}
+              className="mt-4 w-full"
+            >
+              {submitting
+                ? "Transmitting..."
                 : !referenceValid
                   ? "Enter Last 5 Digits"
                   : "Deploy Mission"}
-          </BunkerButton>
+            </BunkerButton>
+          )}
         </Panel>
       </div>
     </AppShell>
