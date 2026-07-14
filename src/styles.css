@@ -302,3 +302,40 @@
 @utility animate-glow-throb {
   animation: glow-throb 3s ease-in-out infinite;
 }
+
+@keyframes badge-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@utility animate-badge-spin {
+  animation: badge-spin 12s linear infinite;
+}
+
+@keyframes rankup-burst {
+  0%   { transform: scale(0.3); opacity: 0; }
+  40%  { opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@utility animate-rankup-burst {
+  animation: rankup-burst 1.6s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+@keyframes rankup-ray {
+  0%   { transform: rotate(var(--r,0deg)) translateY(-30%) scaleY(0.2); opacity: 0; }
+  40%  { opacity: 1; }
+  100% { transform: rotate(var(--r,0deg)) translateY(-120%) scaleY(1); opacity: 0; }
+}
+@utility animate-rankup-ray {
+  animation: rankup-ray 1.4s ease-out forwards;
+}
+
+@keyframes door-shake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-2px,1px); }
+  40% { transform: translate(2px,-1px); }
+  60% { transform: translate(-1px,2px); }
+  80% { transform: translate(1px,-2px); }
+}
+@utility animate-door-shake {
+  animation: door-shake 0.35s ease-in-out 2;
+}
