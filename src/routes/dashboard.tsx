@@ -88,15 +88,17 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Bottom-left tactical caption */}
-        <div className="absolute bottom-6 left-5 z-10 flex flex-col gap-1 md:left-7 animate-in fade-in duration-1000">
+        {/* Bottom-left tactical caption + Contact HQ */}
+        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000">
           <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
             // BUNKER ONLINE
           </span>
           <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
             Sector 07 · Secure Channel
           </span>
+          <ContactHQ className="mt-1 w-fit" />
         </div>
+
 
         {/* Bottom-right telemetry */}
         <div className="absolute bottom-6 right-5 z-10 hidden flex-col items-end gap-1 font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground md:flex md:right-7 animate-in fade-in duration-1000">
