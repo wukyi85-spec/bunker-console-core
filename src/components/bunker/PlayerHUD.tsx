@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Shield, Zap, Coins, Star, Radio } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
 import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getPlayerProfile } from "@/lib/player";
 import { levelProgress } from "@/lib/progression";
+import { getRankSettings } from "@/lib/sheets.functions";
+
 
 interface PlayerHUDProps {
   onClick?: () => void;
