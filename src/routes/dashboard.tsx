@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Logo } from "@/components/bunker/Logo";
 import { PlayerHUD } from "@/components/bunker/PlayerHUD";
 import { GameNav } from "@/components/bunker/GameNav";
@@ -66,7 +66,13 @@ function DashboardPage() {
 
         {/* Top left — Logo only */}
         <div className="absolute left-4 top-4 z-20 md:left-6 md:top-5 animate-in fade-in slide-in-from-left-4 duration-700">
-          <Logo />
+          <Link
+            to="/dashboard"
+            aria-label="Back to Dashboard"
+            className="inline-flex rounded-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60"
+          >
+            <Logo />
+          </Link>
         </div>
 
         {/* Top right — Player HUD + Bunker Alarm stack (20px gap) */}
