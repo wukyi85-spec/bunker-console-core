@@ -177,7 +177,7 @@ function ProfilePage() {
                   // Digital Stoner Pass
                 </div>
                 <div className="mt-1 flex items-center gap-3">
-                  <h1 className="min-w-0 flex-1 truncate font-display text-3xl font-black uppercase tracking-widest text-foreground">
+                  <h1 className="min-w-0 flex-1 truncate font-display text-2xl font-black uppercase tracking-widest text-foreground">
                     {profile.playerName ?? "OPERATOR"}
                   </h1>
                   <button
