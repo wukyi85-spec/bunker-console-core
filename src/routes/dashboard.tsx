@@ -3,7 +3,9 @@ import { Logo } from "@/components/bunker/Logo";
 import { PlayerHUD } from "@/components/bunker/PlayerHUD";
 import { GameNav } from "@/components/bunker/GameNav";
 import { BunkerAlarm } from "@/components/bunker/BunkerAlarm";
+import { ContactHQ } from "@/components/bunker/ContactHQ";
 import heroImage from "@/assets/bunker-hero.jpg";
+
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
