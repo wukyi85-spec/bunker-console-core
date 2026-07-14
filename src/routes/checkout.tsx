@@ -267,6 +267,7 @@ function CheckoutPage() {
               );
             })}
           </div>
+          )}
 
           {/* STEP 1 — DELIVERY */}
           {step === "delivery" && (
