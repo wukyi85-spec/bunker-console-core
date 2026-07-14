@@ -49,10 +49,10 @@ export function NotificationPopup() {
   const current = queue[0];
   if (!current) return null;
 
-  const cancelled = current.type.toUpperCase() === "ORDER_CANCELLED";
+  const upperType = current.type.toUpperCase();
 
   async function handleClose() {
-    const n = current;
+    const n = current!;
     setSeen((s) => new Set(s).add(n.id));
     setQueue((q) => q.slice(1));
     try {
@@ -62,10 +62,13 @@ export function NotificationPopup() {
     }
   }
 
-  if (cancelled) {
+  if (upperType === "ORDER_CANCELLED") {
     return <CancelledOverlay notif={current} onClose={handleClose} />;
   }
-  return <ConfirmedCinematic key={current.id} notif={current} onClose={handleClose} />;
+  if (upperType === "ORDER_COMPLETED") {
+    return <ConfirmedCinematic key={current.id} notif={current} onClose={handleClose} />;
+  }
+  return <ConfirmedSimple notif={current} onClose={handleClose} />;
 }
 
 // ============================================================
