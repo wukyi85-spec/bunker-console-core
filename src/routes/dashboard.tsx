@@ -106,11 +106,13 @@ function DashboardPage() {
           </Link>
         </div>
 
-        {/* Top right — Player HUD + Bunker Alarm stack */}
+        {/* Top right — Player HUD + Bunker Alarm stack.
+            On landscape phones, shrink further and clamp height so the
+            alarm can never sit behind the bottom navigation dock. */}
         <div
-          className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:scale-75"
+          className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-3 lphone:top-3 lphone:w-[310px] lphone:gap-3 lphone:scale-[0.72] lphone:max-h-[calc(100svh-64px)]"
         >
-          <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full" />
+          <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
           <BunkerAlarm />
         </div>
 
