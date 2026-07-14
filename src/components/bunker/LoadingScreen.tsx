@@ -117,7 +117,7 @@ export function LoadingScreen({ onComplete }: { onComplete: () => void }) {
               <span key={messageIdx} className="animate-in fade-in duration-300 text-foreground/80">
                 {MESSAGES[messageIdx]}
               </span>
-              <span className="text-neon">{Math.floor(progress).toString().padStart(3, "0")}%</span>
+              <span className="text-neon">{Math.floor(progress)}%</span>
             </div>
           </div>
         </div>
