@@ -146,11 +146,11 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
 function MiniBar({ label, value, tone }: { label: string; value: number; tone: "neon" | "dim" }) {
   const pct = Math.max(0, Math.min(100, value));
   return (
-    <div className="flex items-center gap-2">
-      <span className="w-6 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+    <div className="flex items-center gap-2 max-sm:gap-1.5">
+      <span className="w-6 font-mono text-[9px] uppercase tracking-widest text-muted-foreground max-sm:w-5 max-sm:text-[7px]">
         {label}
       </span>
-      <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40">
+      <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40 max-sm:h-0.5">
         <div
           className={cn(
             "h-full transition-[width] duration-1000 ease-out",
@@ -161,7 +161,7 @@ function MiniBar({ label, value, tone }: { label: string; value: number; tone: "
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="w-8 text-right font-mono text-[9px] tabular-nums text-foreground/80">
+      <span className="w-8 text-right font-mono text-[9px] tabular-nums text-foreground/80 max-sm:w-6 max-sm:text-[7px]">
         {pct}%
       </span>
     </div>
