@@ -30,7 +30,7 @@ export interface SheetProduct {
 }
 
 const SPREADSHEET_ID = "1kTOlpWLZ6HlAzV3kOOobaN-4aNuqsyFRCb4jWeTzs5M";
-const RANGE = "Sheet1!A1:Z500";
+const RANGE = "SupplyRoom!A1:Z500";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets";
 
 const SIZE_REGEX = /^(\d+(?:\.\d+)?)\s*g$/i;
@@ -120,43 +120,54 @@ export const getProducts = createServerFn({ method: "GET" }).handler(
     const products: SheetProduct[] = [];
     for (let r = 1; r < rows.length; r++) {
       const row = rows[r];
-      const name = (row[idx.name] ?? "").trim();
-      if (!name) continue;
+      try {
+        const name = (row[idx.name] ?? "").trim();
+        if (!name) continue;
 
-      const sizes: SheetPackageSize[] = [];
-      for (const s of sizeCols) {
-        const total = toNumber(row[s.colIndex]);
-        if (total > 0) {
-          sizes.push({
-            grams: s.grams,
-            label: s.label,
-            totalPrice: total,
-            pricePerGram: total / s.grams,
-          });
+        const sizes: SheetPackageSize[] = [];
+        for (const s of sizeCols) {
+          const total = toNumber(row[s.colIndex]);
+          if (total > 0) {
+            sizes.push({
+              grams: s.grams,
+              label: s.label,
+              totalPrice: total,
+              pricePerGram: total / s.grams,
+            });
+          }
         }
+        if (sizes.length === 0) continue;
+
+        const stockLabel = (row[idx.stock] ?? "").trim();
+        const category = (row[idx.category] ?? "products").trim() || "products";
+
+        products.push({
+          id: slugify(name, r),
+          name: name.toUpperCase(),
+          category: category.toLowerCase(),
+          description: (row[idx.description] ?? "").trim(),
+          image: (row[idx.image] ?? "").trim(),
+          thc: toNumber(row[idx.thc]),
+          indica: toNumber(row[idx.indica]),
+          sativa: toNumber(row[idx.sativa]),
+          stockLabel,
+          availability: normalizeAvailability(stockLabel),
+          popular: toBool(row[idx.popular]),
+          newDrop: toBool(row[idx.newDrop]),
+          displayOrder: toNumber(row[idx.order]),
+          sizes,
+        });
+      } catch (err) {
+        console.error(
+          `[SupplyRoom] Failed to parse row ${r + 1}:`,
+          JSON.stringify(row),
+          "Error:",
+          err instanceof Error ? err.message : String(err),
+        );
       }
-      if (sizes.length === 0) continue;
-
-      const stockLabel = (row[idx.stock] ?? "").trim();
-      const category = (row[idx.category] ?? "products").trim() || "products";
-
-      products.push({
-        id: slugify(name, r),
-        name: name.toUpperCase(),
-        category: category.toLowerCase(),
-        description: (row[idx.description] ?? "").trim(),
-        image: (row[idx.image] ?? "").trim(),
-        thc: toNumber(row[idx.thc]),
-        indica: toNumber(row[idx.indica]),
-        sativa: toNumber(row[idx.sativa]),
-        stockLabel,
-        availability: normalizeAvailability(stockLabel),
-        popular: toBool(row[idx.popular]),
-        newDrop: toBool(row[idx.newDrop]),
-        displayOrder: toNumber(row[idx.order]),
-        sizes,
-      });
     }
+    console.log(`[SupplyRoom] Loaded ${products.length} products successfully.`);
+
 
     products.sort(
       (a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name),
