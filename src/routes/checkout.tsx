@@ -358,7 +358,7 @@ function CheckoutPage() {
                   <div className="mt-2 flex items-center gap-2 rounded-sm border border-neon/40 bg-neon/5 px-3 py-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5 text-neon" />
                     <span className="font-mono text-[10px] uppercase tracking-widest text-neon">
-                      {voucher.reward_name} · −฿{Number(voucher.discount_amount).toLocaleString()}
+                      {voucher.reward_name} · {voucherPercent}% OFF (up to ฿{voucherMaxDiscount.toLocaleString()})
                     </span>
                   </div>
                 )}
@@ -368,6 +368,7 @@ function CheckoutPage() {
                   </div>
                 )}
               </Panel>
+              )}
             </>
           )}
 
