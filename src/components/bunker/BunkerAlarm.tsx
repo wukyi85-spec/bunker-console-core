@@ -1,24 +1,37 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle, Package, Radio, Bell } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
 import { listPlayerNotifications, markNotificationRead, type PlayerNotificationRow } from "@/lib/bunker-supabase";
+import { getAnnouncements, getGameSettings } from "@/lib/sheets.functions";
 
 type AlarmTone = "intel" | "supply" | "reward" | "warn" | "ops";
 
+interface AlarmItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  isRead: boolean;
+  source: "notification" | "announcement";
+}
+
 function toneFor(type: string): AlarmTone {
   const t = type.toUpperCase();
-  if (t === "ORDER" || t === "SUPPLY") return "supply";
-  if (t === "REWARD") return "reward";
-  if (t === "WARN" || t === "ALERT") return "warn";
+  if (t.includes("ORDER") || t === "SUPPLY") return "supply";
+  if (t === "REWARD" || t === "NEWS") return "reward";
+  if (t === "WARN" || t === "ALERT" || t === "SYSTEM") return "warn";
   if (t === "OPS") return "ops";
   return "intel";
 }
 
 function iconFor(type: string) {
   const t = type.toUpperCase();
-  if (t === "ORDER" || t === "SUPPLY") return Package;
-  if (t === "WARN" || t === "ALERT") return AlertTriangle;
-  if (t === "REWARD") return Bell;
+  if (t.includes("ORDER") || t === "SUPPLY") return Package;
+  if (t === "WARN" || t === "ALERT" || t === "SYSTEM") return AlertTriangle;
+  if (t === "REWARD" || t === "NEWS") return Bell;
   return Radio;
 }
 
@@ -39,15 +52,23 @@ const toneStyles: Record<AlarmTone, { badge: string; label: string; icon: string
 };
 
 export function BunkerAlarm() {
-  const [items, setItems] = useState<PlayerNotificationRow[]>([]);
+  const [notifs, setNotifs] = useState<PlayerNotificationRow[]>([]);
   const [mountedCount, setMountedCount] = useState(0);
+
+  const fetchAnnouncements = useServerFn(getAnnouncements);
+  const fetchSettings = useServerFn(getGameSettings);
+  const annQ = useQuery({ queryKey: ["announcements"], queryFn: fetchAnnouncements, staleTime: 60_000 });
+  const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
+
+  const expireDays = settingsQ.data?.bunker_alarm_expire_days ?? 3;
+  const maxDisplay = settingsQ.data?.max_alarm_display ?? 3;
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
         const rows = await listPlayerNotifications();
-        if (!cancelled) setItems(rows.slice(0, 3));
+        if (!cancelled) setNotifs(rows);
       } catch {
         /* silent */
       }
@@ -59,6 +80,34 @@ export function BunkerAlarm() {
       clearInterval(t);
     };
   }, []);
+
+  // Merge notifications + announcements, drop items older than expireDays.
+  const now = Date.now();
+  const cutoff = now - expireDays * 86_400_000;
+  const items: AlarmItem[] = [
+    ...notifs
+      .filter((n) => new Date(n.created_at).getTime() >= cutoff)
+      .map<AlarmItem>((n) => ({
+        id: `n-${n.id}`,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        createdAt: n.created_at,
+        isRead: n.is_read,
+        source: "notification",
+      })),
+    ...(annQ.data ?? []).map<AlarmItem>((a, i) => ({
+      id: `a-${i}-${a.title}`,
+      type: a.type || "intel",
+      title: a.title || "BUNKER TRANSMISSION",
+      message: a.message,
+      createdAt: a.createdAt || new Date().toISOString(),
+      isRead: true,
+      source: "announcement",
+    })),
+  ]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, maxDisplay);
 
   const visible = items;
 
@@ -73,15 +122,17 @@ export function BunkerAlarm() {
     return () => clearInterval(t);
   }, [visible.length]);
 
-  async function handleClick(n: PlayerNotificationRow) {
-    if (n.is_read) return;
+  async function handleClick(n: AlarmItem) {
+    if (n.source !== "notification" || n.isRead) return;
+    const rawId = n.id.replace(/^n-/, "");
     try {
-      await markNotificationRead(n.id);
-      setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, is_read: true } : x)));
+      await markNotificationRead(rawId);
+      setNotifs((prev) => prev.map((x) => (x.id === rawId ? { ...x, is_read: true } : x)));
     } catch {
       /* ignore */
     }
   }
+
 
   return (
     <div className="relative flex w-full flex-col rounded-md gunmetal-glass p-3">
