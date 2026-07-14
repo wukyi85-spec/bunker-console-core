@@ -178,8 +178,6 @@ export function Logo({ className }: { className?: string }) {
           <span className="pointer-events-none absolute inset-y-1 left-1/2 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-neon/70 to-transparent animate-vault-seam" />
         </div>
 
-        {/* Live status dot */}
-        <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-neon animate-hud-pulse shadow-[0_0_10px_var(--neon)]" />
       </div>
 
       {/* Wordmark */}
