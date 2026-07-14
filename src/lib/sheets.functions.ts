@@ -65,7 +65,9 @@ export interface GameSettings {
   gold_per_10_thb: number;
   voucher_expire_days: number;
   notification_expire_days: number;
+  contact_telegram_url: string;
 }
+
 
 export const DEFAULT_SETTINGS: GameSettings = {
   minimum_order_amount: 1000,
