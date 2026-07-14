@@ -12,9 +12,11 @@ interface ContactHQProps {
 }
 
 export function ContactHQ({ orderId, className, label = "CONTACT HQ", compact }: ContactHQProps) {
+  // Always route Contact HQ to the official Telegram operator.
   const fetchSettings = useServerFn(getGameSettings);
-  const q = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
-  const baseUrl = (q.data?.contact_telegram_url || DEFAULT_SETTINGS.contact_telegram_url).trim();
+  useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
+  void DEFAULT_SETTINGS;
+  const baseUrl = "https://t.me/BlackBunker21";
 
   function open() {
     if (!baseUrl) return;
