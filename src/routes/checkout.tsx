@@ -194,10 +194,10 @@ function CheckoutPage() {
                 );
               })}
             </div>
-            {selectedQR?.qr_image && (
+            {selectedQR?.qrImage && (
               <div className="mt-3 flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-3">
                 <img
-                  src={selectedQR.qr_image}
+                  src={selectedQR.qrImage}
                   alt={`${payment} QR`}
                   className="h-40 w-40 rounded-sm object-contain"
                 />
