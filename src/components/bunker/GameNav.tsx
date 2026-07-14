@@ -88,14 +88,14 @@ export function GameNav() {
 
             <Icon
               className={cn(
-                "relative h-[22px] w-[22px] transition-all duration-300 max-sm:h-4 max-sm:w-4",
+                "relative h-[22px] w-[22px] transition-all duration-300",
                 "group-hover:-translate-y-0.5",
                 isActive &&
                   "drop-shadow-[0_0_10px_color-mix(in_oklab,var(--neon)_75%,transparent)]",
               )}
             />
 
-            <span className="relative max-w-full break-words text-center font-display text-[10.5px] font-bold uppercase leading-tight tracking-[0.26em] max-sm:text-[8px] max-sm:tracking-[0.18em]">
+            <span className="relative font-display text-[10.5px] font-bold uppercase tracking-[0.26em]">
               {item.label}
             </span>
 
@@ -103,7 +103,7 @@ export function GameNav() {
             {isActive && (
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-x-6 bottom-1.5 h-[2px] rounded-full bg-neon/90 shadow-[0_0_10px_var(--neon)] max-sm:inset-x-3"
+                className="pointer-events-none absolute inset-x-6 bottom-1.5 h-[2px] rounded-full bg-neon/90 shadow-[0_0_10px_var(--neon)]"
               />
             )}
           </Link>
