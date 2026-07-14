@@ -268,9 +268,9 @@ function SupplyPage() {
         {/* panel */}
         <aside
           className={cn(
-            "absolute right-0 top-0 flex h-full w-[440px] max-w-[92vw] flex-col",
+            "absolute right-0 top-0 flex h-full w-full flex-col sm:w-[440px] sm:max-w-[92vw]",
             "border-l border-white/10 bg-gradient-to-b from-[rgb(20_20_20)] to-[rgb(10_10_10)]",
-            "shadow-[-24px_0_60px_-12px_rgb(0_0_0/0.9)] transition-transform duration-400 ease-out",
+            "shadow-[-24px_0_60px_-12px_rgb(0_0_0/0.9)] transition-transform duration-400 ease-out overflow-hidden",
             selected ? "translate-x-0" : "translate-x-full",
           )}
         >

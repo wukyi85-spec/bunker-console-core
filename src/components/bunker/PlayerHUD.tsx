@@ -56,9 +56,8 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
     <button
       type="button"
       onClick={onClick}
-      style={{ width: 360 }}
       className={cn(
-        "group relative flex items-stretch gap-3 rounded-md p-3 pr-4",
+        "group relative flex w-full max-w-full items-stretch gap-3 rounded-md p-3 pr-4 sm:w-[360px]",
         "gunmetal-glass text-left transition-all duration-300",
         "hover:border-neon/60 hover:shadow-[0_22px_60px_-16px_color-mix(in_oklab,var(--neon)_55%,transparent)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60",

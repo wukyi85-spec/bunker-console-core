@@ -108,13 +108,11 @@ function DashboardPage() {
 
         {/* Top right — Player HUD + Bunker Alarm stack (20px gap) */}
         <div
-          className="absolute right-4 top-4 z-20 md:right-6 md:top-5 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700"
-          style={{ width: 360, gap: 20 }}
+          className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700 left-4 right-4 top-16 sm:left-auto sm:right-6 sm:top-5 sm:w-[360px]"
+          style={{ gap: 20 }}
         >
-          <PlayerHUD onClick={() => navigate({ to: "/profile" })} />
-          <div className="hidden sm:block">
-            <BunkerAlarm />
-          </div>
+          <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full" />
+          <BunkerAlarm />
         </div>
 
         {/* Bottom-left tactical caption + Contact HQ */}
