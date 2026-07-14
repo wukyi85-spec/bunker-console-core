@@ -452,24 +452,30 @@ function ReadonlyField({
   );
 }
 
-function StatChip({
-  icon,
+function MiniStat({
   label,
   value,
+  valueClass,
+  icon,
 }: {
-  icon: React.ReactNode;
   label: string;
   value: string;
+  valueClass?: string;
+  icon?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-sm border border-white/10 bg-panel-elevated/60 px-2.5 py-1.5">
-      {icon}
-      <div className="min-w-0">
-        <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          {label}
-        </div>
-        <div className="font-display text-sm font-bold tabular-nums">{value}</div>
+    <div className="rounded-sm border border-white/10 bg-panel-elevated/60 px-2.5 py-1.5">
+      <div className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+        {icon}
+        <span className="truncate">{label}</span>
       </div>
+      <div className={cn("mt-0.5 truncate font-display text-sm font-bold tabular-nums", valueClass ?? "text-foreground")}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
     </div>
   );
 }
