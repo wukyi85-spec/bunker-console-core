@@ -641,7 +641,7 @@ function OrderDetailsDrawer({
                 className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/50 bg-red-500/10 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
               >
                 <Ban className="h-4 w-4" />
-                Cancel Order
+                Reject Order
               </button>
             )}
           </div>
