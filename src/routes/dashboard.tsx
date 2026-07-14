@@ -108,22 +108,21 @@ function DashboardPage() {
 
         {/* Top right — Player HUD + Bunker Alarm stack */}
         <div
-          className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700 left-4 right-4 top-16 gap-3.5 sm:left-auto sm:right-6 sm:top-5 sm:w-[360px] sm:gap-5"
+          className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700 left-4 right-4 top-16 gap-3 sm:left-auto sm:right-6 sm:top-5 sm:w-[360px] sm:gap-5"
         >
           <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full" />
           <BunkerAlarm />
         </div>
 
         {/* Bottom-left tactical caption + Contact HQ */}
-        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000 max-sm:bottom-[132px] max-sm:left-3 max-sm:gap-1">
-          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse max-sm:text-[8px]">
+        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000 max-sm:hidden">
+          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
             // BUNKER ONLINE
           </span>
-          <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground max-sm:text-[9px]">
+          <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
             Sector 07 · Secure Channel
           </span>
-          <ContactHQ className="mt-1 w-fit max-sm:hidden" />
-          <ContactHQ compact className="mt-0.5 w-fit sm:hidden" />
+          <ContactHQ className="mt-1 w-fit" />
         </div>
 
 
