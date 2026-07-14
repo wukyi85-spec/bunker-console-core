@@ -27,8 +27,8 @@ export function AppShell({
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       {/* Top-left: Logo + Back button stack */}
-      <header className="relative z-20 flex items-start justify-between gap-4 px-6 py-5 md:px-9 md:py-6">
-        <div className="flex flex-col gap-3">
+      <header className="relative z-20 flex items-start justify-between gap-4 px-6 py-3 md:px-9 md:py-6 lphone:px-4 lphone:py-2">
+        <div className="flex flex-col gap-3 lphone:gap-1.5">
           {!hideLogo && (
             <Link
               to="/dashboard"
@@ -42,7 +42,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 min-h-0 px-6 pb-4 md:px-9">
+      <main className="relative z-10 flex-1 min-h-0 px-6 pb-4 md:px-9 lphone:px-4 lphone:pb-2">
         {children}
       </main>
 
@@ -51,6 +51,7 @@ export function AppShell({
           <GameNav />
         </footer>
       )}
+
 
       <NotificationPopup />
     </div>
