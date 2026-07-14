@@ -47,6 +47,8 @@ function LoadoutPage() {
     weight: minWeight,
   });
 
+  const deliveryFee = 0;
+  const grandTotal = productTotal + deliveryFee;
 
   return (
     <AppShell hideLogo hideNav>
@@ -143,7 +145,7 @@ function LoadoutPage() {
           <div className="flex flex-col gap-2 text-xs">
             <Row label="Total Weight" value={`${totalGrams} G`} />
             <Row label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
-            <Row label="Delivery Fee" value="TO BE CONFIRMED" muted />
+            <Row label="Delivery Fee" value="FREE" />
 
             <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
@@ -186,7 +188,7 @@ function LoadoutPage() {
                 Grand Total
               </span>
               <span className="font-display text-xl font-bold text-neon">
-                ฿{productTotal.toLocaleString()}
+                ฿{grandTotal.toLocaleString()}
               </span>
             </div>
           </div>
@@ -205,32 +207,38 @@ function LoadoutPage() {
             </div>
           )}
 
-
-
-
           {/* Order Policy */}
           {enriched.length > 0 && (
-            <div className="mt-3 rounded-sm border border-white/10 bg-background/40 p-2.5">
-              <div className="flex items-center gap-1.5">
-                <ShieldAlert className="h-3.5 w-3.5 text-neon" />
-                <span className="font-display text-[11px] font-bold uppercase tracking-widest text-foreground">
-                  Order Policy
+            <div className="mt-4 rounded-sm border border-white/10 bg-background/40 p-4">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 text-neon" />
+                <span className="font-display text-sm font-bold uppercase tracking-[0.2em] text-foreground">
+                  ORDER POLICY
                 </span>
               </div>
-              <ul className="mt-1.5 space-y-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                <li>• Rush orders are not accepted.</li>
-                <li>• Processing & delivery: 2–5 days.</li>
-                <li>• Please answer delivery calls to avoid delays.</li>
+              <ul className="mt-3 space-y-2 font-mono text-[11px] leading-relaxed uppercase tracking-wider text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-neon">•</span>
+                  <span>Rush orders are not accepted.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-neon">•</span>
+                  <span>Estimated processing and delivery time is 2–5 days.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-neon">•</span>
+                  <span>Please answer calls from the delivery service to avoid delays.</span>
+                </li>
               </ul>
-              <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-sm border border-white/10 bg-background/60 px-2 py-1.5 hover:border-neon/40">
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-sm border border-white/10 bg-background/60 p-3 hover:border-neon/40">
                 <input
                   type="checkbox"
                   checked={policyAccepted}
                   onChange={(e) => setPolicyAccepted(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-neon"
+                  className="mt-0.5 h-4 w-4 accent-neon"
                 />
-                <span className="font-mono text-[9px] uppercase tracking-widest text-foreground">
-                  I have read and agree to the order policy
+                <span className="font-mono text-[11px] uppercase tracking-widest text-foreground">
+                  I have read and agree to the Order Policy.
                 </span>
               </label>
             </div>
