@@ -136,26 +136,35 @@ function ProfilePage() {
           />
           <div className="pointer-events-none absolute inset-0 hud-grid opacity-[0.08]" />
 
-          <div className="relative grid grid-cols-[180px_1fr_260px] gap-5">
-            {/* Portrait */}
-            <div className="relative">
-              <CharacterPortrait
-                codename={character.codename}
-                accent={character.accent}
-                selected
-                className="rounded-md border border-white/10"
-              />
-              <div className="pointer-events-none absolute -inset-0.5 rounded-md border border-neon/30 shadow-[0_0_25px_-6px_var(--neon)]" />
+          <div className="relative grid grid-cols-[170px_1fr_260px] gap-5">
+            {/* Character Avatar */}
+            <div className="relative flex flex-col gap-3">
+              <div className="relative overflow-hidden rounded-md border border-white/10">
+                <CharacterPortrait
+                  codename={character.codename}
+                  accent={character.accent}
+                  selected
+                />
+                <div className="pointer-events-none absolute -inset-0.5 rounded-md border border-neon/30 shadow-[0_0_25px_-6px_var(--neon)]" />
+              </div>
+              <div className="rounded-sm border border-white/10 bg-black/40 px-3 py-2 text-center">
+                <div className="font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
+                  Codename
+                </div>
+                <div className="mt-0.5 truncate font-display text-xs font-bold uppercase tracking-widest">
+                  {character.codename}
+                </div>
+              </div>
             </div>
 
-            {/* Identity + Personal Info */}
+            {/* Identity + Contact */}
             <div className="flex min-w-0 flex-col gap-4">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
                   // Digital Stoner Pass
                 </div>
                 <div className="mt-1 flex items-center gap-3">
-                  <h1 className="truncate font-display text-3xl font-black uppercase tracking-widest text-foreground">
+                  <h1 className="min-w-0 flex-1 truncate font-display text-3xl font-black uppercase tracking-widest text-foreground">
                     {profile.playerName ?? "OPERATOR"}
                   </h1>
                   <button
@@ -164,55 +173,33 @@ function ProfilePage() {
                       setConfirmStep(false);
                       setChangeOpen(true);
                     }}
-                    className="rounded-sm border border-white/15 bg-black/40 p-1.5 text-muted-foreground transition-colors hover:border-neon/50 hover:text-neon"
+                    className="shrink-0 rounded-sm border border-white/15 bg-black/40 p-1.5 text-muted-foreground transition-colors hover:border-neon/50 hover:text-neon"
                     aria-label="Change player name"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-                  {character.codename} · {character.label}
-                </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-2 font-mono text-[10px] uppercase tracking-widest">
+              <div className="grid grid-cols-2 gap-2">
                 <ReadonlyField label="Pass ID" value={profile.passId ?? "—"} />
                 <ReadonlyField label="Member Since" value={memberSince} />
-                <ReadonlyField
-                  label="Status"
-                  value="ACTIVE"
-                  valueClass="text-neon"
-                />
-                <ReadonlyField
-                  label="Gold"
-                  value={(stats?.gold ?? 0).toLocaleString()}
-                  valueClass="text-amber-300"
-                />
               </div>
 
               <div className="border-t border-white/10 pt-3">
-                <div className="flex items-center justify-between pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
-                    <span className="font-display text-[11px] font-bold uppercase tracking-widest">
-                      Personal Information
-                    </span>
-                  </div>
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    Used for auto-fill at checkout
+                <div className="flex items-center gap-2 pb-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
+                  <span className="font-display text-[11px] font-bold uppercase tracking-widest">
+                    Delivery Contact
+                  </span>
+                  <span className="ml-auto font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                    Auto-fills at checkout
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <BunkerInput
-                    label="Full Name"
-                    icon={<User className="h-3.5 w-3.5" />}
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your legal name"
-                  />
-                  <BunkerInput
-                    label="Phone Number"
+                    label="Phone"
                     icon={<Phone className="h-3.5 w-3.5" />}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -237,7 +224,6 @@ function ProfilePage() {
               </div>
             </div>
 
-
             {/* Rank / Stats */}
             <div className="flex flex-col gap-3 rounded-md border border-white/10 bg-black/40 p-3">
               <div className="flex items-center gap-3">
@@ -247,22 +233,30 @@ function ProfilePage() {
                     <BadgeGlow
                       src={rankRow?.badgeImage || null}
                       alt={rank}
-                      size={44}
-                      primary={rankAccent || t.primary}
+                      size={48}
+                      primary={t.primary}
                       secondary={t.secondary}
                       intensity="md"
                     />
                   );
                 })()}
-                <div>
+                <div className="min-w-0">
                   <div className="font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
                     Current Rank
                   </div>
                   <div
-                    className="font-display text-lg font-black uppercase tracking-widest"
+                    className="truncate font-display text-lg font-black uppercase tracking-widest"
                     style={{ color: rankAccent }}
                   >
                     {rank}
+                  </div>
+                </div>
+                <div className="ml-auto text-right">
+                  <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
+                    Level
+                  </div>
+                  <div className="font-display text-lg font-black tabular-nums text-neon">
+                    {stats?.level ?? 1}
                   </div>
                 </div>
               </div>
@@ -270,8 +264,7 @@ function ProfilePage() {
               <div>
                 <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Zap className="h-3 w-3 text-neon" /> XP · LV{" "}
-                    {stats?.level ?? 1}
+                    <Zap className="h-3 w-3 text-neon" /> XP
                   </span>
                   <span className="text-neon">
                     {xpInLevel} / {PROGRESSION.xpPerLevel}
@@ -283,42 +276,34 @@ function ProfilePage() {
                     style={{ width: `${xpPct}%` }}
                   />
                 </div>
+                <div className="mt-1 text-right font-mono text-[9px] uppercase tracking-widest text-muted-foreground/70">
+                  {(stats?.xp ?? 0).toLocaleString()} TOTAL
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <StatChip
-                  icon={<Shield className="h-3.5 w-3.5 text-neon" />}
-                  label="Level"
-                  value={String(stats?.level ?? 1)}
-                />
-                <StatChip
-                  icon={<Coins className="h-3.5 w-3.5 text-amber-300" />}
+                <MiniStat
                   label="Gold"
                   value={(stats?.gold ?? 0).toLocaleString()}
+                  valueClass="text-amber-300"
+                  icon={<Coins className="h-3 w-3 text-amber-300" />}
                 />
-                <StatChip
-                  icon={<Trophy className="h-3.5 w-3.5 text-neon" />}
-                  label="Total XP"
-                  value={(stats?.xp ?? 0).toLocaleString()}
-                />
-                <StatChip
-                  icon={<Star className="h-3.5 w-3.5 fill-neon text-neon" />}
+                <MiniStat
                   label="Total Purchase"
                   value={`฿${Number(stats?.total_purchase ?? 0).toLocaleString()}`}
                 />
-                <StatChip
-                  icon={<Zap className="h-3.5 w-3.5 text-neon" />}
+                <MiniStat
                   label="Total Weight"
                   value={`${Number(stats?.total_weight ?? 0)}G`}
+                />
+                <MiniStat
+                  label="Status"
+                  value="ACTIVE"
+                  valueClass="text-neon"
                 />
               </div>
             </div>
           </div>
-        </Panel>
-        <div className="flex justify-end">
-          <ContactHQ label="Contact HQ on Telegram" />
-        </div>
-      </div>
 
 
       {/* ========== Change Name Confirmation ========== */}
