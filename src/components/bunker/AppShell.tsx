@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { GameNav } from "./GameNav";
 import { BackToBunker } from "./BackToBunker";
