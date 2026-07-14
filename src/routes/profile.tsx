@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 
 import { ContactHQ } from "@/components/bunker/ContactHQ";
+import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
 import { cn } from "@/lib/utils";
 
 import { toast } from "sonner";
