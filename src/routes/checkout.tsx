@@ -153,34 +153,52 @@ function CheckoutPage() {
       setVoucherError("Voucher expired");
       return;
     }
-    if (!match.discount_amount || Number(match.discount_amount) <= 0) {
+    const percent = Number(match.discount_percent ?? 0);
+    if (!percent || percent <= 0) {
       setVoucher(null);
       setVoucherError("Voucher has no discount value");
       return;
     }
     setVoucher(match);
-    toast.success(`Voucher applied · ฿${Number(match.discount_amount).toLocaleString()} off`);
+    toast.success(`Voucher applied · ${percent}% off (up to ฿${voucherMaxDiscount.toLocaleString()})`);
   }
 
   const handleConfirm = async () => {
-    if (!canSubmit || !payment) return;
+    if (!canSubmit) return;
     setSubmitting(true);
     try {
+      // Build order payload — reward orders send the reward loadout as items,
+      // skip payment method + reference, and always send order_type "reward".
+      const payloadItems = isReward
+        ? rewardItems.map((r) => ({
+            productId: r.rewardId,
+            productName: r.rewardName,
+            productImage: r.image,
+            sizeLabel: "REWARD",
+            grams: 0,
+            pricePerGram: 0,
+            quantity: 1,
+            category: "REWARD",
+          }))
+        : enriched;
       const { order } = await createOrder({
-        items,
+        items: payloadItems as any,
         customer: {
           name: name.trim(),
           phone: phone.trim(),
           address: address.trim(),
           notes: notes.trim() || undefined,
         },
-        payment,
-        productTotal,
-        totalGrams,
-        paymentReference: reference.trim(),
-        voucherCode: voucher?.code ?? null,
-        voucherDiscount,
-      });
+        payment: (isReward ? "PromptPay" : payment) as Payment,
+        productTotal: isReward ? 0 : productTotal,
+        totalGrams: isReward ? 0 : totalGrams,
+        paymentReference: isReward ? "" : reference.trim(),
+        voucherCode: isReward ? null : voucher?.code ?? null,
+        voucherDiscount: isReward ? 0 : voucherDiscount,
+        orderType: isReward ? "reward" : voucher ? "voucher" : "supply",
+        voucherPercent: !isReward && voucher ? voucherPercent : 0,
+        voucherMaxDiscount: !isReward && voucher ? voucherMaxDiscount : 0,
+      } as any);
       if (saveAsDefault) {
         try {
           await updatePlayerProfileInfo({
@@ -192,7 +210,12 @@ function CheckoutPage() {
           console.warn("[BLACK'S BUNKER] Could not save default profile info", e);
         }
       }
-      clearLoadout();
+      if (isReward) {
+        clearRewardLoadout();
+      } else {
+        clearLoadout();
+      }
+      clearCheckoutMode();
       navigate({ to: "/order-complete", search: { id: order.mission_number } });
     } catch (err: any) {
       console.error("[BLACK'S BUNKER] Order transmission failed:", err);
