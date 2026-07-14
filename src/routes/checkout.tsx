@@ -41,8 +41,13 @@ type Step = "delivery" | "method" | "verify";
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  // Detect reward mode ONCE on mount; cleared after submission.
+  const [mode] = useState<"supply" | "reward">(() => getCheckoutMode());
+  const isReward = mode === "reward";
+  // Reward orders skip payment method + verification — delivery is the only step.
   const [step, setStep] = useState<Step>("delivery");
-  const [items, setItems] = useState(getLoadout);
+  const [supplyItems, setSupplyItems] = useState(getLoadout);
+  const [rewardItems, setRewardItems] = useState(getRewardLoadout);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -71,7 +76,10 @@ function CheckoutPage() {
 
   const selectedQR = qrQ.data?.find((q) => q.method === payment) ?? null;
 
-  useEffect(() => setItems(getLoadout()), []);
+  useEffect(() => {
+    setSupplyItems(getLoadout());
+    setRewardItems(getRewardLoadout());
+  }, []);
 
   useEffect(() => {
     if (!stats) return;
@@ -82,35 +90,43 @@ function CheckoutPage() {
 
   const minAmount = settingsQ.data?.minimum_order_amount ?? 0;
   const minWeight = settingsQ.data?.minimum_order_weight ?? 0;
-  const settingsReady = minAmount > 0 && minWeight > 0;
-  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items, {
+  const settingsReady = isReward ? true : minAmount > 0 && minWeight > 0;
+  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(supplyItems, {
     amount: minAmount,
     weight: minWeight,
   });
+  const rewardTotals = rewardLoadoutTotals(rewardItems);
 
-  const voucherDiscount = voucher ? Math.min(Number(voucher.discount_amount ?? 0), productTotal) : 0;
-  const grandTotal = Math.max(0, productTotal - voucherDiscount);
+  // Voucher discount: dynamic — min(cartTotal × percent, voucher_max_discount from Settings sheet).
+  // Vouchers are only valid on supply orders (reward orders are free anyway).
+  const voucherMaxDiscount = Number(settingsQ.data?.voucher_max_discount ?? 0);
+  const voucherPercent = voucher ? Number(voucher.discount_percent ?? 10) : 0;
+  const voucherDiscount =
+    !isReward && voucher && voucherMaxDiscount > 0
+      ? Math.min((productTotal * voucherPercent) / 100, voucherMaxDiscount, productTotal)
+      : 0;
+  const grandTotal = isReward ? 0 : Math.max(0, productTotal - voucherDiscount);
 
   const referenceValid = /^\d{5}$/.test(reference.trim());
   const deliveryValid = !!(name.trim() && phone.trim() && address.trim());
   const qrReady = !!(payment && selectedQR?.qrImage);
 
-  const canSubmit =
-    settingsReady &&
-    minMet &&
-    payment &&
-    referenceValid &&
-    deliveryValid &&
-    !submitting;
+  const canSubmit = isReward
+    ? deliveryValid && rewardItems.length > 0 && !submitting
+    : settingsReady && minMet && payment && referenceValid && deliveryValid && !submitting;
 
   function goNext() {
-    if (step === "delivery" && deliveryValid) setStep("method");
-    else if (step === "method" && payment && qrReady) setStep("verify");
+    if (step === "delivery" && deliveryValid) {
+      if (isReward) return; // Reward flow submits directly from delivery step.
+      setStep("method");
+    } else if (step === "method" && payment && qrReady) {
+      setStep("verify");
+    }
   }
   function goBack() {
     if (step === "verify") setStep("method");
     else if (step === "method") setStep("delivery");
-    else navigate({ to: "/loadout" });
+    else navigate({ to: isReward ? "/rewards" : "/loadout" });
   }
 
   function handleApplyVoucher() {
