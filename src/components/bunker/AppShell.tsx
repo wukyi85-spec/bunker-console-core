@@ -29,7 +29,15 @@ export function AppShell({
       {/* Top-left: Logo + Back button stack */}
       <header className="relative z-20 flex items-start justify-between gap-4 px-6 py-5 md:px-9 md:py-6">
         <div className="flex flex-col gap-3">
-          {!hideLogo && <Logo />}
+          {!hideLogo && (
+            <Link
+              to="/dashboard"
+              aria-label="Back to Dashboard"
+              className="inline-flex rounded-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60"
+            >
+              <Logo />
+            </Link>
+          )}
           {!hideBack && <BackToBunker />}
         </div>
       </header>
