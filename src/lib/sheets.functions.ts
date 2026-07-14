@@ -128,7 +128,13 @@ export const getGameSettings = createServerFn({ method: "GET" }).handler(
       voucher_expire_days: num(map.voucher_expire_days) || DEFAULT_SETTINGS.voucher_expire_days,
       notification_expire_days:
         num(map.notification_expire_days) || DEFAULT_SETTINGS.notification_expire_days,
+      contact_telegram_url:
+        str(map.contact_telegram_url) ||
+        str(map.telegram_url) ||
+        str(map.telegram_link) ||
+        DEFAULT_SETTINGS.contact_telegram_url,
     };
+
   },
 );
 
