@@ -392,6 +392,45 @@ export type Database = {
         }
         Relationships: []
       }
+      player_vouchers: {
+        Row: {
+          code: string
+          created_at: string
+          discount_amount: number | null
+          expires_at: string | null
+          gold_cost: number
+          id: string
+          player_key: string
+          redeemed_at: string | null
+          reward_id: string
+          reward_name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_amount?: number | null
+          expires_at?: string | null
+          gold_cost?: number
+          id?: string
+          player_key: string
+          redeemed_at?: string | null
+          reward_id: string
+          reward_name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_amount?: number | null
+          expires_at?: string | null
+          gold_cost?: number
+          id?: string
+          player_key?: string
+          redeemed_at?: string | null
+          reward_id?: string
+          reward_name?: string
+        }
+        Relationships: []
+      }
       ranks: {
         Row: {
           accent: string | null
@@ -996,6 +1035,27 @@ export type Database = {
         }
       }
       list_player_rewards: { Args: { p_player_key: string }; Returns: Json }
+      list_player_vouchers: {
+        Args: { p_player_key: string }
+        Returns: {
+          code: string
+          created_at: string
+          discount_amount: number | null
+          expires_at: string | null
+          gold_cost: number
+          id: string
+          player_key: string
+          redeemed_at: string | null
+          reward_id: string
+          reward_name: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "player_vouchers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       login_member: {
         Args: { p_pass_id: string; p_password: string }
         Returns: {
@@ -1015,6 +1075,18 @@ export type Database = {
       mark_notification_read: {
         Args: { p_id: string; p_player_key: string }
         Returns: undefined
+      }
+      redeem_shop_reward: {
+        Args: {
+          p_discount_amount: number
+          p_expire_days: number
+          p_gold_cost: number
+          p_player_key: string
+          p_reward_id: string
+          p_reward_name: string
+          p_type: string
+        }
+        Returns: Json
       }
       set_player_activity: {
         Args: { p_activity: number; p_player_key: string }
