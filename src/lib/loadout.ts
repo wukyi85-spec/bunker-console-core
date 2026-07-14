@@ -94,13 +94,17 @@ export function enrichLoadout(items: LoadoutItem[]): EnrichedItem[] {
   });
 }
 
-export function loadoutTotals(items: LoadoutItem[]) {
+export function loadoutTotals(
+  items: LoadoutItem[],
+  mins: { amount: number; weight: number } = { amount: 1000, weight: 50 },
+) {
   const enriched = enrichLoadout(items);
   const productTotal = enriched.reduce((s, i) => s + i.subtotal, 0);
   const totalGrams = enriched.reduce((s, i) => s + i.gramsTotal, 0);
-  const minMet = totalGrams >= 50 || productTotal >= 1000;
+  const minMet = totalGrams >= mins.weight || productTotal >= mins.amount;
   return { enriched, productTotal, totalGrams, minMet };
 }
+
 
 // Orders
 export function saveOrder(order: Order) {

@@ -1,13 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
-import { Gift, CheckCircle2, Lock } from "lucide-react";
+import { Gift, CheckCircle2, Ticket, Coins, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  claimReward,
-  listPlayerRewards,
-  listRewardsCatalog,
+  getSheetRewards,
+  getGameSettings,
+  type SheetReward,
+} from "@/lib/sheets.functions";
+import {
+  getPlayerStats,
+  listPlayerVouchers,
+  redeemShopReward,
 } from "@/lib/bunker-supabase";
 import { toast } from "sonner";
 
@@ -23,95 +30,134 @@ export const Route = createFileRoute("/rewards")({
 
 function RewardsPage() {
   const qc = useQueryClient();
-  const catalogQ = useQuery({ queryKey: ["rewards_catalog"], queryFn: listRewardsCatalog });
-  const earnedQ = useQuery({ queryKey: ["player_rewards"], queryFn: listPlayerRewards });
+  const fetchRewards = useServerFn(getSheetRewards);
+  const fetchSettings = useServerFn(getGameSettings);
 
-  const claim = useMutation({
-    mutationFn: claimReward,
-    onSuccess: () => {
-      toast.success("REWARD CLAIMED");
+  const rewardsQ = useQuery({ queryKey: ["sheet_rewards"], queryFn: fetchRewards });
+  const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings });
+  const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
+  const vouchersQ = useQuery({ queryKey: ["player_vouchers"], queryFn: listPlayerVouchers });
+
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  const redeem = useMutation({
+    mutationFn: (r: SheetReward) =>
+      redeemShopReward({
+        rewardId: r.id,
+        rewardName: r.name,
+        goldCost: r.goldCost,
+        type: r.type,
+        discountAmount: settingsQ.data?.voucher_max_discount,
+        expireDays: settingsQ.data?.voucher_expire_days,
+      }),
+    onSuccess: (result, r) => {
+      if (result.kind === "voucher" && result.voucher) {
+        toast.success(`VOUCHER CODE: ${result.voucher.code}`);
+      } else {
+        toast.success(`${r.name} — REWARD CLAIMED`);
+      }
+      qc.invalidateQueries({ queryKey: ["player_stats"] });
+      qc.invalidateQueries({ queryKey: ["player_vouchers"] });
       qc.invalidateQueries({ queryKey: ["player_rewards"] });
+      setConfirmId(null);
     },
-    onError: () => toast.error("Could not claim reward"),
+    onError: (e: any) => {
+      toast.error(e?.message || "REDEMPTION FAILED");
+      setConfirmId(null);
+    },
   });
 
-  const earned = earnedQ.data ?? [];
-  const catalog = catalogQ.data ?? [];
-  const earnedByReward = new Map<string, typeof earned>();
-  earned.forEach((e) => {
-    const arr = earnedByReward.get(e.reward_id) ?? [];
-    arr.push(e);
-    earnedByReward.set(e.reward_id, arr);
-  });
+  const rewards = rewardsQ.data ?? [];
+  const gold = statsQ.data?.gold ?? 0;
+  const vouchers = vouchersQ.data ?? [];
+
+  const confirmReward = useMemo(
+    () => rewards.find((r) => r.id === confirmId) ?? null,
+    [rewards, confirmId],
+  );
 
   return (
     <AppShell hideLogo hideNav>
-      <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500">
+      <div className="grid h-full w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500">
         <Panel variant="elevated" corners className="corner-frame-lines flex min-h-0 flex-col p-4">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
-            <Gift className="h-4 w-4 text-neon" />
-            <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
-              Reward Vault
+          <div className="mb-3 flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+            <div className="flex items-center gap-2">
+              <Gift className="h-4 w-4 text-neon" />
+              <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
+                Reward Vault
+              </span>
+            </div>
+            <span className="flex items-center gap-1 rounded-sm border border-neon/40 bg-neon/10 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-neon">
+              <Coins className="h-3 w-3" /> {gold.toLocaleString()}
             </span>
           </div>
           <div className="grid min-h-0 flex-1 grid-cols-2 gap-3 overflow-y-auto pr-1">
-            {catalog.map((r) => {
-              const owned = earnedByReward.get(r.id) ?? [];
-              const unclaimed = owned.filter((o) => !o.claimed_at);
-              const has = owned.length > 0;
+            {rewards.length === 0 && (
+              <div className="col-span-2 py-8 text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                LOADING SUPPLY...
+              </div>
+            )}
+            {rewards.map((r) => {
+              const canAfford = gold >= r.goldCost;
+              const disabled = !r.inStock || !canAfford;
               return (
                 <div
                   key={r.id}
                   className={cn(
                     "flex flex-col rounded-md border p-3 transition-all",
-                    has
-                      ? "border-neon/50 bg-neon/5"
-                      : "border-white/10 bg-panel-elevated/40 opacity-70",
+                    r.inStock
+                      ? "border-white/10 bg-panel-elevated/60"
+                      : "border-white/5 bg-background/30 opacity-55",
                   )}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-background/60 text-lg">
-                      {r.icon ?? "🎁"}
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-md border border-white/10 bg-background/60">
+                      {r.image ? (
+                        <img
+                          src={r.image}
+                          alt={r.name}
+                          className={cn(
+                            "h-full w-full object-cover",
+                            !r.inStock && "grayscale blur-[1px]",
+                          )}
+                        />
+                      ) : r.type === "voucher" ? (
+                        <Ticket className="h-6 w-6 text-neon" />
+                      ) : (
+                        <Gift className="h-6 w-6 text-neon" />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="font-display text-sm font-bold uppercase tracking-widest text-foreground">
                         {r.name}
                       </div>
                       <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                        {r.reward_type}
+                        {r.type === "voucher" ? "VOUCHER" : "PHYSICAL"}
+                        {r.type === "physical" && " · SINGLE ITEM ONLY"}
                       </div>
                     </div>
-                    {has ? (
-                      <CheckCircle2 className="h-4 w-4 text-neon" />
-                    ) : (
-                      <Lock className="h-4 w-4 text-muted-foreground" />
-                    )}
                   </div>
-                  {r.description && (
-                    <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {r.description}
-                    </div>
-                  )}
-                  <div className="mt-auto pt-2">
-                    {has ? (
-                      <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-widest">
-                        <span className="text-neon">
-                          x{owned.length} EARNED · x{unclaimed.length} UNCLAIMED
-                        </span>
-                        {unclaimed[0] && (
-                          <button
-                            className="rounded-sm border border-neon/60 bg-neon/10 px-2 py-1 font-bold tracking-widest text-neon transition-colors hover:bg-neon/20"
-                            onClick={() => claim.mutate(unclaimed[0].id)}
-                            disabled={claim.isPending}
-                          >
-                            CLAIM
-                          </button>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-yellow-400/90">
+                      <Coins className="h-3 w-3" /> {r.goldCost.toLocaleString()}
+                    </span>
+                    {r.inStock ? (
+                      <button
+                        disabled={disabled || redeem.isPending}
+                        onClick={() => setConfirmId(r.id)}
+                        className={cn(
+                          "rounded-sm border px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-widest transition-all",
+                          canAfford
+                            ? "border-neon/60 bg-neon/10 text-neon hover:bg-neon/20"
+                            : "cursor-not-allowed border-white/10 bg-background/40 text-muted-foreground",
                         )}
-                      </div>
+                      >
+                        {canAfford ? "REDEEM" : "NEED GOLD"}
+                      </button>
                     ) : (
-                      <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                        COMPLETE MISSIONS TO UNLOCK
-                      </div>
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-destructive">
+                        <Lock className="h-3 w-3" /> OUT OF STOCK
+                      </span>
                     )}
                   </div>
                 </div>
@@ -120,48 +166,110 @@ function RewardsPage() {
           </div>
         </Panel>
 
+        {/* Vouchers wallet */}
         <Panel variant="default" className="flex min-h-0 flex-col p-4">
           <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
-            <CheckCircle2 className="h-4 w-4 text-neon" />
+            <Ticket className="h-4 w-4 text-neon" />
             <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
-              Recent Drops
+              My Vouchers
             </span>
           </div>
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
-            {earned.length === 0 && (
+            {vouchers.length === 0 && (
               <div className="py-8 text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                NO REWARDS YET — COMPLETE A MISSION
+                NO VOUCHERS YET — REDEEM ONE
               </div>
             )}
-            {earned.map((e) => (
-              <div
-                key={e.id}
-                className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
-              >
-                <span className="text-lg">{e.reward?.icon ?? "🎁"}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="font-display text-xs font-bold uppercase tracking-widest">
-                    {e.reward?.name}
-                  </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {new Date(e.earned_at).toLocaleDateString()}
-                  </div>
-                </div>
-                <span
+            {vouchers.map((v) => {
+              const expired = v.expires_at ? new Date(v.expires_at).getTime() < Date.now() : false;
+              const used = !!v.redeemed_at;
+              return (
+                <div
+                  key={v.id}
                   className={cn(
-                    "rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-widest",
-                    e.claimed_at
-                      ? "border-white/10 text-muted-foreground"
-                      : "border-neon/60 bg-neon/10 text-neon",
+                    "rounded-sm border border-white/10 bg-background/40 p-2.5",
+                    (expired || used) && "opacity-50",
                   )}
                 >
-                  {e.claimed_at ? "CLAIMED" : "NEW"}
-                </span>
-              </div>
-            ))}
+                  <div className="flex items-center justify-between">
+                    <span className="font-display text-[11px] font-bold uppercase tracking-widest">
+                      {v.reward_name}
+                    </span>
+                    <span
+                      className={cn(
+                        "rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-widest",
+                        used
+                          ? "border-white/10 text-muted-foreground"
+                          : expired
+                            ? "border-destructive/40 text-destructive"
+                            : "border-neon/60 bg-neon/10 text-neon",
+                      )}
+                    >
+                      {used ? "USED" : expired ? "EXPIRED" : "ACTIVE"}
+                    </span>
+                  </div>
+                  <div className="mt-1 select-all rounded-sm border border-dashed border-neon/40 bg-black/40 px-2 py-1 font-mono text-[12px] tracking-widest text-neon">
+                    {v.code}
+                  </div>
+                  {v.expires_at && (
+                    <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                      Expires {new Date(v.expires_at).toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </Panel>
       </div>
+
+      {confirmReward && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="w-[420px] rounded-md border border-neon/40 bg-panel-elevated p-5 shadow-[0_0_60px_-10px_var(--neon)]">
+            <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+              <CheckCircle2 className="h-4 w-4 text-neon" />
+              <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
+                Confirm Redemption
+              </span>
+            </div>
+            <div className="mt-4 space-y-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+              <div className="flex justify-between">
+                <span>Reward</span>
+                <span className="text-foreground">{confirmReward.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Type</span>
+                <span className="text-foreground">{confirmReward.type.toUpperCase()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Cost</span>
+                <span className="text-yellow-400">{confirmReward.goldCost} GOLD</span>
+              </div>
+            </div>
+            {confirmReward.type === "physical" && (
+              <div className="mt-3 rounded-sm border border-amber-400/40 bg-amber-400/5 p-2 font-mono text-[10px] uppercase tracking-widest text-amber-300">
+                Physical rewards ship as a single item. Delivery is free.
+              </div>
+            )}
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setConfirmId(null)}
+                disabled={redeem.isPending}
+                className="flex-1 rounded-sm border border-white/10 bg-background/40 py-2 font-display text-xs font-bold uppercase tracking-widest hover:border-white/25"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => redeem.mutate(confirmReward)}
+                disabled={redeem.isPending}
+                className="flex-1 rounded-sm border border-neon bg-neon/10 py-2 font-display text-xs font-bold uppercase tracking-widest text-neon hover:bg-neon/20"
+              >
+                {redeem.isPending ? "REDEEMING..." : "CONFIRM"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

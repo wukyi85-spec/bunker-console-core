@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Shield, Zap, Coins, Star, Radio } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
 import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getPlayerProfile } from "@/lib/player";
 import { levelProgress } from "@/lib/progression";
+import { getRankSettings } from "@/lib/sheets.functions";
+
 
 interface PlayerHUDProps {
   onClick?: () => void;
@@ -27,9 +30,15 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   const stats = statsQ.data;
   const profile = getPlayerProfile();
 
+  const fetchRanks = useServerFn(getRankSettings);
+  const ranksQ = useQuery({ queryKey: ["sheet_ranks"], queryFn: fetchRanks, staleTime: 60_000 });
+  const xp = stats?.xp ?? 0;
+  const currentRank = (ranksQ.data ?? []).find((r) => xp >= r.minXp && xp <= r.maxXp);
+
   const player = {
     name: profile.playerName ?? "OPERATOR",
-    rank: (stats?.current_rank ?? "ROOKIE").toUpperCase(),
+    rank: (currentRank?.name ?? stats?.current_rank ?? "ROOKIE").toUpperCase(),
+    badge: currentRank?.badgeImage ?? "",
     level: stats?.level ?? 1,
     xp: stats ? levelProgress(stats.xp) : 0,
     activity: stats?.activity ?? 0,
@@ -37,6 +46,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
     stars: Math.min(5, Math.floor((stats?.level ?? 1) / 4)),
     status: "ONLINE" as const,
   };
+
 
   const goldDisplay = useCountUp(player.gold);
 
@@ -61,19 +71,24 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
 
       <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neon/50 bg-panel-elevated shadow-[0_0_18px_-4px_var(--neon)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,color-mix(in_oklab,var(--neon)_25%,transparent),transparent_70%)]" />
-        <svg viewBox="0 0 64 64" className="relative h-full w-full">
-          <defs>
-            <linearGradient id="hud-p" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--neon)" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="var(--neon)" stopOpacity="0.15" />
-            </linearGradient>
-          </defs>
-          <circle cx="32" cy="24" r="10" fill="url(#hud-p)" />
-          <path d="M12 60 C 14 44, 50 44, 52 60 Z" fill="url(#hud-p)" />
-        </svg>
+        {player.badge ? (
+          <img src={player.badge} alt={player.rank} className="relative h-full w-full object-contain p-1.5" />
+        ) : (
+          <svg viewBox="0 0 64 64" className="relative h-full w-full">
+            <defs>
+              <linearGradient id="hud-p" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--neon)" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="var(--neon)" stopOpacity="0.15" />
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="24" r="10" fill="url(#hud-p)" />
+            <path d="M12 60 C 14 44, 50 44, 52 60 Z" fill="url(#hud-p)" />
+          </svg>
+        )}
         <span className="absolute -bottom-1 -right-1 rounded-sm border border-background bg-neon px-1 py-[1px] font-mono text-[9px] font-bold text-background shadow-[0_0_8px_-1px_var(--neon)]">
           {String(player.level).padStart(2, "0")}
         </span>
+
       </div>
 
       <div className="flex min-w-0 flex-col justify-between gap-1.5">

@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -11,6 +13,7 @@ import {
   removeFromLoadout,
   loadoutTotals,
 } from "@/lib/loadout";
+import { getGameSettings } from "@/lib/sheets.functions";
 import { AlertTriangle, Backpack, Package, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,13 +30,21 @@ export const Route = createFileRoute("/loadout")({
 function LoadoutPage() {
   const [items, setItems] = useState(getLoadout);
   const navigate = useNavigate();
+  const fetchSettings = useServerFn(getGameSettings);
+  const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
+  const minAmount = settingsQ.data?.minimum_order_amount ?? 1000;
+  const minWeight = settingsQ.data?.minimum_order_weight ?? 50;
 
   useEffect(() => {
     setItems(getLoadout());
     return subscribeLoadout(() => setItems(getLoadout()));
   }, []);
 
-  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items);
+  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items, {
+    amount: minAmount,
+    weight: minWeight,
+  });
+
 
   return (
     <AppShell hideLogo hideNav>
@@ -139,7 +150,7 @@ function LoadoutPage() {
                 Minimum Requirement
               </div>
               <div className="mt-0.5 font-display text-xs font-bold uppercase tracking-wider text-foreground">
-                50G OR ฿1,000
+                {minWeight}G OR ฿{minAmount.toLocaleString()}
               </div>
               <div
                 className={cn(
@@ -158,11 +169,12 @@ function LoadoutPage() {
                   style={{
                     width: `${Math.min(
                       100,
-                      Math.max(totalGrams / 50, productTotal / 1000) * 100,
+                      Math.max(totalGrams / minWeight, productTotal / minAmount) * 100,
                     )}%`,
                   }}
                 />
               </div>
+
             </div>
 
             <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -185,11 +197,14 @@ function LoadoutPage() {
                   Mission Requirement Not Met
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-200/80">
-                  Minimum Order: 50G or ฿1,000
+                  Minimum Order: {minWeight}G or ฿{minAmount.toLocaleString()}
                 </div>
               </div>
             </div>
           )}
+
+
+
 
           <BunkerButton
             variant="primary"

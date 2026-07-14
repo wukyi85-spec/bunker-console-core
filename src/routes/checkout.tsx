@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -11,6 +12,7 @@ import {
   getPlayerStats,
   updatePlayerProfileInfo,
 } from "@/lib/bunker-supabase";
+import { getGameSettings, getPaymentQRs } from "@/lib/sheets.functions";
 import { cn } from "@/lib/utils";
 import { CreditCard, MapPin, Package, Phone, User } from "lucide-react";
 import { toast } from "sonner";
@@ -26,7 +28,6 @@ export const Route = createFileRoute("/checkout")({
 });
 
 type Payment = "PromptPay" | "KPay" | "WavePay";
-const PAYMENTS: Payment[] = ["PromptPay", "KPay", "WavePay"];
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -42,6 +43,18 @@ function CheckoutPage() {
   const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
   const stats: any = statsQ.data;
 
+  const fetchQRs = useServerFn(getPaymentQRs);
+  const fetchSettings = useServerFn(getGameSettings);
+  const qrQ = useQuery({ queryKey: ["payment_qrs"], queryFn: fetchQRs, staleTime: 60_000 });
+  const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
+
+  const paymentOptions = useMemo<Payment[]>(() => {
+    const fromSheet = (qrQ.data ?? []).map((q) => q.method as Payment);
+    return fromSheet.length ? fromSheet : ["PromptPay", "KPay", "WavePay"];
+  }, [qrQ.data]);
+
+  const selectedQR = qrQ.data?.find((q) => q.method === payment) ?? null;
+
   useEffect(() => setItems(getLoadout()), []);
 
   // Autofill from profile when it loads (only if inputs are still empty).
@@ -52,7 +65,11 @@ function CheckoutPage() {
     setAddress((v) => (v ? v : stats.default_address ?? ""));
   }, [stats?.player_key]);
 
-  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items);
+  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items, {
+    amount: settingsQ.data?.minimum_order_amount ?? 1000,
+    weight: settingsQ.data?.minimum_order_weight ?? 50,
+  });
+
 
   const canSubmit =
     minMet && payment && name.trim() && phone.trim() && address.trim() && !submitting;
@@ -156,7 +173,7 @@ function CheckoutPage() {
           <Panel variant="default" className="p-4">
             <SectionTitle>Payment Method</SectionTitle>
             <div className="mt-3 grid grid-cols-3 gap-3">
-              {PAYMENTS.map((p) => {
+              {paymentOptions.map((p) => {
                 const active = payment === p;
                 return (
                   <button
@@ -177,6 +194,19 @@ function CheckoutPage() {
                 );
               })}
             </div>
+            {selectedQR?.qrImage && (
+              <div className="mt-3 flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-3">
+                <img
+                  src={selectedQR.qrImage}
+                  alt={`${payment} QR`}
+                  className="h-40 w-40 rounded-sm object-contain"
+                />
+                <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  Scan to pay · {payment}
+                </div>
+              </div>
+            )}
+
           </Panel>
         </div>
 

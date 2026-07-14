@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
-import { listRanks, getPlayerStats } from "@/lib/bunker-supabase";
+import { getPlayerStats } from "@/lib/bunker-supabase";
+import { getRankSettings } from "@/lib/sheets.functions";
 import { Lock, Star, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,19 +19,19 @@ export const Route = createFileRoute("/rank")({
 });
 
 function RankPage() {
-  const ranksQ = useQuery({ queryKey: ["ranks"], queryFn: listRanks });
+  const fetchRanks = useServerFn(getRankSettings);
+  const ranksQ = useQuery({ queryKey: ["sheet_ranks"], queryFn: fetchRanks, staleTime: 60_000 });
   const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
 
   const ranks = ranksQ.data ?? [];
   const stats = statsQ.data;
   const xp = stats?.xp ?? 0;
-  const current = ranks.find(
-    (r) => xp >= r.min_xp && (r.max_xp == null || xp <= r.max_xp),
-  );
-  const next = ranks.find((r) => r.min_xp > xp);
-  const progress = next
-    ? Math.min(100, ((xp - (current?.min_xp ?? 0)) / (next.min_xp - (current?.min_xp ?? 0))) * 100)
+  const current = ranks.find((r) => xp >= r.minXp && xp <= r.maxXp);
+  const next = ranks.find((r) => r.minXp > xp);
+  const progress = next && current
+    ? Math.min(100, ((xp - current.minXp) / (next.minXp - current.minXp)) * 100)
     : 100;
+
 
   return (
     <AppShell hideLogo hideNav>
@@ -44,27 +46,24 @@ function RankPage() {
           </div>
 
           <div className="flex flex-col items-center py-4">
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-2 border-neon/60 bg-background shadow-[0_0_40px_-8px_color-mix(in_oklab,var(--neon)_60%,transparent)]">
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-2 border-neon/60 bg-background shadow-[0_0_40px_-8px_color-mix(in_oklab,var(--neon)_60%,transparent)] overflow-hidden">
               <span className="absolute inset-0 rounded-full bg-neon/10 blur-2xl" />
-              <span
-                className="relative font-display text-2xl font-black uppercase tracking-widest"
-                style={{ color: current?.accent ?? "var(--neon)" }}
-              >
-                {current?.name?.[0] ?? "R"}
-              </span>
+              {current?.badgeImage ? (
+                <img src={current.badgeImage} alt={current.name} className="relative h-full w-full object-contain p-2" />
+              ) : (
+                <span className="relative font-display text-2xl font-black uppercase tracking-widest text-neon">
+                  {current?.name?.[0] ?? "R"}
+                </span>
+              )}
             </div>
-            <div
-              className="mt-3 font-display text-2xl font-bold uppercase tracking-widest"
-              style={{ color: current?.accent ?? "var(--neon)" }}
-            >
-              {current?.name ?? "Rookie"}
+            <div className="mt-3 font-display text-2xl font-bold uppercase tracking-widest text-neon">
+              {current?.name ?? "ROOKIE"}
             </div>
             <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
               LVL {stats?.level ?? 1} · {xp.toLocaleString()} XP
             </div>
           </div>
 
-          {/* XP progress */}
           <div className="mt-2">
             <div className="mb-1 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               <span>Progress to {next?.name ?? "MAX"}</span>
@@ -78,7 +77,7 @@ function RankPage() {
             </div>
             {next && (
               <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground/70">
-                {(next.min_xp - xp).toLocaleString()} XP TO NEXT RANK
+                {(next.minXp - xp).toLocaleString()} XP TO NEXT RANK
               </div>
             )}
           </div>
@@ -91,7 +90,6 @@ function RankPage() {
           </div>
         </Panel>
 
-        {/* RIGHT — All ranks */}
         <Panel variant="default" className="flex min-h-0 flex-col p-4">
           <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
             <Star className="h-4 w-4 text-neon" />
@@ -102,12 +100,11 @@ function RankPage() {
 
           <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
             {ranks.map((r) => {
-              const isCurrent = current?.id === r.id;
-              const unlocked = xp >= r.min_xp;
-              const rewards = Array.isArray(r.rewards) ? (r.rewards as unknown[]) : [];
+              const isCurrent = current?.name === r.name;
+              const unlocked = xp >= r.minXp;
               return (
                 <div
-                  key={r.id}
+                  key={r.name}
                   className={cn(
                     "rounded-md border p-3 transition-all",
                     isCurrent
@@ -120,19 +117,21 @@ function RankPage() {
                   <div className="flex items-center gap-3">
                     <div
                       className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-full border font-display text-sm font-bold uppercase",
+                        "flex h-10 w-10 items-center justify-center rounded-full border overflow-hidden",
                         isCurrent ? "border-neon" : "border-white/20",
                       )}
-                      style={{ color: r.accent ?? undefined }}
                     >
-                      {unlocked ? r.name[0] : <Lock className="h-4 w-4 text-muted-foreground" />}
+                      {unlocked && r.badgeImage ? (
+                        <img src={r.badgeImage} alt={r.name} className="h-full w-full object-contain p-1" />
+                      ) : unlocked ? (
+                        <span className="font-display text-sm font-bold uppercase text-neon">{r.name[0]}</span>
+                      ) : (
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span
-                          className="font-display text-base font-bold uppercase tracking-widest"
-                          style={{ color: unlocked ? r.accent ?? "var(--foreground)" : undefined }}
-                        >
+                        <span className="font-display text-base font-bold uppercase tracking-widest text-foreground">
                           {r.name}
                         </span>
                         {isCurrent && (
@@ -142,25 +141,14 @@ function RankPage() {
                         )}
                       </div>
                       <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        {r.min_xp.toLocaleString()} – {r.max_xp?.toLocaleString() ?? "∞"} XP
+                        {r.minXp.toLocaleString()} – {Number.isFinite(r.maxXp) ? r.maxXp.toLocaleString() : "∞"} XP
                       </div>
                     </div>
                   </div>
-                  {rewards.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5 border-t border-white/5 pt-2">
-                      {rewards.map((rw, i) => (
-                        <span
-                          key={i}
-                          className="rounded-sm border border-white/10 bg-background/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground"
-                        >
-                          {String(rw)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               );
             })}
+
           </div>
         </Panel>
       </div>
