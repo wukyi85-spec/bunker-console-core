@@ -459,41 +459,41 @@ function ProductDrawer({
   return (
     <div className="flex h-full flex-col">
       {/* Image header */}
-      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden border-b border-white/10 bg-black">
+      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden border-b border-white/10 bg-black lphone:aspect-[21/9]">
         {product.image ? (
           <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <Package className="h-16 w-16 text-white/25" />
+            <Package className="h-16 w-16 text-white/25 lphone:h-8 lphone:w-8" />
           </div>
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/80 backdrop-blur-md transition hover:border-neon/50 hover:text-neon"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/80 backdrop-blur-md transition hover:border-neon/50 hover:text-neon lphone:right-1.5 lphone:top-1.5 lphone:h-6 lphone:w-6"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 lphone:h-3 lphone:w-3" />
         </button>
 
-        <div className="absolute bottom-3 left-4 right-4">
-          <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+        <div className="absolute bottom-3 left-4 right-4 lphone:bottom-1 lphone:left-2 lphone:right-2">
+          <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground lphone:text-[8px] lphone:tracking-[0.2em]">
             {formatCategoryLabel(product.category)}
           </div>
-          <h2 className="mt-1 font-display text-2xl font-bold uppercase leading-none tracking-wider text-foreground">
+          <h2 className="mt-1 font-display text-2xl font-bold uppercase leading-none tracking-wider text-foreground lphone:mt-0 lphone:text-sm lphone:tracking-wider">
             {product.name}
           </h2>
         </div>
       </div>
 
       {/* Body */}
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5 lphone:gap-2 lphone:p-2.5">
         {product.description && (
-          <p className="text-sm leading-relaxed text-white/70">{product.description}</p>
+          <p className="text-sm leading-relaxed text-white/70 lphone:text-[10px] lphone:leading-snug lphone:line-clamp-2">{product.description}</p>
         )}
 
         {(product.thc || product.indica || product.sativa) > 0 && (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 lphone:gap-1">
             <Stat label="THC" value={`${product.thc}%`} />
             <Stat label="Indica" value={`${product.indica}%`} />
             <Stat label="Sativa" value={`${product.sativa}%`} />
@@ -501,10 +501,10 @@ function ProductDrawer({
         )}
 
         <div>
-          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground lphone:mb-1 lphone:text-[8px] lphone:tracking-[0.2em]">
             Available Sizes
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 lphone:gap-1">
             {product.sizes.map((s) => {
               const active = size === s.label;
               return (
@@ -512,7 +512,7 @@ function ProductDrawer({
                   key={s.label}
                   onClick={() => onSize(s.label)}
                   className={cn(
-                    "flex flex-col items-start gap-1 rounded-md border px-3 py-2.5 text-left transition-all",
+                    "flex flex-col items-start gap-1 rounded-md border px-3 py-2.5 text-left transition-all lphone:gap-0 lphone:px-1.5 lphone:py-1",
                     active
                       ? "border-neon bg-neon/10 shadow-[0_0_20px_-6px_color-mix(in_oklab,var(--neon)_70%,transparent)]"
                       : "border-white/10 bg-black/40 hover:border-white/30",
@@ -520,7 +520,7 @@ function ProductDrawer({
                 >
                   <span
                     className={cn(
-                      "font-display text-base font-bold uppercase tracking-wider",
+                      "font-display text-base font-bold uppercase tracking-wider lphone:text-[11px]",
                       active ? "text-neon" : "text-foreground",
                     )}
                   >
@@ -528,7 +528,7 @@ function ProductDrawer({
                   </span>
                   <span
                     className={cn(
-                      "font-mono text-[10px] uppercase tracking-widest",
+                      "font-mono text-[10px] uppercase tracking-widest lphone:text-[8.5px]",
                       active ? "text-neon/80" : "text-muted-foreground",
                     )}
                   >
@@ -540,7 +540,7 @@ function ProductDrawer({
           </div>
         </div>
 
-        <div>
+        <div className="lphone:hidden">
           <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
             Current Stock
           </div>
@@ -557,19 +557,19 @@ function ProductDrawer({
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-white/10 bg-black/60 p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
-              Quantity
+      <div className="shrink-0 border-t border-white/10 bg-black/60 p-4 lphone:p-2">
+        <div className="mb-3 flex items-center justify-between lphone:mb-1.5">
+          <div className="flex items-center gap-3 lphone:gap-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground lphone:text-[8px] lphone:tracking-[0.2em]">
+              Qty
             </span>
             <QuantityStepper value={qty} onChange={onQty} />
           </div>
           <div className="text-right">
-            <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground lphone:text-[8px]">
               Subtotal
             </div>
-            <div className="font-display text-lg font-bold text-neon">
+            <div className="font-display text-lg font-bold text-neon lphone:text-sm">
               ฿{subtotal.toLocaleString()}
             </div>
           </div>
@@ -578,7 +578,7 @@ function ProductDrawer({
         <BunkerButton
           variant="primary"
           size="lg"
-          className="w-full"
+          className="w-full lphone:h-9 lphone:text-[11px]"
           disabled={!size || outOfStock}
           onClick={onAdd}
         >
@@ -588,6 +588,7 @@ function ProductDrawer({
     </div>
   );
 }
+
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
