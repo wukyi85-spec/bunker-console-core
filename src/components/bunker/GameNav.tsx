@@ -37,6 +37,7 @@ export function GameNav() {
     <nav
       className={cn(
         "relative flex items-stretch gap-2.5 rounded-2xl p-2.5",
+        "max-w-[calc(100vw-1rem)] overflow-x-auto scrollbar-none",
         "bg-black/55 backdrop-blur-xl",
         "border border-white/8",
         "shadow-[0_28px_60px_-24px_rgb(0_0_0/0.9),inset_0_1px_0_0_rgb(255_255_255/0.05)]",
@@ -49,9 +50,9 @@ export function GameNav() {
           <Link
             key={i}
             to={item.to}
-            style={{ width: 168, height: 66 }}
             className={cn(
-              "group relative flex flex-col items-center justify-center gap-1 overflow-hidden",
+              "group relative flex shrink-0 flex-col items-center justify-center gap-1 overflow-hidden",
+              "w-[104px] h-[60px] sm:w-[168px] sm:h-[66px]",
               "rounded-xl px-3 select-none",
               "transition-all duration-300 ease-out",
               // Matte black body with thin white border
