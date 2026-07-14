@@ -153,11 +153,11 @@ function SupplyPage() {
       </div>
 
       {/* Main grid — fills the rest of the viewport */}
-      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[180px_1fr_360px] gap-0">
+      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[180px_1fr_360px] gap-0 lphone:grid-cols-[128px_1fr_260px]">
         {/* LEFT — Category rail */}
-        <aside className="relative flex min-h-0 flex-col border-r border-white/8 bg-black/30 p-3">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-2">
-            <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-muted-foreground">
+        <aside className="relative flex min-h-0 flex-col border-r border-white/8 bg-black/30 p-3 lphone:p-2">
+          <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-2 lphone:mb-1.5 lphone:pb-1">
+            <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-muted-foreground lphone:text-[8px] lphone:tracking-[0.28em]">
               Categories
             </span>
           </div>
@@ -178,7 +178,7 @@ function SupplyPage() {
               />
             ))}
           </div>
-          <div className="mt-2 border-t border-white/8 pt-2">
+          <div className="mt-2 border-t border-white/8 pt-2 lphone:hidden">
             <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
               // Signal: Secure
             </div>
@@ -186,7 +186,7 @@ function SupplyPage() {
         </aside>
 
         {/* CENTER — Product grid */}
-        <main className="relative flex min-h-0 flex-col p-5">
+        <main className="relative flex min-h-0 flex-col p-5 lphone:p-2.5">
           {isLoading && (
             <div className="flex flex-1 flex-col items-center justify-center text-center text-muted-foreground">
               <Loader2 className="mb-3 h-6 w-6 animate-spin text-neon" />
@@ -213,16 +213,16 @@ function SupplyPage() {
 
           {!isLoading && !isError && (
             <>
-              <div className="mb-3 flex items-center justify-between">
+              <div className="mb-3 flex items-center justify-between lphone:mb-1.5">
                 <div className="flex items-center gap-2">
-                  <Package className="h-3.5 w-3.5 text-neon" />
-                  <span className="font-display text-xs font-bold uppercase tracking-widest">
+                  <Package className="h-3.5 w-3.5 text-neon lphone:h-3 lphone:w-3" />
+                  <span className="font-display text-xs font-bold uppercase tracking-widest lphone:text-[10px] lphone:tracking-widest">
                     {activeCategory === "all"
                       ? "All Supply"
                       : formatCategoryLabel(activeCategory)}
                   </span>
                 </div>
-                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground lphone:text-[8px]">
                   {filtered.length} UNITS
                 </span>
               </div>
@@ -235,7 +235,7 @@ function SupplyPage() {
                   </div>
                 </div>
               ) : (
-                <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-4 overflow-y-auto pr-1 md:grid-cols-3">
+                <div className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 gap-4 overflow-y-auto pr-1 md:grid-cols-3 lphone:grid-cols-1 lphone:gap-1.5">
                   {filtered.map((p) => (
                     <ProductTile
                       key={p.id}
@@ -249,6 +249,7 @@ function SupplyPage() {
             </>
           )}
         </main>
+
 
         {/* RIGHT — Inline detail panel */}
         <aside className="relative flex min-h-0 flex-col border-l border-white/10 bg-gradient-to-b from-[rgb(20_20_20)] to-[rgb(10_10_10)]">
