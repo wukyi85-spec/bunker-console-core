@@ -32,8 +32,9 @@ function LoadoutPage() {
   const navigate = useNavigate();
   const fetchSettings = useServerFn(getGameSettings);
   const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
-  const minAmount = settingsQ.data?.minimum_order_amount ?? 1000;
-  const minWeight = settingsQ.data?.minimum_order_weight ?? 50;
+  const minAmount = settingsQ.data?.minimum_order_amount ?? 0;
+  const minWeight = settingsQ.data?.minimum_order_weight ?? 0;
+  const settingsReady = minAmount > 0 && minWeight > 0;
 
   useEffect(() => {
     setItems(getLoadout());
