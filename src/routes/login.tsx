@@ -312,11 +312,17 @@ function BunkerDoorOpening({ target }: { target: string | null }) {
       </div>
 
       {/* Center caption */}
-      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 animate-in fade-in duration-500">
+      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 px-6 text-center animate-in fade-in duration-500" style={{ animationDelay: "800ms", animationFillMode: "both" }}>
         <span className="font-mono text-[10px] uppercase tracking-[0.6em] text-neon animate-hud-pulse">
           // Access Granted
         </span>
-        <span className="font-display text-lg font-black uppercase tracking-[0.35em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
+        <p className="font-display text-sm font-medium uppercase tracking-[0.28em] text-foreground/90 drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
+          Thank you for choosing Black's Joint &amp; Bud.
+        </p>
+        <h2 className="font-display text-2xl font-black uppercase tracking-[0.35em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
+          Welcome to BLACK'S BUNKER
+        </h2>
+        <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground/80">
           {label}
         </span>
       </div>
