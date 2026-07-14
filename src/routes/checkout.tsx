@@ -11,10 +11,12 @@ import {
   createOrder,
   getPlayerStats,
   updatePlayerProfileInfo,
+  listPlayerVouchers,
+  type PlayerVoucherRow,
 } from "@/lib/bunker-supabase";
 import { getGameSettings, getPaymentQRs } from "@/lib/sheets.functions";
 import { cn } from "@/lib/utils";
-import { CreditCard, MapPin, Package, Phone, User } from "lucide-react";
+import { CheckCircle2, CreditCard, MapPin, Package, Phone, Ticket, User } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
@@ -37,11 +39,16 @@ function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [notes, setNotes] = useState("");
   const [payment, setPayment] = useState<Payment | null>(null);
+  const [reference, setReference] = useState("");
+  const [voucherInput, setVoucherInput] = useState("");
+  const [voucher, setVoucher] = useState<PlayerVoucherRow | null>(null);
+  const [voucherError, setVoucherError] = useState<string | null>(null);
   const [saveAsDefault, setSaveAsDefault] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
   const stats: any = statsQ.data;
+  const vouchersQ = useQuery({ queryKey: ["player_vouchers"], queryFn: listPlayerVouchers });
 
   const fetchQRs = useServerFn(getPaymentQRs);
   const fetchSettings = useServerFn(getGameSettings);
@@ -57,7 +64,6 @@ function CheckoutPage() {
 
   useEffect(() => setItems(getLoadout()), []);
 
-  // Autofill from profile when it loads (only if inputs are still empty).
   useEffect(() => {
     if (!stats) return;
     setName((v) => (v ? v : stats.full_name ?? ""));
@@ -73,15 +79,59 @@ function CheckoutPage() {
     weight: minWeight,
   });
 
+  const voucherDiscount = voucher ? Math.min(Number(voucher.discount_amount ?? 0), productTotal) : 0;
+  const grandTotal = Math.max(0, productTotal - voucherDiscount);
+
+  const referenceValid = /^\d{5}$/.test(reference.trim());
 
   const canSubmit =
-    settingsReady && minMet && payment && name.trim() && phone.trim() && address.trim() && !submitting;
+    settingsReady &&
+    minMet &&
+    payment &&
+    referenceValid &&
+    name.trim() &&
+    phone.trim() &&
+    address.trim() &&
+    !submitting;
+
+  function handleApplyVoucher() {
+    const code = voucherInput.trim().toUpperCase();
+    setVoucherError(null);
+    if (!code) {
+      setVoucher(null);
+      return;
+    }
+    const list = vouchersQ.data ?? [];
+    const match = list.find((v) => v.code.toUpperCase() === code);
+    if (!match) {
+      setVoucher(null);
+      setVoucherError("Voucher code not found");
+      return;
+    }
+    if (match.redeemed_at) {
+      setVoucher(null);
+      setVoucherError("Voucher already used");
+      return;
+    }
+    if (match.expires_at && new Date(match.expires_at).getTime() < Date.now()) {
+      setVoucher(null);
+      setVoucherError("Voucher expired");
+      return;
+    }
+    if (!match.discount_amount || Number(match.discount_amount) <= 0) {
+      setVoucher(null);
+      setVoucherError("Voucher has no discount value");
+      return;
+    }
+    setVoucher(match);
+    toast.success(`Voucher applied · ฿${Number(match.discount_amount).toLocaleString()} off`);
+  }
 
   const handleConfirm = async () => {
     if (!canSubmit || !payment) return;
     setSubmitting(true);
     try {
-      const { order, missionRewards } = await createOrder({
+      const { order } = await createOrder({
         items,
         customer: {
           name: name.trim(),
@@ -92,6 +142,9 @@ function CheckoutPage() {
         payment,
         productTotal,
         totalGrams,
+        paymentReference: reference.trim(),
+        voucherCode: voucher?.code ?? null,
+        voucherDiscount,
       });
       if (saveAsDefault) {
         try {
@@ -105,9 +158,6 @@ function CheckoutPage() {
         }
       }
       clearLoadout();
-      if (missionRewards.length) {
-        toast.success(`MISSION COMPLETE — ${missionRewards.map((m) => m.title).join(", ")}`);
-      }
       navigate({ to: "/order-complete", search: { id: order.mission_number } });
     } catch (err: any) {
       console.error("[BLACK'S BUNKER] Order transmission failed:", err);
@@ -120,6 +170,24 @@ function CheckoutPage() {
     <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500">
         <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
+          {/* Rule Panel */}
+          {settingsReady && (
+            <Panel variant="default" className="p-3">
+              <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
+                <span className="font-display text-xs font-bold uppercase tracking-widest">
+                  Checkout Rules
+                </span>
+              </div>
+              <ul className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                <li>· Minimum order amount: <span className="text-foreground">฿{minAmount.toLocaleString()}</span></li>
+                <li>· Minimum order weight: <span className="text-foreground">{minWeight}G</span></li>
+                <li>· Meet <span className="text-foreground">amount OR weight</span> to unlock checkout</li>
+                <li>· Enter last <span className="text-foreground">5 digits</span> of your transfer reference</li>
+              </ul>
+            </Panel>
+          )}
+
           <Panel variant="default" corners className="corner-frame-lines p-4">
             <SectionTitle>Delivery Information</SectionTitle>
             <div className="mt-3 grid grid-cols-2 gap-3">
@@ -173,6 +241,50 @@ function CheckoutPage() {
             </div>
           </Panel>
 
+          {/* Voucher */}
+          <Panel variant="default" className="p-4">
+            <SectionTitle>Voucher Code</SectionTitle>
+            <div className="mt-3 flex items-center gap-2">
+              <div className="relative flex-1">
+                <Ticket className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neon/70" />
+                <input
+                  value={voucherInput}
+                  onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
+                  placeholder="ENTER VOUCHER CODE"
+                  className="w-full rounded-sm border border-white/10 bg-background/60 py-2 pl-8 pr-3 font-mono text-sm uppercase tracking-widest text-foreground placeholder:text-muted-foreground/50 focus:border-neon/70 focus:outline-none"
+                />
+              </div>
+              <BunkerButton variant="outline" size="sm" onClick={handleApplyVoucher}>
+                Apply
+              </BunkerButton>
+              {voucher && (
+                <button
+                  onClick={() => {
+                    setVoucher(null);
+                    setVoucherInput("");
+                    setVoucherError(null);
+                  }}
+                  className="rounded-sm border border-white/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            {voucher && (
+              <div className="mt-2 flex items-center gap-2 rounded-sm border border-neon/40 bg-neon/5 px-3 py-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-neon" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-neon">
+                  {voucher.reward_name} · −฿{Number(voucher.discount_amount).toLocaleString()}
+                </span>
+              </div>
+            )}
+            {voucherError && (
+              <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-red-400">
+                {voucherError}
+              </div>
+            )}
+          </Panel>
+
           <Panel variant="default" className="p-4">
             <SectionTitle>Payment Method</SectionTitle>
             <div className="mt-3 grid grid-cols-3 gap-3">
@@ -197,7 +309,8 @@ function CheckoutPage() {
                 );
               })}
             </div>
-            {selectedQR?.qrImage && (
+
+            {payment && selectedQR?.qrImage && (
               <div className="mt-3 flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-3">
                 <img
                   src={selectedQR.qrImage}
@@ -210,6 +323,31 @@ function CheckoutPage() {
               </div>
             )}
 
+            {payment && (
+              <div className="mt-3">
+                <label className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+                  Last 5 Digits of Transfer Reference
+                </label>
+                <input
+                  value={reference}
+                  onChange={(e) =>
+                    setReference(e.target.value.replace(/\D/g, "").slice(0, 5))
+                  }
+                  inputMode="numeric"
+                  placeholder="12345"
+                  className={cn(
+                    "mt-1 w-full rounded-sm border bg-background/60 px-3 py-2 font-mono text-lg tracking-[0.5em] text-center text-foreground placeholder:text-muted-foreground/40 focus:outline-none",
+                    referenceValid
+                      ? "border-neon/60 focus:border-neon"
+                      : "border-white/10 focus:border-neon/70",
+                  )}
+                  maxLength={5}
+                />
+                <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  Required to deploy mission
+                </div>
+              </div>
+            )}
           </Panel>
         </div>
 
@@ -251,6 +389,9 @@ function CheckoutPage() {
           <div className="mt-3 flex flex-col gap-1.5 border-t border-white/10 pt-3 text-xs">
             <SummaryRow label="Total Weight" value={`${totalGrams} G`} />
             <SummaryRow label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
+            {voucherDiscount > 0 && (
+              <SummaryRow label="Voucher" value={`−฿${voucherDiscount.toLocaleString()}`} />
+            )}
             <SummaryRow label="Delivery Fee" value="TO BE CONFIRMED" muted />
             <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <div className="flex items-center justify-between">
@@ -258,7 +399,7 @@ function CheckoutPage() {
                 Grand Total
               </span>
               <span className="font-display text-lg font-bold text-neon">
-                ฿{productTotal.toLocaleString()}
+                ฿{grandTotal.toLocaleString()}
               </span>
             </div>
           </div>
@@ -270,7 +411,13 @@ function CheckoutPage() {
             onClick={handleConfirm}
             className="mt-4 w-full"
           >
-            {submitting ? "Transmitting..." : "Deploy Mission"}
+            {submitting
+              ? "Transmitting..."
+              : !payment
+                ? "Select Payment"
+                : !referenceValid
+                  ? "Enter Last 5 Digits"
+                  : "Deploy Mission"}
           </BunkerButton>
         </Panel>
       </div>
