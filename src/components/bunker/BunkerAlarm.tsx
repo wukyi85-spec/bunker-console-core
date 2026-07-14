@@ -195,7 +195,8 @@ export function BunkerAlarm() {
               type="button"
               onClick={() => void handleClick(a)}
               className={cn(
-                "relative animate-notif-in overflow-hidden rounded-sm border border-border/50 bg-panel/60 p-2 pl-3 text-left transition-colors hover:border-neon/40 hover:bg-panel-elevated/70 max-sm:p-1.5 max-sm:pl-2",
+                "relative animate-notif-in overflow-hidden rounded-sm border border-border/50 bg-panel/60 p-2 pl-3 text-left transition-colors hover:border-neon/40 hover:bg-panel-elevated/70 max-sm:p-1 max-sm:pl-1.5",
+                i >= 1 && "max-sm:hidden",
                 !a.isRead && "ring-1 ring-neon/20",
               )}
               style={{ animationDelay: `${i * 40}ms` }}
@@ -223,10 +224,10 @@ export function BunkerAlarm() {
                       {timeAgo(a.createdAt)}
                     </span>
                   </div>
-                  <div className="mt-1 truncate font-display text-[12px] font-bold uppercase tracking-wider text-foreground max-sm:text-[10px]">
+                  <div className="mt-1 truncate font-display text-[12px] font-bold uppercase tracking-wider text-foreground max-sm:mt-0.5 max-sm:text-[10px]">
                     {a.title}
                   </div>
-                  <div className="truncate text-[11px] text-muted-foreground max-sm:text-[9px]">{a.message}</div>
+                  <div className="truncate text-[11px] text-muted-foreground max-sm:hidden max-sm:text-[9px]">{a.message}</div>
                 </div>
               </div>
             </button>
