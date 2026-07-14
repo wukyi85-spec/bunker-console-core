@@ -312,6 +312,14 @@
   animation: badge-spin 12s linear infinite;
 }
 
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.06); filter: brightness(1.18); }
+}
+@utility animate-badge-pulse {
+  animation: badge-pulse 3.6s ease-in-out infinite;
+}
+
 @keyframes rankup-burst {
   0%   { transform: scale(0.3); opacity: 0; }
   40%  { opacity: 0.9; }

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 
 import { ContactHQ } from "@/components/bunker/ContactHQ";
+import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
 import { cn } from "@/lib/utils";
 
 import { toast } from "sonner";
@@ -243,17 +244,20 @@ function ProfilePage() {
 
             {/* Rank / Stats */}
             <div className="flex flex-col gap-3 rounded-md border border-white/10 bg-black/40 p-3">
-              <div className="flex items-center gap-2">
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full border-2"
-                  style={{
-                    borderColor: rankAccent,
-                    background: `color-mix(in oklab, ${rankAccent} 12%, transparent)`,
-                    boxShadow: `0 0 22px -6px ${rankAccent}`,
-                  }}
-                >
-                  <Shield className="h-5 w-5" style={{ color: rankAccent }} />
-                </div>
+              <div className="flex items-center gap-3">
+                {(() => {
+                  const t = getRankTheme(rank);
+                  return (
+                    <BadgeGlow
+                      src={rankRow?.badgeImage || null}
+                      alt={rank}
+                      size={44}
+                      primary={rankAccent || t.primary}
+                      secondary={t.secondary}
+                      intensity="md"
+                    />
+                  );
+                })()}
                 <div>
                   <div className="font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
                     Current Rank
@@ -287,11 +291,14 @@ function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-2">
                 <StatChip
-                  icon={<Star className="h-3.5 w-3.5 fill-neon text-neon" />}
-                  label="Stars"
-                  value={String(
-                    Math.min(5, Math.floor((stats?.level ?? 1) / 4)),
-                  )}
+                  icon={<Shield className="h-3.5 w-3.5 text-neon" />}
+                  label="Level"
+                  value={String(stats?.level ?? 1)}
+                />
+                <StatChip
+                  icon={<Coins className="h-3.5 w-3.5 text-amber-300" />}
+                  label="Gold"
+                  value={(stats?.gold ?? 0).toLocaleString()}
                 />
                 <StatChip
                   icon={<Trophy className="h-3.5 w-3.5 text-neon" />}
@@ -299,9 +306,14 @@ function ProfilePage() {
                   value={(stats?.xp ?? 0).toLocaleString()}
                 />
                 <StatChip
-                  icon={<Shield className="h-3.5 w-3.5 text-neon" />}
-                  label="Level"
-                  value={String(stats?.level ?? 1)}
+                  icon={<Star className="h-3.5 w-3.5 fill-neon text-neon" />}
+                  label="Total Purchase"
+                  value={`฿${Number(stats?.total_purchase ?? 0).toLocaleString()}`}
+                />
+                <StatChip
+                  icon={<Zap className="h-3.5 w-3.5 text-neon" />}
+                  label="Total Weight"
+                  value={`${Number(stats?.total_weight ?? 0)}G`}
                 />
               </div>
             </div>
