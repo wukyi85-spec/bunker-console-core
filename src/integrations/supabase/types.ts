@@ -904,6 +904,14 @@ export type Database = {
         Args: { p_id: string; p_player_key: string }
         Returns: undefined
       }
+      complete_member_onboarding: {
+        Args: {
+          p_character_id: string
+          p_pass_id: string
+          p_player_name: string
+        }
+        Returns: undefined
+      }
       create_player_order: {
         Args: { payload: Json }
         Returns: {

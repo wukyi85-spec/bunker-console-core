@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { Eye, EyeOff, Fingerprint, KeyRound, Loader2, Maximize } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Eye, EyeOff, Fingerprint, KeyRound, Loader2, Maximize, Minimize } from "lucide-react";
 import { Logo } from "@/components/bunker/Logo";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -36,19 +36,36 @@ function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
 
-  async function enterFullscreenThenForm() {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  async function toggleFullscreen() {
+    const doc = document as Document & {
+      webkitExitFullscreen?: () => Promise<void> | void;
+      msExitFullscreen?: () => Promise<void> | void;
+    };
     const el = document.documentElement as HTMLElement & {
       webkitRequestFullscreen?: () => Promise<void> | void;
       msRequestFullscreen?: () => Promise<void> | void;
     };
     try {
-      if (el.requestFullscreen) await el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-      else if (el.msRequestFullscreen) await el.msRequestFullscreen();
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (doc.webkitExitFullscreen) await doc.webkitExitFullscreen();
+        else if (doc.msExitFullscreen) await doc.msExitFullscreen();
+      } else {
+        if (el.requestFullscreen) await el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) await el.msRequestFullscreen();
+      }
     } catch {
-      // Fullscreen not allowed or unsupported — continue normally.
+      // Fullscreen not allowed or unsupported — silently ignore.
     }
-    setStage("form");
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -90,7 +107,7 @@ function LoginScreen() {
       // Play bunker-door opening animation, then continue.
       setNextRoute(target);
       setStage("opening");
-      window.setTimeout(() => navigate({ to: target }), 1500);
+      window.setTimeout(() => navigate({ to: target }), 2800);
     } catch (err) {
       console.error("[LOGIN] error:", err);
       const msg = err instanceof Error ? err.message : JSON.stringify(err);
@@ -155,11 +172,11 @@ function LoginScreen() {
                 type="button"
                 size="lg"
                 variant="outline"
-                onClick={enterFullscreenThenForm}
+                onClick={toggleFullscreen}
                 className="w-full active:scale-[0.98]"
               >
-                <Maximize className="h-4 w-4" />
-                FULL SCREEN
+                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                {isFullscreen ? "EXIT FULL SCREEN" : "FULL SCREEN"}
               </BunkerButton>
             </div>
           </div>
@@ -295,11 +312,17 @@ function BunkerDoorOpening({ target }: { target: string | null }) {
       </div>
 
       {/* Center caption */}
-      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 animate-in fade-in duration-500">
+      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 px-6 text-center animate-in fade-in duration-500" style={{ animationDelay: "800ms", animationFillMode: "both" }}>
         <span className="font-mono text-[10px] uppercase tracking-[0.6em] text-neon animate-hud-pulse">
           // Access Granted
         </span>
-        <span className="font-display text-lg font-black uppercase tracking-[0.35em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
+        <p className="font-display text-sm font-medium uppercase tracking-[0.28em] text-foreground/90 drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
+          Thank you for choosing Black's Joint &amp; Bud.
+        </p>
+        <h2 className="font-display text-2xl font-black uppercase tracking-[0.35em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
+          Welcome to BLACK'S BUNKER
+        </h2>
+        <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground/80">
           {label}
         </span>
       </div>
