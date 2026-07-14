@@ -626,29 +626,49 @@ function RankUp({
   const accent = toAccent ?? "var(--neon)";
   return (
     <div className="relative flex flex-col items-center animate-in fade-in duration-700">
-      <div
-        className="pointer-events-none absolute -inset-32 animate-hud-pulse rounded-full blur-3xl"
-        style={{ background: `${accent}33` }}
+      {/* Radial burst */}
+      <span
+        className="pointer-events-none absolute inset-0 -z-10 animate-rankup-burst rounded-full blur-2xl"
+        style={{ background: `radial-gradient(circle, ${accent}66 0%, transparent 60%)` }}
       />
-      <div className="relative flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.5em]" style={{ color: accent }}>
+      {/* God-rays */}
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <span
+            key={i}
+            className="absolute h-40 w-1 origin-bottom rounded-full animate-rankup-ray"
+            style={{
+              // @ts-expect-error CSS custom prop
+              "--r": `${i * 30}deg`,
+              background: `linear-gradient(to top, transparent, ${accent}cc, transparent)`,
+              animationDelay: `${i * 40}ms`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div
+        className="relative flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.5em]"
+        style={{ color: accent }}
+      >
         <Trophy className="h-4 w-4" />
         <span>Rank Promotion</span>
         <Trophy className="h-4 w-4" />
       </div>
       <h1
-        className="relative mt-3 font-display text-6xl font-black uppercase tracking-[0.2em]"
-        style={{ color: accent, textShadow: `0 0 30px ${accent}` }}
+        className="relative mt-3 font-display text-6xl font-black uppercase tracking-[0.2em] animate-in zoom-in-50 duration-700"
+        style={{ color: accent, textShadow: `0 0 40px ${accent}, 0 0 80px ${accent}` }}
       >
         RANK UP
       </h1>
       <div className="relative mt-6 flex items-center gap-6 font-display text-xl font-bold uppercase tracking-[0.35em]">
         <span className="text-muted-foreground line-through">{fromName ?? "—"}</span>
-        <span className="text-2xl" style={{ color: accent }}>
+        <span className="text-2xl animate-hud-pulse" style={{ color: accent }}>
           →
         </span>
         <span
           className="text-3xl animate-in zoom-in-75 duration-700"
-          style={{ color: accent, textShadow: `0 0 20px ${accent}` }}
+          style={{ color: accent, textShadow: `0 0 24px ${accent}` }}
         >
           {toName}
         </span>
@@ -657,11 +677,12 @@ function RankUp({
         {Array.from({ length: 5 }).map((_, i) => (
           <Star
             key={i}
-            className="h-4 w-4 animate-in fade-in zoom-in-50"
+            className="h-5 w-5 animate-in fade-in zoom-in-50 duration-500"
             style={{
               color: accent,
               fill: accent,
-              animationDelay: `${i * 120}ms`,
+              filter: `drop-shadow(0 0 6px ${accent})`,
+              animationDelay: `${400 + i * 140}ms`,
             }}
           />
         ))}
@@ -669,3 +690,4 @@ function RankUp({
     </div>
   );
 }
+
