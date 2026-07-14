@@ -152,7 +152,7 @@ function SupplyPage() {
       </div>
 
       {/* Main grid — fills the rest of the viewport */}
-      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[200px_1fr] gap-0">
+      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[180px_1fr_360px] gap-0">
         {/* LEFT — Category rail */}
         <aside className="relative flex min-h-0 flex-col border-r border-white/8 bg-black/30 p-3">
           <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-2">
