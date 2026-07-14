@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { Eye, EyeOff, Fingerprint, KeyRound, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Fingerprint, KeyRound, Loader2, Maximize } from "lucide-react";
 import { Logo } from "@/components/bunker/Logo";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -35,6 +35,21 @@ function LoginScreen() {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
+
+  async function enterFullscreenThenForm() {
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+    try {
+      if (el.requestFullscreen) await el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) await el.msRequestFullscreen();
+    } catch {
+      // Fullscreen not allowed or unsupported — continue normally.
+    }
+    setStage("form");
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -127,14 +142,26 @@ function LoginScreen() {
                 Access is restricted to verified operatives.
               </p>
             </div>
-            <BunkerButton
-              type="button"
-              size="lg"
-              onClick={() => setStage("form")}
-              className="w-full max-w-xs active:scale-[0.98]"
-            >
-              Enter the Bunker
-            </BunkerButton>
+            <div className="flex w-full max-w-xs flex-col gap-3">
+              <BunkerButton
+                type="button"
+                size="lg"
+                onClick={() => setStage("form")}
+                className="w-full active:scale-[0.98]"
+              >
+                ENTER BUNKER
+              </BunkerButton>
+              <BunkerButton
+                type="button"
+                size="lg"
+                variant="outline"
+                onClick={enterFullscreenThenForm}
+                className="w-full active:scale-[0.98]"
+              >
+                <Maximize className="h-4 w-4" />
+                FULL SCREEN
+              </BunkerButton>
+            </div>
           </div>
         ) : (
           <Panel
