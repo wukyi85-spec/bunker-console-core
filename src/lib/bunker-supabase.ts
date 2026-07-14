@@ -7,12 +7,15 @@ import { PROGRESSION, calcGold, calcLevel, calcXp } from "./progression";
 export interface OrderInsertPayload {
   items: LoadoutItem[];
   customer: { name: string; phone: string; address: string; notes?: string };
-  payment: "PromptPay" | "KPay" | "WavePay";
+  payment: "PromptPay" | "KPay" | "WavePay" | "REWARD";
   productTotal: number;
   totalGrams: number;
   paymentReference: string;
   voucherCode?: string | null;
   voucherDiscount?: number;
+  voucherPercent?: number | null;
+  voucherMaxDiscount?: number | null;
+  orderType?: "supply" | "reward";
 }
 
 export function calcRewards(productTotal: number) {
