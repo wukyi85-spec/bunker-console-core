@@ -150,7 +150,7 @@ function LoadoutPage() {
                 Minimum Requirement
               </div>
               <div className="mt-0.5 font-display text-xs font-bold uppercase tracking-wider text-foreground">
-                50G OR ฿1,000
+                {minWeight}G OR ฿{minAmount.toLocaleString()}
               </div>
               <div
                 className={cn(
@@ -169,11 +169,12 @@ function LoadoutPage() {
                   style={{
                     width: `${Math.min(
                       100,
-                      Math.max(totalGrams / 50, productTotal / 1000) * 100,
+                      Math.max(totalGrams / minWeight, productTotal / minAmount) * 100,
                     )}%`,
                   }}
                 />
               </div>
+
             </div>
 
             <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
