@@ -21,9 +21,6 @@ import {
   subscribeRewardLoadout,
   type RewardLoadoutItem,
 } from "@/lib/reward-loadout";
-  getGameSettings,
-  type SheetReward,
-} from "@/lib/sheets.functions";
 import {
   getPlayerStats,
   listPlayerVouchers,
