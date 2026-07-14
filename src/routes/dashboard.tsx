@@ -52,10 +52,38 @@ function DashboardPage() {
           }}
         />
 
+        {/* GTA-style volumetric god-rays from top */}
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-screen opacity-60"
+          style={{
+            background:
+              "conic-gradient(from 220deg at 50% -20%, transparent 0deg, color-mix(in oklab, var(--neon) 18%, transparent) 15deg, transparent 30deg, color-mix(in oklab, var(--neon) 12%, transparent) 55deg, transparent 80deg)",
+            filter: "blur(18px)",
+          }}
+        />
+        {/* Warm bunker firelight bottom */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 mix-blend-screen opacity-70"
+          style={{
+            background:
+              "radial-gradient(60% 55% at 50% 100%, rgb(255 170 90 / 0.14), transparent 70%)",
+            filter: "blur(20px)",
+          }}
+        />
         {/* Cinematic vignette + top/bottom fades so HUD sits legible over scene */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgb(0_0_0/0.55)_100%)]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background/80 via-background/30 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-background/85 via-background/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgb(0_0_0/0.65)_100%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background/85 via-background/35 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-background/90 via-background/45 to-transparent" />
+        {/* Chromatic edge tint for cinematic feel */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0/0.35)_0%,transparent_15%,transparent_85%,rgb(0_0_0/0.35)_100%)]" />
+        {/* Film grain */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.7'/></svg>\")",
+          }}
+        />
 
         {/* Subtle HUD grid + scanline over everything */}
         <div className="pointer-events-none absolute inset-0 hud-grid opacity-15" />
@@ -63,6 +91,7 @@ function DashboardPage() {
 
         {/* Top scanline hairline */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
+
 
         {/* ============ FLOATING HUD OVERLAYS ============ */}
 
