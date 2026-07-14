@@ -108,14 +108,14 @@ function DashboardPage() {
 
         {/* Top right — Player HUD + Bunker Alarm stack */}
         <div
-          className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700 left-4 right-4 top-16 gap-3 sm:left-auto sm:right-6 sm:top-5 sm:w-[360px] sm:gap-5"
+          className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:scale-75"
         >
           <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full" />
           <BunkerAlarm />
         </div>
 
         {/* Bottom-left tactical caption + Contact HQ */}
-        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000 max-sm:hidden">
+        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000 lphone:hidden">
           <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
             // BUNKER ONLINE
           </span>
@@ -133,7 +133,7 @@ function DashboardPage() {
         </div>
 
         {/* Bottom center — Floating nav dock */}
-        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 max-sm:px-2">
+        <div className="absolute inset-x-0 bottom-4 z-20 flex origin-bottom justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 lphone:bottom-1 lphone:scale-[0.6]">
           <GameNav />
         </div>
       </div>

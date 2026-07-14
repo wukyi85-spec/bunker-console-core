@@ -36,9 +36,7 @@ export function GameNav() {
   return (
     <nav
       className={cn(
-        "relative grid grid-cols-3 grid-rows-2 gap-2 overflow-hidden rounded-2xl p-2",
-        "sm:flex sm:flex-row sm:items-stretch sm:gap-2.5 sm:p-2.5",
-        "max-w-full sm:max-w-[calc(100vw-1rem)] sm:overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "relative flex flex-row items-stretch gap-2.5 rounded-2xl p-2.5",
         "bg-black/55 backdrop-blur-xl",
         "border border-white/8",
         "shadow-[0_28px_60px_-24px_rgb(0_0_0/0.9),inset_0_1px_0_0_rgb(255_255_255/0.05)]",
@@ -53,8 +51,8 @@ export function GameNav() {
             to={item.to}
             className={cn(
               "group relative flex shrink-0 flex-col items-center justify-center gap-1 overflow-hidden",
-              "w-full h-[48px] sm:w-[168px] sm:h-[66px]",
-              "rounded-xl px-2 sm:px-3 select-none",
+              "w-[168px] h-[66px]",
+              "rounded-xl px-3 select-none",
               "transition-all duration-300 ease-out",
               // Matte black body with thin white border
               "bg-gradient-to-b from-[rgb(28_28_28)] to-[rgb(14_14_14)]",
@@ -90,14 +88,14 @@ export function GameNav() {
 
             <Icon
               className={cn(
-                "relative h-[22px] w-[22px] transition-all duration-300 max-sm:h-4 max-sm:w-4",
+                "relative h-[22px] w-[22px] transition-all duration-300",
                 "group-hover:-translate-y-0.5",
                 isActive &&
                   "drop-shadow-[0_0_10px_color-mix(in_oklab,var(--neon)_75%,transparent)]",
               )}
             />
 
-            <span className="relative max-w-full break-words text-center font-display text-[10.5px] font-bold uppercase leading-tight tracking-[0.26em] max-sm:text-[8px] max-sm:tracking-[0.18em]">
+            <span className="relative font-display text-[10.5px] font-bold uppercase tracking-[0.26em]">
               {item.label}
             </span>
 
@@ -105,7 +103,7 @@ export function GameNav() {
             {isActive && (
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-x-6 bottom-1.5 h-[2px] rounded-full bg-neon/90 shadow-[0_0_10px_var(--neon)] max-sm:inset-x-3"
+                className="pointer-events-none absolute inset-x-6 bottom-1.5 h-[2px] rounded-full bg-neon/90 shadow-[0_0_10px_var(--neon)]"
               />
             )}
           </Link>
