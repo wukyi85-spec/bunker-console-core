@@ -111,15 +111,6 @@ function RankPage() {
                   </span>
                 )}
 
-                {t.crown && (
-                  <Crown
-                    className="relative mb-1 h-5 w-5"
-                    style={{
-                      color: t.primary,
-                      filter: `drop-shadow(0 0 6px ${t.primary})`,
-                    }}
-                  />
-                )}
 
                 <div className="relative flex h-28 w-28 items-center justify-center">
                   {unlocked ? (
