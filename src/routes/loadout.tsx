@@ -30,6 +30,7 @@ export const Route = createFileRoute("/loadout")({
 function LoadoutPage() {
   const [items, setItems] = useState(getLoadout);
   const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
   const navigate = useNavigate();
   const fetchSettings = useServerFn(getGameSettings);
   const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
