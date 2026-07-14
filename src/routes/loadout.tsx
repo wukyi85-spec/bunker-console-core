@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -11,6 +13,7 @@ import {
   removeFromLoadout,
   loadoutTotals,
 } from "@/lib/loadout";
+import { getGameSettings } from "@/lib/sheets.functions";
 import { AlertTriangle, Backpack, Package, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,13 +30,21 @@ export const Route = createFileRoute("/loadout")({
 function LoadoutPage() {
   const [items, setItems] = useState(getLoadout);
   const navigate = useNavigate();
+  const fetchSettings = useServerFn(getGameSettings);
+  const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
+  const minAmount = settingsQ.data?.minimum_order_amount ?? 1000;
+  const minWeight = settingsQ.data?.minimum_order_weight ?? 50;
 
   useEffect(() => {
     setItems(getLoadout());
     return subscribeLoadout(() => setItems(getLoadout()));
   }, []);
 
-  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items);
+  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items, {
+    amount: minAmount,
+    weight: minWeight,
+  });
+
 
   return (
     <AppShell hideLogo hideNav>
