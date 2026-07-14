@@ -30,7 +30,7 @@ export interface SheetProduct {
 }
 
 const SPREADSHEET_ID = "1kTOlpWLZ6HlAzV3kOOobaN-4aNuqsyFRCb4jWeTzs5M";
-const RANGE = "Sheet1!A1:Z500";
+const RANGE = "SupplyRoom!A1:Z500";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets";
 
 const SIZE_REGEX = /^(\d+(?:\.\d+)?)\s*g$/i;
