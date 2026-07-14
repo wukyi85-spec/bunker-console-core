@@ -167,8 +167,16 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   );
 }
 
-function MiniBar({ label, value, tone }: { label: string; value: number; tone: "neon" | "dim" }) {
+function MiniBar({ label, value, tone }: { label: string; value: number; tone: "xp" | "act" | "neon" | "dim" }) {
   const pct = Math.max(0, Math.min(100, value));
+  const barStyle =
+    tone === "xp"
+      ? { background: "linear-gradient(90deg,rgba(255,255,255,0.55),rgba(255,255,255,0.95))", boxShadow: "0 0 8px -1px rgba(255,255,255,0.5)" }
+      : tone === "act"
+        ? { background: "linear-gradient(90deg,#7a1414,#ff3a3a)", boxShadow: "0 0 8px -1px rgba(255,58,58,0.6)" }
+        : tone === "neon"
+          ? { background: "linear-gradient(90deg,var(--neon-dim),var(--neon))", boxShadow: "0 0 8px -1px var(--neon)" }
+          : { background: "linear-gradient(90deg,rgba(255,255,255,0.25),rgba(255,255,255,0.5))" };
   return (
     <div className="flex items-center gap-2 max-sm:gap-1.5">
       <span className="w-6 font-mono text-[9px] uppercase tracking-widest text-muted-foreground max-sm:w-5 max-sm:text-[7px]">
@@ -176,13 +184,8 @@ function MiniBar({ label, value, tone }: { label: string; value: number; tone: "
       </span>
       <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40 max-sm:h-0.5">
         <div
-          className={cn(
-            "h-full transition-[width] duration-1000 ease-out",
-            tone === "neon"
-              ? "bg-gradient-to-r from-neon-dim via-neon to-neon shadow-[0_0_8px_-1px_var(--neon)]"
-              : "bg-gradient-to-r from-muted-foreground/40 via-muted-foreground/70 to-neon-dim",
-          )}
-          style={{ width: `${pct}%` }}
+          className="h-full transition-[width] duration-1000 ease-out"
+          style={{ width: `${pct}%`, ...barStyle }}
         />
       </div>
       <span className="w-8 text-right font-mono text-[9px] tabular-nums text-foreground/80 max-sm:w-6 max-sm:text-[7px]">
