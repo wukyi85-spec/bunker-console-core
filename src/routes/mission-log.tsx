@@ -222,7 +222,7 @@ function OrderRow({ order }: { order: OrderRow }) {
                 </a>
               ) : (
                 <div className="mt-1 font-mono text-[10px] text-muted-foreground">
-                  Tracking information is not available yet. Please check again after your order is handed to delivery.
+                  Tracking information will be available after dispatch.
                 </div>
               )}
             </div>

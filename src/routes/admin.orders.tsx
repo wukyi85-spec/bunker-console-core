@@ -353,7 +353,7 @@ function AdminOrdersPage() {
                         className="inline-flex items-center gap-1 rounded-sm border border-red-500/40 bg-red-500/10 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-red-300 transition-colors hover:bg-red-500/20"
                       >
                         <Ban className="h-3 w-3" />
-                        Cancel
+                        Reject
                       </button>
                     )}
                     {!canConfirm(o) && !canCancel(o) && (
@@ -641,7 +641,7 @@ function OrderDetailsDrawer({
                 className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/50 bg-red-500/10 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/20 disabled:opacity-50"
               >
                 <Ban className="h-4 w-4" />
-                Cancel Order
+                Reject Order
               </button>
             )}
           </div>
@@ -721,7 +721,7 @@ function CancelOrderDialog({
           </div>
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-red-400">
-              // Cancel Order
+              // Reject Order
             </div>
             <div className="font-display text-lg font-black uppercase tracking-widest text-foreground">
               {order.mission_number}
@@ -730,7 +730,7 @@ function CancelOrderDialog({
         </div>
 
         <p className="mt-4 text-sm text-muted-foreground">
-          Provide a cancellation reason. The member will receive a notification with this reason.
+          Provide a reason for rejecting this order. The member will receive a notification with this reason.
         </p>
 
         <label className="mt-4 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -760,7 +760,7 @@ function CancelOrderDialog({
             className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/60 bg-red-500/15 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/25 disabled:opacity-40"
           >
             <Ban className="h-4 w-4" />
-            {submitting ? "Cancelling…" : "Confirm Cancel"}
+            {submitting ? "Rejecting…" : "Confirm Reject"}
           </button>
         </div>
       </div>
