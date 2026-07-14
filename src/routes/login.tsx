@@ -77,7 +77,7 @@ function LoginScreen() {
       // Play bunker-door opening animation, then continue.
       setNextRoute(target);
       setStage("opening");
-      window.setTimeout(() => navigate({ to: target }), 2800);
+      window.setTimeout(() => navigate({ to: target }), 4600);
     } catch (err) {
       console.error("[LOGIN] error:", err);
       const msg = err instanceof Error ? err.message : JSON.stringify(err);
