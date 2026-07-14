@@ -217,10 +217,14 @@ function LoginScreen() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 flex flex-col items-center gap-0.5 font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/60">
-        <span>Members Only</span>
-        <span>Version 1.0</span>
+      {/* Footer — subtle brand mark */}
+      <footer className="relative z-10 flex flex-col items-center gap-1 text-center">
+        <span className="font-mono text-[9px] uppercase tracking-[0.32em] text-muted-foreground/50">
+          Black&rsquo;s Joint Smoking Accessories &nbsp;·&nbsp; Black&rsquo;s Joint &amp; Bud
+        </span>
+        <span className="font-display text-[10px] font-semibold uppercase tracking-[0.42em] text-foreground/70">
+          BLACK&rsquo;S BUNKER <span className="text-muted-foreground/50">— Version 1.0</span>
+        </span>
       </footer>
 
       {/* ================ BUNKER DOOR OPENING OVERLAY ================ */}
