@@ -115,9 +115,23 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground max-sm:text-[8px]">
+        <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground max-sm:text-[8px]">
           <Shield className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">{player.rank}</span>
+          {(() => {
+            const t = getRankTheme(player.rank);
+            return (
+              <BadgeGlow
+                src={player.badge || null}
+                alt={player.rank}
+                size={26}
+                primary={currentRank?.accent || t.primary}
+                secondary={t.secondary}
+                intensity="sm"
+                className="max-sm:!h-5 max-sm:!w-5"
+              />
+            );
+          })()}
           <span className="text-border">·</span>
           <Zap className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">LV {player.level}</span>
