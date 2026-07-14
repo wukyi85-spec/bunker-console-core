@@ -172,11 +172,11 @@ function LoginScreen() {
                 type="button"
                 size="lg"
                 variant="outline"
-                onClick={enterFullscreenThenForm}
+                onClick={toggleFullscreen}
                 className="w-full active:scale-[0.98]"
               >
-                <Maximize className="h-4 w-4" />
-                FULL SCREEN
+                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                {isFullscreen ? "EXIT FULL SCREEN" : "FULL SCREEN"}
               </BunkerButton>
             </div>
           </div>
