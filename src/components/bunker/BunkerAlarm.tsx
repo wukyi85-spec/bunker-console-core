@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, Package, Radio, Bell } from "lucide-react";
+import { AlertTriangle, Package, Radio, Bell, X, Trophy } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { listPlayerNotifications, markNotificationRead, type PlayerNotificationRow } from "@/lib/bunker-supabase";
 import { getAnnouncements, getGameSettings } from "@/lib/sheets.functions";
@@ -16,6 +17,7 @@ interface AlarmItem {
   createdAt: string;
   isRead: boolean;
   source: "notification" | "announcement";
+  orderId?: string | null;
 }
 
 function toneFor(type: string): AlarmTone {
@@ -31,7 +33,8 @@ function iconFor(type: string) {
   const t = type.toUpperCase();
   if (t.includes("ORDER") || t === "SUPPLY") return Package;
   if (t === "WARN" || t === "ALERT" || t === "SYSTEM") return AlertTriangle;
-  if (t === "REWARD" || t === "NEWS") return Bell;
+  if (t === "REWARD") return Trophy;
+  if (t === "NEWS") return Bell;
   return Radio;
 }
 
@@ -51,9 +54,20 @@ const toneStyles: Record<AlarmTone, { badge: string; label: string; icon: string
   ops:    { badge: "border-border bg-panel-elevated text-muted-foreground",     label: "OPS",    icon: "text-muted-foreground" },
 };
 
+function routeFor(item: AlarmItem): string | null {
+  const t = item.type.toUpperCase();
+  if (t.includes("ORDER")) return "/mission-log";
+  if (t === "REWARD") return "/rewards";
+  if (t === "MISSION") return "/missions";
+  if (t === "RANK") return "/rank";
+  return null;
+}
+
 export function BunkerAlarm() {
+  const navigate = useNavigate();
   const [notifs, setNotifs] = useState<PlayerNotificationRow[]>([]);
   const [mountedCount, setMountedCount] = useState(0);
+  const [showAll, setShowAll] = useState(false);
 
   const fetchAnnouncements = useServerFn(getAnnouncements);
   const fetchSettings = useServerFn(getGameSettings);
@@ -81,10 +95,9 @@ export function BunkerAlarm() {
     };
   }, []);
 
-  // Merge notifications + announcements, drop items older than expireDays.
   const now = Date.now();
   const cutoff = now - expireDays * 86_400_000;
-  const items: AlarmItem[] = [
+  const allItems: AlarmItem[] = [
     ...notifs
       .filter((n) => new Date(n.created_at).getTime() >= cutoff)
       .map<AlarmItem>((n) => ({
@@ -95,21 +108,26 @@ export function BunkerAlarm() {
         createdAt: n.created_at,
         isRead: n.is_read,
         source: "notification",
+        orderId: n.order_id,
       })),
-    ...(annQ.data ?? []).map<AlarmItem>((a, i) => ({
-      id: `a-${i}-${a.title}`,
-      type: a.type || "intel",
-      title: a.title || "BUNKER TRANSMISSION",
-      message: a.message,
-      createdAt: a.createdAt || new Date().toISOString(),
-      isRead: true,
-      source: "announcement",
-    })),
-  ]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, maxDisplay);
+    ...(annQ.data ?? [])
+      .filter((a) => {
+        const t = a.createdAt ? new Date(a.createdAt).getTime() : now;
+        return t >= cutoff;
+      })
+      .map<AlarmItem>((a, i) => ({
+        id: `a-${i}-${a.title}`,
+        type: a.type || "intel",
+        title: a.title || "BUNKER TRANSMISSION",
+        message: a.message,
+        createdAt: a.createdAt || new Date().toISOString(),
+        isRead: true,
+        source: "announcement",
+      })),
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const visible = items;
+  const visible = allItems.slice(0, maxDisplay);
+  const hasMore = allItems.length > visible.length;
 
   useEffect(() => {
     let i = 0;
@@ -122,9 +140,7 @@ export function BunkerAlarm() {
     return () => clearInterval(t);
   }, [visible.length]);
 
-  async function handleClick(n: AlarmItem) {
-    if (n.source !== "notification" || n.isRead) return;
-    const rawId = n.id.replace(/^n-/, "");
+  async function markRead(rawId: string) {
     try {
       await markNotificationRead(rawId);
       setNotifs((prev) => prev.map((x) => (x.id === rawId ? { ...x, is_read: true } : x)));
@@ -133,6 +149,16 @@ export function BunkerAlarm() {
     }
   }
 
+  async function handleClick(n: AlarmItem) {
+    if (n.source === "notification" && !n.isRead) {
+      void markRead(n.id.replace(/^n-/, ""));
+    }
+    const route = routeFor(n);
+    if (route) {
+      setShowAll(false);
+      navigate({ to: route });
+    }
+  }
 
   return (
     <div className="relative flex w-full flex-col rounded-md gunmetal-glass p-3">
@@ -154,7 +180,6 @@ export function BunkerAlarm() {
       <div className="mx-1 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
       <div className="mt-2 flex flex-col gap-2">
-
         {visible.length === 0 && (
           <div className="rounded-sm border border-dashed border-white/10 bg-black/30 p-3 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             No transmissions
@@ -209,13 +234,104 @@ export function BunkerAlarm() {
         })}
       </div>
 
-
-
-
       <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
         <span className="text-neon/70">// LIVE</span>
-        <span>Secure Channel</span>
+        {(hasMore || allItems.length > 0) && (
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="rounded-sm border border-neon/40 bg-neon/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-neon transition-all hover:bg-neon/15 hover:shadow-[0_0_10px_-2px_var(--neon)]"
+          >
+            SEE MORE
+          </button>
+        )}
+        {!(hasMore || allItems.length > 0) && <span>Secure Channel</span>}
       </div>
+
+      {showAll && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowAll(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex max-h-[85vh] w-[min(560px,92vw)] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
+          >
+            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Radio className="h-4 w-4 text-neon" />
+                <span className="font-display text-sm font-black uppercase tracking-[0.32em] text-foreground">
+                  All Transmissions
+                </span>
+                <span className="rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold text-neon">
+                  {allItems.length}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAll(false)}
+                className="rounded-sm border border-white/10 bg-background/40 p-1 text-muted-foreground hover:text-neon"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-2 overflow-y-auto p-3">
+              {allItems.length === 0 && (
+                <div className="p-6 text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                  No transmissions in the last {expireDays} days
+                </div>
+              )}
+              {allItems.map((a) => {
+                const tone = toneFor(a.type);
+                const Icon = iconFor(a.type);
+                const styles = toneStyles[tone];
+                return (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => void handleClick(a)}
+                    className={cn(
+                      "relative overflow-hidden rounded-sm border border-border/50 bg-panel/60 p-3 pl-4 text-left transition-colors hover:border-neon/50 hover:bg-panel-elevated/70",
+                      !a.isRead && "ring-1 ring-neon/20",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "absolute left-0 top-2 bottom-2 w-0.5 rounded-full",
+                        tone === "intel" && "bg-neon shadow-[0_0_6px_var(--neon)]",
+                        tone === "supply" && "bg-sky-400",
+                        tone === "reward" && "bg-amber-400",
+                        tone === "warn" && "bg-orange-400",
+                        tone === "ops" && "bg-muted-foreground/60",
+                      )}
+                    />
+                    <div className="flex items-start gap-3">
+                      <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border bg-background/40", styles.badge)}>
+                        <Icon className={cn("h-4 w-4", styles.icon)} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={cn("rounded-sm border px-1.5 py-[1px] font-mono text-[8px] font-bold uppercase tracking-widest", styles.badge)}>
+                            {styles.label}
+                          </span>
+                          <span className="ml-auto font-mono text-[9px] tabular-nums text-muted-foreground">
+                            {timeAgo(a.createdAt)}
+                          </span>
+                        </div>
+                        <div className="mt-1 font-display text-[13px] font-bold uppercase tracking-wider text-foreground">
+                          {a.title}
+                        </div>
+                        <div className="text-[12px] text-muted-foreground">{a.message}</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
