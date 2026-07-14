@@ -36,6 +36,21 @@ function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
 
+  async function enterFullscreenThenForm() {
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+    try {
+      if (el.requestFullscreen) await el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) await el.msRequestFullscreen();
+    } catch {
+      // Fullscreen not allowed or unsupported — continue normally.
+    }
+    setStage("form");
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (verifying) return;
