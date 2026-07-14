@@ -92,14 +92,14 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
 
       <div className="flex min-w-0 flex-col justify-between gap-1.5 max-sm:gap-1">
         <div className="flex items-center gap-2">
-          <span className="truncate font-display text-sm font-black uppercase tracking-[0.18em] text-foreground">
+          <span className="truncate font-display text-sm font-black uppercase tracking-[0.18em] text-foreground max-sm:text-xs">
             {player.name}
           </span>
-          <span className="flex items-center gap-1 rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-neon">
-            <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse shadow-[0_0_6px_var(--neon)]" />
+          <span className="flex items-center gap-1 rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-neon max-sm:px-1 max-sm:text-[7px]">
+            <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse shadow-[0_0_6px_var(--neon)] max-sm:h-1 max-sm:w-1" />
             {player.status}
           </span>
-          <span className="ml-auto font-mono text-[10px] tabular-nums text-muted-foreground">
+          <span className="ml-auto font-mono text-[10px] tabular-nums text-muted-foreground max-sm:text-[8px]">
             {time}
           </span>
         </div>
