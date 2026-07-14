@@ -760,7 +760,7 @@ function CancelOrderDialog({
             className="flex flex-1 items-center justify-center gap-2 rounded-sm border border-red-500/60 bg-red-500/15 px-3 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-red-300 transition-colors hover:bg-red-500/25 disabled:opacity-40"
           >
             <Ban className="h-4 w-4" />
-            {submitting ? "Cancelling…" : "Confirm Cancel"}
+            {submitting ? "Rejecting…" : "Confirm Reject"}
           </button>
         </div>
       </div>
