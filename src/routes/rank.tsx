@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
-import { listRanks, getPlayerStats } from "@/lib/bunker-supabase";
+import { getPlayerStats } from "@/lib/bunker-supabase";
+import { getRankSettings } from "@/lib/sheets.functions";
 import { Lock, Star, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,19 +19,19 @@ export const Route = createFileRoute("/rank")({
 });
 
 function RankPage() {
-  const ranksQ = useQuery({ queryKey: ["ranks"], queryFn: listRanks });
+  const fetchRanks = useServerFn(getRankSettings);
+  const ranksQ = useQuery({ queryKey: ["sheet_ranks"], queryFn: fetchRanks, staleTime: 60_000 });
   const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
 
   const ranks = ranksQ.data ?? [];
   const stats = statsQ.data;
   const xp = stats?.xp ?? 0;
-  const current = ranks.find(
-    (r) => xp >= r.min_xp && (r.max_xp == null || xp <= r.max_xp),
-  );
-  const next = ranks.find((r) => r.min_xp > xp);
-  const progress = next
-    ? Math.min(100, ((xp - (current?.min_xp ?? 0)) / (next.min_xp - (current?.min_xp ?? 0))) * 100)
+  const current = ranks.find((r) => xp >= r.minXp && xp <= r.maxXp);
+  const next = ranks.find((r) => r.minXp > xp);
+  const progress = next && current
+    ? Math.min(100, ((xp - current.minXp) / (next.minXp - current.minXp)) * 100)
     : 100;
+
 
   return (
     <AppShell hideLogo hideNav>
