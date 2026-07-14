@@ -8,6 +8,13 @@ import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { getLoadout, loadoutTotals, clearLoadout } from "@/lib/loadout";
 import {
+  clearRewardLoadout,
+  clearCheckoutMode,
+  getCheckoutMode,
+  getRewardLoadout,
+  rewardLoadoutTotals,
+} from "@/lib/reward-loadout";
+import {
   createOrder,
   getPlayerStats,
   updatePlayerProfileInfo,
@@ -16,7 +23,7 @@ import {
 } from "@/lib/bunker-supabase";
 import { getGameSettings, getPaymentQRs } from "@/lib/sheets.functions";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, CreditCard, MapPin, Package, Phone, Ticket, User } from "lucide-react";
+import { CheckCircle2, CreditCard, Gift, MapPin, Package, Phone, Ticket, User } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
@@ -34,8 +41,13 @@ type Step = "delivery" | "method" | "verify";
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  // Detect reward mode ONCE on mount; cleared after submission.
+  const [mode] = useState<"supply" | "reward">(() => getCheckoutMode());
+  const isReward = mode === "reward";
+  // Reward orders skip payment method + verification — delivery is the only step.
   const [step, setStep] = useState<Step>("delivery");
-  const [items, setItems] = useState(getLoadout);
+  const [supplyItems, setSupplyItems] = useState(getLoadout);
+  const [rewardItems, setRewardItems] = useState(getRewardLoadout);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -64,7 +76,10 @@ function CheckoutPage() {
 
   const selectedQR = qrQ.data?.find((q) => q.method === payment) ?? null;
 
-  useEffect(() => setItems(getLoadout()), []);
+  useEffect(() => {
+    setSupplyItems(getLoadout());
+    setRewardItems(getRewardLoadout());
+  }, []);
 
   useEffect(() => {
     if (!stats) return;
@@ -75,35 +90,43 @@ function CheckoutPage() {
 
   const minAmount = settingsQ.data?.minimum_order_amount ?? 0;
   const minWeight = settingsQ.data?.minimum_order_weight ?? 0;
-  const settingsReady = minAmount > 0 && minWeight > 0;
-  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items, {
+  const settingsReady = isReward ? true : minAmount > 0 && minWeight > 0;
+  const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(supplyItems, {
     amount: minAmount,
     weight: minWeight,
   });
+  const rewardTotals = rewardLoadoutTotals(rewardItems);
 
-  const voucherDiscount = voucher ? Math.min(Number(voucher.discount_amount ?? 0), productTotal) : 0;
-  const grandTotal = Math.max(0, productTotal - voucherDiscount);
+  // Voucher discount: dynamic — min(cartTotal × percent, voucher_max_discount from Settings sheet).
+  // Vouchers are only valid on supply orders (reward orders are free anyway).
+  const voucherMaxDiscount = Number(settingsQ.data?.voucher_max_discount ?? 0);
+  const voucherPercent = voucher ? Number(voucher.discount_percent ?? 10) : 0;
+  const voucherDiscount =
+    !isReward && voucher && voucherMaxDiscount > 0
+      ? Math.min((productTotal * voucherPercent) / 100, voucherMaxDiscount, productTotal)
+      : 0;
+  const grandTotal = isReward ? 0 : Math.max(0, productTotal - voucherDiscount);
 
   const referenceValid = /^\d{5}$/.test(reference.trim());
   const deliveryValid = !!(name.trim() && phone.trim() && address.trim());
   const qrReady = !!(payment && selectedQR?.qrImage);
 
-  const canSubmit =
-    settingsReady &&
-    minMet &&
-    payment &&
-    referenceValid &&
-    deliveryValid &&
-    !submitting;
+  const canSubmit = isReward
+    ? deliveryValid && rewardItems.length > 0 && !submitting
+    : settingsReady && minMet && payment && referenceValid && deliveryValid && !submitting;
 
   function goNext() {
-    if (step === "delivery" && deliveryValid) setStep("method");
-    else if (step === "method" && payment && qrReady) setStep("verify");
+    if (step === "delivery" && deliveryValid) {
+      if (isReward) return; // Reward flow submits directly from delivery step.
+      setStep("method");
+    } else if (step === "method" && payment && qrReady) {
+      setStep("verify");
+    }
   }
   function goBack() {
     if (step === "verify") setStep("method");
     else if (step === "method") setStep("delivery");
-    else navigate({ to: "/loadout" });
+    else navigate({ to: isReward ? "/rewards" : "/loadout" });
   }
 
   function handleApplyVoucher() {
@@ -130,34 +153,52 @@ function CheckoutPage() {
       setVoucherError("Voucher expired");
       return;
     }
-    if (!match.discount_amount || Number(match.discount_amount) <= 0) {
+    const percent = Number(match.discount_percent ?? 0);
+    if (!percent || percent <= 0) {
       setVoucher(null);
       setVoucherError("Voucher has no discount value");
       return;
     }
     setVoucher(match);
-    toast.success(`Voucher applied · ฿${Number(match.discount_amount).toLocaleString()} off`);
+    toast.success(`Voucher applied · ${percent}% off (up to ฿${voucherMaxDiscount.toLocaleString()})`);
   }
 
   const handleConfirm = async () => {
-    if (!canSubmit || !payment) return;
+    if (!canSubmit) return;
     setSubmitting(true);
     try {
+      // Build order payload — reward orders send the reward loadout as items,
+      // skip payment method + reference, and always send order_type "reward".
+      const payloadItems = isReward
+        ? rewardItems.map((r) => ({
+            productId: r.rewardId,
+            productName: r.rewardName,
+            productImage: r.image,
+            sizeLabel: "REWARD",
+            grams: 0,
+            pricePerGram: 0,
+            quantity: 1,
+            category: "REWARD",
+          }))
+        : enriched;
       const { order } = await createOrder({
-        items,
+        items: payloadItems as any,
         customer: {
           name: name.trim(),
           phone: phone.trim(),
           address: address.trim(),
           notes: notes.trim() || undefined,
         },
-        payment,
-        productTotal,
-        totalGrams,
-        paymentReference: reference.trim(),
-        voucherCode: voucher?.code ?? null,
-        voucherDiscount,
-      });
+        payment: (isReward ? "PromptPay" : payment) as Payment,
+        productTotal: isReward ? 0 : productTotal,
+        totalGrams: isReward ? 0 : totalGrams,
+        paymentReference: isReward ? "" : reference.trim(),
+        voucherCode: isReward ? null : voucher?.code ?? null,
+        voucherDiscount: isReward ? 0 : voucherDiscount,
+        orderType: isReward ? "reward" : voucher ? "voucher" : "supply",
+        voucherPercent: !isReward && voucher ? voucherPercent : 0,
+        voucherMaxDiscount: !isReward && voucher ? voucherMaxDiscount : 0,
+      } as any);
       if (saveAsDefault) {
         try {
           await updatePlayerProfileInfo({
@@ -169,7 +210,12 @@ function CheckoutPage() {
           console.warn("[BLACK'S BUNKER] Could not save default profile info", e);
         }
       }
-      clearLoadout();
+      if (isReward) {
+        clearRewardLoadout();
+      } else {
+        clearLoadout();
+      }
+      clearCheckoutMode();
       navigate({ to: "/order-complete", search: { id: order.mission_number } });
     } catch (err: any) {
       console.error("[BLACK'S BUNKER] Order transmission failed:", err);
@@ -182,7 +228,8 @@ function CheckoutPage() {
     <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500">
         <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
-          {/* Step Indicator */}
+          {/* Step Indicator — hidden for reward orders (delivery only). */}
+          {!isReward && (
           <div className="flex items-center gap-2">
             {(["delivery", "method", "verify"] as Step[]).map((s, idx) => {
               const active = step === s;
@@ -220,6 +267,7 @@ function CheckoutPage() {
               );
             })}
           </div>
+          )}
 
           {/* STEP 1 — DELIVERY */}
           {step === "delivery" && (
@@ -277,6 +325,7 @@ function CheckoutPage() {
                 </div>
               </Panel>
 
+              {!isReward && (
               <Panel variant="default" className="p-4 animate-in fade-in duration-300">
                 <SectionTitle>Voucher Code</SectionTitle>
                 <div className="mt-3 flex items-center gap-2">
@@ -309,7 +358,7 @@ function CheckoutPage() {
                   <div className="mt-2 flex items-center gap-2 rounded-sm border border-neon/40 bg-neon/5 px-3 py-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5 text-neon" />
                     <span className="font-mono text-[10px] uppercase tracking-widest text-neon">
-                      {voucher.reward_name} · −฿{Number(voucher.discount_amount).toLocaleString()}
+                      {voucher.reward_name} · {voucherPercent}% OFF (up to ฿{voucherMaxDiscount.toLocaleString()})
                     </span>
                   </div>
                 )}
@@ -319,6 +368,7 @@ function CheckoutPage() {
                   </div>
                 )}
               </Panel>
+              )}
             </>
           )}
 
@@ -403,7 +453,7 @@ function CheckoutPage() {
 
           <div className="flex items-center gap-2">
             <BunkerButton variant="outline" size="sm" onClick={goBack}>
-              {step === "delivery" ? "Back to Loadout" : "Back"}
+              {step === "delivery" ? (isReward ? "Back to Rewards" : "Back to Loadout") : "Back"}
             </BunkerButton>
           </div>
         </div>
@@ -417,52 +467,109 @@ function CheckoutPage() {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
-            {enriched.map((i) => (
-              <div
-                key={`${i.productId}-${i.sizeLabel}`}
-                className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
-              >
-                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-hud">
-                  {i.productImage ? (
-                    <img src={i.productImage} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <Package className="h-4 w-4 text-neon/70" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
-                    {i.productName ?? i.productId}
+            {isReward
+              ? rewardItems.map((r, idx) => (
+                  <div
+                    key={`${r.rewardId}-${idx}`}
+                    className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
+                  >
+                    <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-hud">
+                      {r.image ? (
+                        <img src={r.image} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Gift className="h-4 w-4 text-neon/70" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
+                        {r.rewardName}
+                      </div>
+                      <div className="font-mono text-[9px] uppercase tracking-widest text-yellow-400/80">
+                        {r.goldCost.toLocaleString()} GOLD · REWARD
+                      </div>
+                    </div>
+                    <div className="font-display text-[11px] font-bold text-neon">FREE</div>
                   </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {i.sizeLabel} · x{i.quantity}
+                ))
+              : enriched.map((i) => (
+                  <div
+                    key={`${i.productId}-${i.sizeLabel}`}
+                    className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
+                  >
+                    <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-hud">
+                      {i.productImage ? (
+                        <img src={i.productImage} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Package className="h-4 w-4 text-neon/70" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
+                        {i.productName ?? i.productId}
+                      </div>
+                      <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                        {i.sizeLabel} · x{i.quantity}
+                      </div>
+                    </div>
+                    <div className="font-display text-[11px] font-bold text-neon">
+                      ฿{i.subtotal.toLocaleString()}
+                    </div>
                   </div>
-                </div>
-                <div className="font-display text-[11px] font-bold text-neon">
-                  ฿{i.subtotal.toLocaleString()}
-                </div>
-              </div>
-            ))}
+                ))}
           </div>
 
           <div className="mt-3 flex flex-col gap-1.5 border-t border-white/10 pt-3 text-xs">
-            <SummaryRow label="Total Weight" value={`${totalGrams} G`} />
-            <SummaryRow label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
-            {voucherDiscount > 0 && (
-              <SummaryRow label="Voucher" value={`−฿${voucherDiscount.toLocaleString()}`} />
+            {isReward ? (
+              <>
+                <SummaryRow label="Reward Items" value={`${rewardTotals.count}`} />
+                <SummaryRow label="Delivery Fee" value="FREE" />
+                <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Grand Total
+                  </span>
+                  <span className="font-display text-lg font-bold text-neon">FREE</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <SummaryRow label="Total Weight" value={`${totalGrams} G`} />
+                <SummaryRow label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
+                {voucherDiscount > 0 && (
+                  <SummaryRow
+                    label={`Voucher (${voucherPercent}%)`}
+                    value={`−฿${voucherDiscount.toLocaleString()}`}
+                  />
+                )}
+                <SummaryRow label="Delivery Fee" value="TO BE CONFIRMED" muted />
+                <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Grand Total
+                  </span>
+                  <span className="font-display text-lg font-bold text-neon">
+                    ฿{grandTotal.toLocaleString()}
+                  </span>
+                </div>
+              </>
             )}
-            <SummaryRow label="Delivery Fee" value="TO BE CONFIRMED" muted />
-            <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Grand Total
-              </span>
-              <span className="font-display text-lg font-bold text-neon">
-                ฿{grandTotal.toLocaleString()}
-              </span>
-            </div>
           </div>
 
-          {step !== "verify" ? (
+          {isReward ? (
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={!canSubmit}
+              onClick={handleConfirm}
+              className="mt-4 w-full"
+            >
+              {submitting
+                ? "Transmitting..."
+                : !deliveryValid
+                  ? "Complete Delivery Info"
+                  : "Deploy Reward Order"}
+            </BunkerButton>
+          ) : step !== "verify" ? (
             <BunkerButton
               variant="primary"
               size="lg"
@@ -498,6 +605,7 @@ function CheckoutPage() {
                   : "Deploy Mission"}
             </BunkerButton>
           )}
+
         </Panel>
       </div>
     </AppShell>

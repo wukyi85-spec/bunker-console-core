@@ -7,12 +7,15 @@ import { PROGRESSION, calcGold, calcLevel, calcXp } from "./progression";
 export interface OrderInsertPayload {
   items: LoadoutItem[];
   customer: { name: string; phone: string; address: string; notes?: string };
-  payment: "PromptPay" | "KPay" | "WavePay";
+  payment: "PromptPay" | "KPay" | "WavePay" | "REWARD";
   productTotal: number;
   totalGrams: number;
   paymentReference: string;
   voucherCode?: string | null;
   voucherDiscount?: number;
+  voucherPercent?: number | null;
+  voucherMaxDiscount?: number | null;
+  orderType?: "supply" | "reward";
 }
 
 export function calcRewards(productTotal: number) {
@@ -77,6 +80,9 @@ export async function createOrder(p: OrderInsertPayload) {
     payment_reference: p.paymentReference,
     voucher_code: p.voucherCode ?? null,
     voucher_discount: voucherDiscount,
+    order_type: p.orderType ?? "supply",
+    voucher_percent: p.voucherPercent ?? null,
+    voucher_max_discount: p.voucherMaxDiscount ?? null,
   };
 
   const { data, error } = await supabase.rpc("create_player_order", {
@@ -427,6 +433,7 @@ export interface PlayerVoucherRow {
   reward_name: string;
   code: string;
   discount_amount: number | null;
+  discount_percent: number | null;
   gold_cost: number;
   expires_at: string | null;
   redeemed_at: string | null;
