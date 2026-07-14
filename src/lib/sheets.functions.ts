@@ -88,7 +88,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
   gold_per_10_thb: 1,
   voucher_expire_days: 30,
   notification_expire_days: 3,
+  contact_telegram_url: "https://t.me/blacksbunker",
 };
+
 
 export const getGameSettings = createServerFn({ method: "GET" }).handler(
   async (): Promise<GameSettings> => {
