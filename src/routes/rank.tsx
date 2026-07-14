@@ -6,7 +6,7 @@ import { Panel } from "@/components/bunker/Panel";
 import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getRankSettings } from "@/lib/sheets.functions";
 import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
-import { Crown, Lock, Star, Trophy } from "lucide-react";
+import { Lock, Star, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/rank")({
