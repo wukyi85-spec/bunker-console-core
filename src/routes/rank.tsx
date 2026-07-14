@@ -112,18 +112,18 @@ function RankPage() {
                 )}
 
 
-                <div className="relative flex h-28 w-28 items-center justify-center">
+                <div className="relative flex h-32 w-32 items-center justify-center">
                   {unlocked ? (
                     <BadgeGlow
                       src={r.badgeImage || null}
                       alt={r.name}
-                      size={96}
-                      primary={r.accent || t.primary}
+                      size={116}
+                      primary={t.primary}
                       secondary={t.secondary}
                       intensity="lg"
                     />
                   ) : (
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-black/40">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-black/40">
                       <Lock className="h-8 w-8 text-muted-foreground" />
                     </div>
                   )}
