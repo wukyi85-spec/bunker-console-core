@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -12,6 +13,7 @@ import {
   changePlayerName,
   listRanks,
 } from "@/lib/bunker-supabase";
+import { getRankSettings } from "@/lib/sheets.functions";
 import { getPlayerProfile, setPlayerProfile, CHARACTERS } from "@/lib/player";
 import { levelProgress, PROGRESSION } from "@/lib/progression";
 import {
