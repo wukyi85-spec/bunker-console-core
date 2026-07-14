@@ -53,8 +53,8 @@ export function GameNav() {
             to={item.to}
             className={cn(
               "group relative flex shrink-0 flex-col items-center justify-center gap-1 overflow-hidden",
-              "w-[104px] h-[60px] sm:w-[168px] sm:h-[66px]",
-              "rounded-xl px-3 select-none",
+              "w-full h-[52px] sm:w-[168px] sm:h-[66px]",
+              "rounded-xl px-2 sm:px-3 select-none",
               "transition-all duration-300 ease-out",
               // Matte black body with thin white border
               "bg-gradient-to-b from-[rgb(28_28_28)] to-[rgb(14_14_14)]",
