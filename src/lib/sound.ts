@@ -150,7 +150,8 @@ type SoundKey =
   | "orderConfirmed"
   | "terminalBoot"
   | "door"
-  | "error";
+  | "error"
+  | "purchase";
 
 const SFX: Record<SoundKey, () => void> = {
   click: () => {
