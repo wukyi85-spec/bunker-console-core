@@ -171,7 +171,7 @@ export function BunkerAlarm() {
               onClick={() => void handleClick(a)}
               className={cn(
                 "relative animate-notif-in overflow-hidden rounded-sm border border-border/50 bg-panel/60 p-2 pl-3 text-left transition-colors hover:border-neon/40 hover:bg-panel-elevated/70",
-                !a.is_read && "ring-1 ring-neon/20",
+                !a.isRead && "ring-1 ring-neon/20",
               )}
               style={{ animationDelay: `${i * 40}ms` }}
             >
