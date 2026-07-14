@@ -325,6 +325,7 @@ function CheckoutPage() {
                 </div>
               </Panel>
 
+              {!isReward && (
               <Panel variant="default" className="p-4 animate-in fade-in duration-300">
                 <SectionTitle>Voucher Code</SectionTitle>
                 <div className="mt-3 flex items-center gap-2">
