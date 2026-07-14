@@ -5,7 +5,8 @@ import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getRankSettings } from "@/lib/sheets.functions";
-import { Lock, Star, Trophy } from "lucide-react";
+import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
+import { Crown, Lock, Star, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/rank")({
@@ -28,45 +29,28 @@ function RankPage() {
   const xp = stats?.xp ?? 0;
   const current = ranks.find((r) => xp >= r.minXp && xp <= r.maxXp);
   const next = ranks.find((r) => r.minXp > xp);
-  const progress = next && current
-    ? Math.min(100, ((xp - current.minXp) / (next.minXp - current.minXp)) * 100)
-    : 100;
-
+  const progress =
+    next && current
+      ? Math.min(100, ((xp - current.minXp) / (next.minXp - current.minXp)) * 100)
+      : 100;
 
   return (
     <AppShell hideLogo hideNav>
-      <div className="grid h-full w-full grid-cols-[360px_1fr] gap-4 animate-in fade-in duration-500">
-        {/* LEFT — Current rank + stats */}
-        <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-4">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
-            <Trophy className="h-4 w-4 text-neon" />
-            <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
-              Operator Status
-            </span>
-          </div>
-
-          <div className="flex flex-col items-center py-4">
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-2 border-neon/60 bg-background shadow-[0_0_40px_-8px_color-mix(in_oklab,var(--neon)_60%,transparent)] overflow-hidden">
-              <span className="absolute inset-0 rounded-full bg-neon/10 blur-2xl" />
-              {current?.badgeImage ? (
-                <img src={current.badgeImage} alt={current.name} className="relative h-full w-full object-contain p-2" />
-              ) : (
-                <span className="relative font-display text-2xl font-black uppercase tracking-widest text-neon">
-                  {current?.name?.[0] ?? "R"}
-                </span>
-              )}
+      <div className="flex h-full w-full flex-col gap-4 overflow-y-auto animate-in fade-in duration-500">
+        {/* Header strip */}
+        <Panel variant="elevated" corners className="corner-frame-lines flex items-center gap-4 p-4">
+          <Trophy className="h-5 w-5 text-neon" />
+          <div className="flex-1">
+            <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+              // Rank Showcase
             </div>
-            <div className="mt-3 font-display text-2xl font-bold uppercase tracking-widest text-neon">
-              {current?.name ?? "ROOKIE"}
-            </div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
-              LVL {stats?.level ?? 1} · {xp.toLocaleString()} XP
+            <div className="font-display text-xl font-black uppercase tracking-widest text-foreground">
+              Operator Ladder
             </div>
           </div>
-
-          <div className="mt-2">
-            <div className="mb-1 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              <span>Progress to {next?.name ?? "MAX"}</span>
+          <div className="min-w-[220px]">
+            <div className="mb-1 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+              <span>{current?.name ?? "ROOKIE"} → {next?.name ?? "MAX"}</span>
               <span className="text-neon">{Math.round(progress)}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-background">
@@ -75,94 +59,124 @@ function RankPage() {
                 style={{ width: `${progress}%` }}
               />
             </div>
-            {next && (
-              <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground/70">
-                {(next.minXp - xp).toLocaleString()} XP TO NEXT RANK
-              </div>
-            )}
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-2 text-xs">
-            <StatCell label="Gold" value={(stats?.gold ?? 0).toLocaleString()} />
-            <StatCell label="Activity" value={String(stats?.activity ?? 0)} />
-            <StatCell label="Total Purchase" value={`฿${Number(stats?.total_purchase ?? 0).toLocaleString()}`} />
-            <StatCell label="Total Weight" value={`${Number(stats?.total_weight ?? 0)}G`} />
+            <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground/70">
+              {xp.toLocaleString()} XP · LVL {stats?.level ?? 1}
+            </div>
           </div>
         </Panel>
 
-        <Panel variant="default" className="flex min-h-0 flex-col p-4">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
-            <Star className="h-4 w-4 text-neon" />
-            <span className="font-display text-sm font-bold uppercase tracking-[0.28em]">
-              Rank Ladder
-            </span>
-          </div>
-
-          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
-            {ranks.map((r) => {
-              const isCurrent = current?.name === r.name;
-              const unlocked = xp >= r.minXp;
-              return (
-                <div
-                  key={r.name}
-                  className={cn(
-                    "rounded-md border p-3 transition-all",
-                    isCurrent
-                      ? "border-neon/70 bg-neon/5 shadow-[0_0_30px_-10px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
-                      : unlocked
+        {/* Three big showcase cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {ranks.map((r) => {
+            const t = getRankTheme(r.name);
+            const isCurrent = current?.name === r.name;
+            const unlocked = xp >= r.minXp;
+            return (
+              <div
+                key={r.name}
+                className={cn(
+                  "group relative overflow-hidden rounded-lg border p-6 transition-all",
+                  "flex flex-col items-center text-center",
+                  isCurrent
+                    ? "border-2 shadow-[0_0_44px_-6px] animate-glow-throb"
+                    : unlocked
                       ? "border-white/10 bg-panel-elevated/60"
-                      : "border-white/5 bg-background/30 opacity-60",
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-full border overflow-hidden",
-                        isCurrent ? "border-neon" : "border-white/20",
-                      )}
-                    >
-                      {unlocked && r.badgeImage ? (
-                        <img src={r.badgeImage} alt={r.name} className="h-full w-full object-contain p-1" />
-                      ) : unlocked ? (
-                        <span className="font-display text-sm font-bold uppercase text-neon">{r.name[0]}</span>
-                      ) : (
-                        <Lock className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-display text-base font-bold uppercase tracking-widest text-foreground">
-                          {r.name}
-                        </span>
-                        {isCurrent && (
-                          <span className="rounded-full border border-neon/60 bg-neon/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-widest text-neon">
-                            Current
-                          </span>
-                        )}
-                      </div>
-                      <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        {r.minXp.toLocaleString()} – {Number.isFinite(r.maxXp) ? r.maxXp.toLocaleString() : "∞"} XP
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                      : "border-white/5 bg-background/40 opacity-70",
+                )}
+                style={
+                  isCurrent
+                    ? {
+                        borderColor: t.primary,
+                        background: `linear-gradient(160deg, ${t.primary}12, transparent 55%), rgba(0,0,0,0.55)`,
+                        boxShadow: `0 0 60px -14px ${t.primary}, inset 0 0 40px -18px ${t.secondary ?? t.primary}`,
+                      }
+                    : undefined
+                }
+              >
+                {/* Ambient background halo — never a frame around the badge */}
+                <span
+                  className="pointer-events-none absolute inset-0 opacity-40"
+                  style={{
+                    background: `radial-gradient(ellipse at 50% 20%, ${t.primary}22, transparent 60%)`,
+                  }}
+                />
+                <div className="pointer-events-none absolute inset-0 hud-grid opacity-[0.08]" />
 
-          </div>
-        </Panel>
+                {isCurrent && (
+                  <span
+                    className="absolute right-3 top-3 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                    style={{ borderColor: t.primary, color: t.primary, background: `${t.primary}12` }}
+                  >
+                    Current Rank
+                  </span>
+                )}
+
+                {t.crown && (
+                  <Crown
+                    className="relative mb-1 h-5 w-5"
+                    style={{
+                      color: t.primary,
+                      filter: `drop-shadow(0 0 6px ${t.primary})`,
+                    }}
+                  />
+                )}
+
+                <div className="relative flex h-28 w-28 items-center justify-center">
+                  {unlocked ? (
+                    <BadgeGlow
+                      src={r.badgeImage || null}
+                      alt={r.name}
+                      size={96}
+                      primary={r.accent || t.primary}
+                      secondary={t.secondary}
+                      intensity="lg"
+                    />
+                  ) : (
+                    <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-black/40">
+                      <Lock className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className="relative mt-4 font-display text-2xl font-black uppercase tracking-widest"
+                  style={{ color: unlocked ? t.primary : undefined }}
+                >
+                  {r.name}
+                </div>
+
+                <div className="relative mt-1 flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={cn("h-4 w-4 transition-all")}
+                      style={
+                        i < t.stars
+                          ? {
+                              color: t.primary,
+                              fill: t.primary,
+                              filter: `drop-shadow(0 0 4px ${t.primary})`,
+                            }
+                          : { color: "rgba(255,255,255,0.15)" }
+                      }
+                    />
+                  ))}
+                </div>
+
+                <div className="relative mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                  {r.minXp.toLocaleString()} – {Number.isFinite(r.maxXp) ? r.maxXp.toLocaleString() : "∞"} XP
+                </div>
+
+                {!unlocked && (
+                  <div className="relative mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground/80">
+                    {(r.minXp - xp).toLocaleString()} XP TO UNLOCK
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </AppShell>
-  );
-}
-
-function StatCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-sm border border-white/10 bg-background/40 p-2">
-      <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-        {label}
-      </div>
-      <div className="font-display text-sm font-bold text-foreground">{value}</div>
-    </div>
   );
 }
