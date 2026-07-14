@@ -210,11 +210,11 @@ function LoadoutPage() {
           <BunkerButton
             variant="primary"
             size="lg"
-            disabled={!minMet || enriched.length === 0}
+            disabled={!minMet || !settingsReady || enriched.length === 0}
             className="mt-4 w-full"
             onClick={() => navigate({ to: "/checkout" })}
           >
-            Proceed to Checkout
+            {settingsReady ? "Proceed to Checkout" : "Loading Settings..."}
           </BunkerButton>
         </Panel>
       </div>
