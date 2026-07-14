@@ -312,8 +312,29 @@ function RewardsPage() {
                     <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-neon/80">
                       {percent}% OFF · CAP FROM SETTINGS
                     </div>
-                    <div className="mt-1 select-all rounded-sm border border-dashed border-neon/40 bg-black/40 px-2 py-1 font-mono text-[12px] tracking-widest text-neon">
-                      {v.code}
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <div className="flex-1 select-all rounded-sm border border-dashed border-neon/40 bg-black/40 px-2 py-1 font-mono text-[12px] tracking-widest text-neon">
+                        {v.code}
+                      </div>
+                      <button
+                        type="button"
+                        disabled={used || expired}
+                        onClick={() => {
+                          navigator.clipboard?.writeText(v.code).then(
+                            () => toast.success(`COPIED: ${v.code}`),
+                            () => toast.error("COPY FAILED"),
+                          );
+                        }}
+                        className={cn(
+                          "rounded-sm border px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest transition-all",
+                          used || expired
+                            ? "cursor-not-allowed border-white/10 bg-background/40 text-muted-foreground"
+                            : "border-neon/60 bg-neon/10 text-neon hover:bg-neon/20",
+                        )}
+                        aria-label="Copy voucher code"
+                      >
+                        COPY
+                      </button>
                     </div>
                     {v.expires_at && (
                       <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
