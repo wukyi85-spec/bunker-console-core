@@ -13,7 +13,6 @@ import {
 } from "@/lib/sheets.functions";
 import {
   addToRewardLoadout,
-  clearRewardLoadout,
   getRewardLoadout,
   removeRewardLoadoutIndex,
   rewardLoadoutTotals,
