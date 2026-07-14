@@ -370,7 +370,10 @@ function ProductTile({
           <img
             src={product.image}
             alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+            className={cn(
+              "h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]",
+              outOfStock && "grayscale blur-[1px] opacity-70",
+            )}
             loading="lazy"
           />
         ) : (
@@ -378,6 +381,14 @@ function ProductTile({
             <Package className="h-14 w-14 transition-colors group-hover:text-white/60" />
           </div>
         )}
+        {outOfStock && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40">
+            <span className="rounded-sm border border-destructive/60 bg-destructive/20 px-2 py-1 font-display text-[11px] font-bold uppercase tracking-[0.28em] text-destructive">
+              Out of Stock
+            </span>
+          </div>
+        )}
+
 
         {/* Badges */}
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
