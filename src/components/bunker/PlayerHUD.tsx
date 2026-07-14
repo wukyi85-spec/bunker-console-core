@@ -7,6 +7,8 @@ import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getPlayerProfile } from "@/lib/player";
 import { levelProgress } from "@/lib/progression";
 import { getRankSettings } from "@/lib/sheets.functions";
+import { RankBadge } from "@/components/bunker/RankBadge";
+
 
 
 interface PlayerHUDProps {
