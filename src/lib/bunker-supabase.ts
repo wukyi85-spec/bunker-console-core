@@ -48,9 +48,10 @@ export async function loginMember(passId: string, password: string) {
 export async function createOrder(p: OrderInsertPayload) {
   const playerKey = getPlayerKey();
   const profile = getPlayerProfile();
-  // XP + Gold are awarded ONLY on delivery (admin_mark_order_delivered).
-  // Persist 0 here so client-side displays reflect the not-yet-earned state.
+  // XP + Gold + Mission progression are awarded ONLY on delivery (admin_mark_order_delivered).
   const mission_number = newMissionNumber();
+  const voucherDiscount = Math.max(0, p.voucherDiscount ?? 0);
+  const grandTotal = Math.max(0, p.productTotal - voucherDiscount);
 
   const orderPayload = {
     mission_number,
@@ -69,10 +70,13 @@ export async function createOrder(p: OrderInsertPayload) {
     total_grams: p.totalGrams,
     product_total: p.productTotal,
     total_price: p.productTotal,
-    grand_total: p.productTotal,
+    grand_total: grandTotal,
     status: "waiting_payment",
     xp_earned: 0,
     gold_earned: 0,
+    payment_reference: p.paymentReference,
+    voucher_code: p.voucherCode ?? null,
+    voucher_discount: voucherDiscount,
   };
 
   const { data, error } = await supabase.rpc("create_player_order", {
@@ -83,15 +87,7 @@ export async function createOrder(p: OrderInsertPayload) {
     throw error;
   }
 
-  // Progress totals + activity only. XP/Gold reserved for delivery.
-  await bumpPlayerStats({ xp: 0, gold: 0, productTotal: p.productTotal, totalGrams: p.totalGrams });
-  const missionRewards = await bumpMissions({
-    grams: p.totalGrams,
-    thb: p.productTotal,
-    orders: 1,
-  });
-
-  return { order: data, missionRewards };
+  return { order: data, missionRewards: [] as MissionWithProgress[] };
 }
 
 
