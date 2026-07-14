@@ -81,6 +81,7 @@ function CancelledOverlay({
   notif: PlayerNotificationRow;
   onClose: () => void;
 }) {
+  const navigate = useNavigate();
   const reasonMatch = notif.message.match(/Reason:\s*(.+)$/);
   const reason = reasonMatch ? reasonMatch[1] : null;
   return (
@@ -105,7 +106,7 @@ function CancelledOverlay({
           // Transmission
         </div>
         <h1 className="relative mt-2 font-display text-3xl font-black uppercase tracking-widest text-foreground">
-          Order Cancelled
+          Order Rejected
         </h1>
         {notif.order_id && (
           <div className="relative mt-3 rounded-sm border border-white/10 bg-background/50 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -114,18 +115,97 @@ function CancelledOverlay({
         )}
         {reason ? (
           <div className="relative mt-4 w-full rounded-sm border border-red-500/30 bg-red-500/5 px-4 py-3 text-left">
-            <div className="font-mono text-[9px] uppercase tracking-widest text-red-400/80">Reason</div>
+            <div className="font-mono text-[9px] uppercase tracking-widest text-red-400/80">Reject Reason</div>
             <div className="mt-1 text-sm text-foreground">{reason}</div>
           </div>
         ) : (
           <p className="relative mt-3 max-w-sm text-sm text-muted-foreground">{notif.message}</p>
         )}
+        <div className="relative mt-6 flex gap-2">
+          <button
+            onClick={() => {
+              void onClose();
+              navigate({ to: "/supply" });
+            }}
+            className="rounded-sm border-2 border-neon bg-neon/10 px-6 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-neon transition-all hover:bg-neon/20"
+          >
+            Order Again
+          </button>
+          <button
+            onClick={() => {
+              void onClose();
+              navigate({ to: "/mission-log" });
+            }}
+            className="rounded-sm border border-white/20 bg-background/40 px-6 py-2 font-display text-xs font-bold uppercase tracking-[0.3em] text-foreground transition-all hover:bg-white/10"
+          >
+            Order Details
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// CONFIRMED (Accepted) — simple full-screen notification, no rewards yet
+// ============================================================
+function ConfirmedSimple({
+  notif,
+  onClose,
+}: {
+  notif: PlayerNotificationRow;
+  onClose: () => void;
+}) {
+  const navigate = useNavigate();
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 animate-in fade-in duration-300">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--neon)_14%,transparent)_0%,transparent_60%)]" />
+      <div className="relative flex w-full max-w-lg flex-col items-center overflow-hidden rounded-md border-2 border-neon/60 bg-panel p-8 text-center shadow-2xl animate-in zoom-in-95 duration-300">
         <button
           onClick={onClose}
-          className="relative mt-6 rounded-sm border border-red-500/60 bg-red-500/10 px-6 py-2 font-display text-xs font-bold uppercase tracking-[0.3em] text-red-300 transition-all hover:bg-red-500/20"
+          aria-label="Close"
+          className="absolute right-3 top-3 rounded-sm p-1.5 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
         >
-          Acknowledge
+          <X className="h-5 w-5" />
         </button>
+        <div className="relative mb-4">
+          <span className="absolute inset-0 rounded-full bg-neon/30 blur-2xl animate-hud-pulse" />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-neon bg-background">
+            <CheckCircle2 className="h-10 w-10 text-neon" />
+          </div>
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon">
+          // Transmission
+        </div>
+        <h1 className="mt-2 font-display text-4xl font-black uppercase tracking-widest text-foreground drop-shadow-[0_0_25px_color-mix(in_oklab,var(--neon)_60%,transparent)]">
+          Order Confirmed
+        </h1>
+        {notif.order_id && (
+          <div className="mt-3 rounded-sm border border-neon/30 bg-background/50 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Mission · <span className="text-neon">{notif.order_id}</span>
+          </div>
+        )}
+        <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+          BLACK'S BUNKER has accepted your order. Await dispatch — XP &amp; Gold are granted on delivery.
+        </p>
+        <div className="mt-6 flex gap-2">
+          <button
+            onClick={onClose}
+            className="rounded-sm border-2 border-neon bg-neon/10 px-8 py-2 font-display text-xs font-black uppercase tracking-[0.3em] text-neon transition-all hover:bg-neon/20"
+          >
+            Continue
+          </button>
+          <button
+            onClick={() => {
+              void onClose();
+              navigate({ to: "/mission-log" });
+            }}
+            className="rounded-sm border border-white/20 bg-background/40 px-6 py-2 font-display text-xs font-bold uppercase tracking-[0.3em] text-foreground transition-all hover:bg-white/10"
+          >
+            Order Details
+          </button>
+        </div>
       </div>
     </div>
   );
