@@ -159,6 +159,19 @@ export async function changePlayerName(newName: string) {
   return data;
 }
 
+export async function completeMemberOnboarding(input: {
+  passId: string;
+  playerName: string;
+  characterId: string;
+}) {
+  const { error } = await supabase.rpc("complete_member_onboarding" as never, {
+    p_pass_id: input.passId,
+    p_player_name: input.playerName,
+    p_character_id: input.characterId,
+  } as never);
+  if (error) throw error;
+}
+
 async function bumpPlayerStats(delta: {
   xp: number;
   gold: number;
