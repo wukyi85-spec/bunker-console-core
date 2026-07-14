@@ -1,9 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
-import { listMissions } from "@/lib/bunker-supabase";
-import { Target, CheckCircle2, Coins, Zap, Trophy } from "lucide-react";
+import { getPlayerStats, listOrders } from "@/lib/bunker-supabase";
+import {
+  getGameSettings,
+  getSpecialMissions,
+  getWeeklyMissions,
+  type SheetMission,
+} from "@/lib/sheets.functions";
+import { CheckCircle2, Coins, Target, Trophy, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/missions")({
@@ -16,17 +23,79 @@ export const Route = createFileRoute("/missions")({
   component: MissionsPage,
 });
 
+interface MissionWithProgress extends SheetMission {
+  progress: number;
+  done: boolean;
+}
+
+function computeProgress(
+  missions: SheetMission[],
+  totals: { grams: number; spend: number; orders: number },
+  windowStart: Date,
+  orderDates: { at: Date; grams: number; spend: number }[],
+): MissionWithProgress[] {
+  return missions.map((m) => {
+    let progress = 0;
+    // Weekly/special windows: only orders after windowStart count.
+    if (m.metric === "order") {
+      progress = orderDates.filter((o) => o.at >= windowStart).length;
+    } else if (m.metric === "weight") {
+      progress = orderDates
+        .filter((o) => o.at >= windowStart)
+        .reduce((s, o) => s + o.grams, 0);
+    } else {
+      progress = orderDates
+        .filter((o) => o.at >= windowStart)
+        .reduce((s, o) => s + o.spend, 0);
+    }
+    return { ...m, progress, done: progress >= m.requirement };
+  });
+}
+
 function MissionsPage() {
-  const q = useQuery({ queryKey: ["missions"], queryFn: listMissions });
-  const missions = q.data ?? [];
-  const weekly = missions.filter((m) => m.mission_type === "weekly");
-  const special = missions.filter((m) => m.mission_type !== "weekly");
+  const fetchWeekly = useServerFn(getWeeklyMissions);
+  const fetchSpecial = useServerFn(getSpecialMissions);
+  const fetchSettings = useServerFn(getGameSettings);
+
+  const weeklyQ = useQuery({ queryKey: ["sheet_weekly_missions"], queryFn: fetchWeekly, staleTime: 60_000 });
+  const specialQ = useQuery({ queryKey: ["sheet_special_missions"], queryFn: fetchSpecial, staleTime: 60_000 });
+  const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
+  const ordersQ = useQuery({ queryKey: ["player_orders"], queryFn: listOrders });
+  const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
+
+  const now = new Date();
+  const weeklyDays = settingsQ.data?.weekly_mission_reset_days ?? 7;
+  const specialDays = settingsQ.data?.special_mission_reset_days ?? 15;
+  const weeklyStart = new Date(now.getTime() - weeklyDays * 86400_000);
+  const specialStart = new Date(now.getTime() - specialDays * 86400_000);
+
+  const orders = (ordersQ.data ?? []).map((o: any) => ({
+    at: new Date(o.created_at),
+    grams: Number(o.total_grams ?? 0),
+    spend: Number(o.grand_total ?? o.product_total ?? 0),
+  }));
+  const totals = {
+    grams: Number((statsQ.data as any)?.total_weight ?? 0),
+    spend: Number((statsQ.data as any)?.total_purchase ?? 0),
+    orders: orders.length,
+  };
+
+  const weekly = computeProgress(weeklyQ.data ?? [], totals, weeklyStart, orders);
+  const special = computeProgress(specialQ.data ?? [], totals, specialStart, orders);
 
   return (
     <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-2 gap-4 animate-in fade-in duration-500">
-        <MissionColumn title="Weekly Missions" icon={<Target className="h-4 w-4 text-neon" />} missions={weekly} />
-        <MissionColumn title="Special Missions" icon={<Trophy className="h-4 w-4 text-neon" />} missions={special} />
+        <MissionColumn
+          title={`Weekly Missions · resets ${weeklyDays}d`}
+          icon={<Target className="h-4 w-4 text-neon" />}
+          missions={weekly}
+        />
+        <MissionColumn
+          title={`Special Missions · resets ${specialDays}d`}
+          icon={<Trophy className="h-4 w-4 text-neon" />}
+          missions={special}
+        />
       </div>
     </AppShell>
   );
@@ -39,7 +108,7 @@ function MissionColumn({
 }: {
   title: string;
   icon: React.ReactNode;
-  missions: Awaited<ReturnType<typeof listMissions>>;
+  missions: MissionWithProgress[];
 }) {
   return (
     <Panel variant="elevated" corners className="corner-frame-lines flex min-h-0 flex-col p-4">
@@ -54,15 +123,14 @@ function MissionColumn({
           </div>
         )}
         {missions.map((m) => {
-          const pct = Math.min(100, (m.progress / m.target_value) * 100);
-          const done = !!m.completed_at;
-          const unit = m.metric === "grams" ? "G" : m.metric === "thb" ? "฿" : "";
+          const pct = Math.min(100, (m.progress / m.requirement) * 100);
+          const unit = m.metric === "weight" ? "G" : m.metric === "spend" ? "฿" : "";
           return (
             <div
               key={m.id}
               className={cn(
                 "rounded-md border p-3 transition-all",
-                done
+                m.done
                   ? "border-neon/70 bg-neon/5 shadow-[0_0_30px_-10px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
                   : "border-white/10 bg-panel-elevated/60",
               )}
@@ -71,26 +139,21 @@ function MissionColumn({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-display text-sm font-bold uppercase tracking-widest text-foreground">
-                      {m.title}
+                      {m.mission}
                     </span>
-                    {done && (
+                    {m.done && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-neon/60 bg-neon/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-widest text-neon">
                         <CheckCircle2 className="h-3 w-3" /> COMPLETE
                       </span>
                     )}
                   </div>
-                  {m.description && (
-                    <div className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {m.description}
-                    </div>
-                  )}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-0.5 font-mono text-[10px] uppercase tracking-widest">
                   <span className="flex items-center gap-1 text-neon">
-                    <Zap className="h-3 w-3" /> {m.xp_reward} XP
+                    <Zap className="h-3 w-3" /> {m.rewardXp} XP
                   </span>
                   <span className="flex items-center gap-1 text-yellow-400/90">
-                    <Coins className="h-3 w-3" /> {m.gold_reward}
+                    <Coins className="h-3 w-3" /> {m.rewardGold}
                   </span>
                 </div>
               </div>
@@ -100,7 +163,7 @@ function MissionColumn({
                     {unit === "฿" ? "฿" : ""}
                     {m.progress.toLocaleString()}
                     {unit === "G" ? "G" : ""} / {unit === "฿" ? "฿" : ""}
-                    {m.target_value.toLocaleString()}
+                    {m.requirement.toLocaleString()}
                     {unit === "G" ? "G" : ""}
                   </span>
                   <span className="text-neon">{Math.round(pct)}%</span>
