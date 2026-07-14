@@ -85,16 +85,26 @@ function CheckoutPage() {
   const grandTotal = Math.max(0, productTotal - voucherDiscount);
 
   const referenceValid = /^\d{5}$/.test(reference.trim());
+  const deliveryValid = !!(name.trim() && phone.trim() && address.trim());
+  const qrReady = !!(payment && selectedQR?.qrImage);
 
   const canSubmit =
     settingsReady &&
     minMet &&
     payment &&
     referenceValid &&
-    name.trim() &&
-    phone.trim() &&
-    address.trim() &&
+    deliveryValid &&
     !submitting;
+
+  function goNext() {
+    if (step === "delivery" && deliveryValid) setStep("method");
+    else if (step === "method" && payment && qrReady) setStep("verify");
+  }
+  function goBack() {
+    if (step === "verify") setStep("method");
+    else if (step === "method") setStep("delivery");
+    else navigate({ to: "/loadout" });
+  }
 
   function handleApplyVoucher() {
     const code = voucherInput.trim().toUpperCase();
