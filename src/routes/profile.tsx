@@ -475,7 +475,3 @@ function MiniStat({
     </div>
   );
 }
-
-    </div>
-  );
-}
