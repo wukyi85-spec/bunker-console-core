@@ -342,16 +342,17 @@ function ProductTile({
           ? "border-neon/60 shadow-[0_0_0_1px_color-mix(in_oklab,var(--neon)_55%,transparent),0_30px_60px_-18px_color-mix(in_oklab,var(--neon)_50%,transparent)]"
           : "border-white/8",
         outOfStock && "opacity-55 hover:translate-y-0",
+        "lphone:h-[64px] lphone:flex-row lphone:rounded-md lphone:hover:translate-y-0",
       )}
     >
       {/* Glass reflection */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+        className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent lphone:hidden"
       />
 
       {/* Image */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-white/8 bg-black/60">
+      <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-white/8 bg-black/60 lphone:aspect-auto lphone:h-full lphone:w-[64px] lphone:shrink-0 lphone:border-b-0 lphone:border-r lphone:border-white/8">
         {active && (
           <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--neon)_14%,transparent)_0%,transparent_70%)]" />
         )}
@@ -367,20 +368,19 @@ function ProductTile({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-white/25">
-            <Package className="h-14 w-14 transition-colors group-hover:text-white/60" />
+            <Package className="h-14 w-14 transition-colors group-hover:text-white/60 lphone:h-6 lphone:w-6" />
           </div>
         )}
         {outOfStock && (
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40">
-            <span className="rounded-sm border border-destructive/60 bg-destructive/20 px-2 py-1 font-display text-[11px] font-bold uppercase tracking-[0.28em] text-destructive">
+            <span className="rounded-sm border border-destructive/60 bg-destructive/20 px-2 py-1 font-display text-[11px] font-bold uppercase tracking-[0.28em] text-destructive lphone:px-1 lphone:py-0.5 lphone:text-[7px] lphone:tracking-[0.15em]">
               Out of Stock
             </span>
           </div>
         )}
 
-
         {/* Badges */}
-        <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+        <div className="absolute left-2 top-2 flex flex-wrap gap-1 lphone:hidden">
           {product.newDrop && (
             <span className="rounded-sm border border-neon/50 bg-black/70 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-neon">
               New Drop
@@ -395,15 +395,16 @@ function ProductTile({
       </div>
 
       {/* Meta */}
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display text-[15px] font-bold uppercase leading-tight tracking-wider text-foreground">
+      <div className="flex flex-1 flex-col gap-2 p-3 lphone:min-w-0 lphone:gap-0.5 lphone:px-2.5 lphone:py-1.5">
+        <div className="flex items-start justify-between gap-2 lphone:items-center">
+          <h3 className="font-display text-[15px] font-bold uppercase leading-tight tracking-wider text-foreground lphone:truncate lphone:text-[11px] lphone:tracking-wider">
             {product.name}
           </h3>
           <span
             className={cn(
               "shrink-0 rounded-sm border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest",
               availabilityTone[product.availability],
+              "lphone:text-[7.5px] lphone:tracking-[0.15em] lphone:px-1 lphone:py-0",
             )}
           >
             {product.availability === "IN STOCK"
@@ -414,15 +415,15 @@ function ProductTile({
           </span>
         </div>
 
-        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground lphone:hidden">
           {formatCategoryLabel(product.category)}
         </div>
 
-        <div className="mt-auto flex flex-wrap gap-1 pt-1">
+        <div className="mt-auto flex flex-wrap gap-1 pt-1 lphone:mt-0 lphone:gap-0.5 lphone:pt-0">
           {product.sizes.map((s) => (
             <span
               key={s.label}
-              className="rounded-sm border border-white/10 bg-black/40 px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-widest text-white/70"
+              className="rounded-sm border border-white/10 bg-black/40 px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-widest text-white/70 lphone:px-1 lphone:py-0 lphone:text-[8px] lphone:tracking-widest"
             >
               {s.label}
             </span>
@@ -432,6 +433,7 @@ function ProductTile({
     </button>
   );
 }
+
 
 function ProductDrawer({
   product,
