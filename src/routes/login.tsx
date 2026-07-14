@@ -142,14 +142,26 @@ function LoginScreen() {
                 Access is restricted to verified operatives.
               </p>
             </div>
-            <BunkerButton
-              type="button"
-              size="lg"
-              onClick={() => setStage("form")}
-              className="w-full max-w-xs active:scale-[0.98]"
-            >
-              Enter the Bunker
-            </BunkerButton>
+            <div className="flex w-full max-w-xs flex-col gap-3">
+              <BunkerButton
+                type="button"
+                size="lg"
+                onClick={() => setStage("form")}
+                className="w-full active:scale-[0.98]"
+              >
+                ENTER BUNKER
+              </BunkerButton>
+              <BunkerButton
+                type="button"
+                size="lg"
+                variant="outline"
+                onClick={enterFullscreenThenForm}
+                className="w-full active:scale-[0.98]"
+              >
+                <Maximize className="h-4 w-4" />
+                FULL SCREEN
+              </BunkerButton>
+            </div>
           </div>
         ) : (
           <Panel
