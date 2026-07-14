@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { CheckCircle2, XCircle, X, Zap, Coins, Trophy, Sparkles, Star } from "lucide-react";
 import {
   listOrders,
@@ -11,7 +12,7 @@ import {
 import { calcLevel, PROGRESSION } from "@/lib/progression";
 import { cn } from "@/lib/utils";
 
-const POPUP_TYPES = new Set(["ORDER", "ORDER_CANCELLED"]);
+const POPUP_TYPES = new Set(["ORDER", "ORDER_CANCELLED", "ORDER_COMPLETED"]);
 
 export function NotificationPopup() {
   const [queue, setQueue] = useState<PlayerNotificationRow[]>([]);
