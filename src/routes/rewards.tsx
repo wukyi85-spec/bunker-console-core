@@ -40,6 +40,7 @@ export const Route = createFileRoute("/rewards")({
 
 function RewardsPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const fetchRewards = useServerFn(getSheetRewards);
   const fetchSettings = useServerFn(getGameSettings);
 
@@ -49,6 +50,12 @@ function RewardsPage() {
   const vouchersQ = useQuery({ queryKey: ["player_vouchers"], queryFn: listPlayerVouchers });
 
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [rewardCart, setRewardCart] = useState<RewardLoadoutItem[]>(getRewardLoadout);
+
+  useEffect(() => {
+    setRewardCart(getRewardLoadout());
+    return subscribeRewardLoadout(() => setRewardCart(getRewardLoadout()));
+  }, []);
 
   const redeem = useMutation({
     mutationFn: (r: SheetReward) =>
@@ -57,14 +64,22 @@ function RewardsPage() {
         rewardName: r.name,
         goldCost: r.goldCost,
         type: r.type,
-        discountAmount: settingsQ.data?.voucher_max_discount,
+        // Physical: no discount value. Voucher: percent-based discount is stored server-side.
+        discountAmount: 0,
         expireDays: settingsQ.data?.voucher_expire_days,
       }),
     onSuccess: (result, r) => {
       if (result.kind === "voucher" && result.voucher) {
         toast.success(`VOUCHER CODE: ${result.voucher.code}`);
       } else {
-        toast.success(`${r.name} — REWARD CLAIMED`);
+        // Physical: add to client-side Reward Loadout for reward-type checkout.
+        addToRewardLoadout({
+          rewardId: r.id,
+          rewardName: r.name,
+          image: r.image,
+          goldCost: r.goldCost,
+        });
+        toast.success(`${r.name} — ADDED TO REWARD LOADOUT`);
       }
       qc.invalidateQueries({ queryKey: ["player_stats"] });
       qc.invalidateQueries({ queryKey: ["player_vouchers"] });
@@ -80,11 +95,18 @@ function RewardsPage() {
   const rewards = rewardsQ.data ?? [];
   const gold = statsQ.data?.gold ?? 0;
   const vouchers = vouchersQ.data ?? [];
+  const rewardTotals = rewardLoadoutTotals(rewardCart);
 
   const confirmReward = useMemo(
     () => rewards.find((r) => r.id === confirmId) ?? null,
     [rewards, confirmId],
   );
+
+  function handleCheckoutRewards() {
+    if (rewardCart.length === 0) return;
+    setCheckoutMode("reward");
+    navigate({ to: "/checkout" });
+  }
 
   return (
     <AppShell hideLogo hideNav>
