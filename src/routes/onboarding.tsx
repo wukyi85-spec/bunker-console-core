@@ -58,19 +58,32 @@ function OnboardingScreen() {
     else setNameError(null);
   }
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!canSubmit || saving) return;
     setSaving(true);
-    // Placeholder persistence — swap for Supabase profiles insert later.
-    setPlayerProfile({
-      characterId,
-      playerName,
-      firstLoginCompleted: true,
-    });
-    window.setTimeout(() => {
-      navigate({ to: "/dashboard" });
-    }, SAVE_STEPS.length * 700 + 400);
+    try {
+      const profile = getPlayerProfile();
+      if (!profile.passId) throw new Error("Missing Pass ID — please sign in again.");
+      await completeMemberOnboarding({
+        passId: profile.passId,
+        playerName,
+        characterId: characterId!,
+      });
+      setPlayerProfile({
+        characterId,
+        playerName,
+        firstLoginCompleted: true,
+      });
+      await ensurePlayerStats();
+      window.setTimeout(() => {
+        navigate({ to: "/dashboard" });
+      }, SAVE_STEPS.length * 700 + 400);
+    } catch (err) {
+      console.error("[ONBOARDING] save failed:", err);
+      setNameError(err instanceof Error ? err.message : "Failed to save. Try again.");
+      setSaving(false);
+    }
   }
 
   return (
