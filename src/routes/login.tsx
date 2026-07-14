@@ -138,16 +138,9 @@ function LoginScreen() {
               >
                 ENTER BUNKER
               </BunkerButton>
-              <BunkerButton
-                type="button"
-                size="lg"
-                variant="outline"
-                onClick={toggleFullscreen}
-                className="w-full active:scale-[0.98]"
-              >
-                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-                {isFullscreen ? "EXIT FULL SCREEN" : "FULL SCREEN"}
-              </BunkerButton>
+              <p className="text-center font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground/60">
+                Double-tap anywhere · Fullscreen
+              </p>
             </div>
           </div>
         ) : (
