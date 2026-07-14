@@ -30,9 +30,11 @@ export const Route = createFileRoute("/checkout")({
 });
 
 type Payment = "PromptPay" | "KPay" | "WavePay";
+type Step = "delivery" | "method" | "verify";
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const [step, setStep] = useState<Step>("delivery");
   const [items, setItems] = useState(getLoadout);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
