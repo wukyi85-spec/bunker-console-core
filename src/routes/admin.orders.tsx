@@ -721,7 +721,7 @@ function CancelOrderDialog({
           </div>
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-red-400">
-              // Cancel Order
+              // Reject Order
             </div>
             <div className="font-display text-lg font-black uppercase tracking-widest text-foreground">
               {order.mission_number}
@@ -730,7 +730,7 @@ function CancelOrderDialog({
         </div>
 
         <p className="mt-4 text-sm text-muted-foreground">
-          Provide a cancellation reason. The member will receive a notification with this reason.
+          Provide a reason for rejecting this order. The member will receive a notification with this reason.
         </p>
 
         <label className="mt-4 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
