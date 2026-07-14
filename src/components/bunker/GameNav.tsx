@@ -97,7 +97,7 @@ export function GameNav() {
               )}
             />
 
-            <span className="relative font-display text-[10.5px] font-bold uppercase tracking-[0.26em] max-sm:text-[9px]">
+            <span className="relative max-w-full break-words text-center font-display text-[10.5px] font-bold uppercase leading-tight tracking-[0.26em] max-sm:text-[8px] max-sm:tracking-[0.18em]">
               {item.label}
             </span>
 
