@@ -116,7 +116,6 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         </div>
 
         <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground max-sm:text-[8px]">
-          <Shield className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">{player.rank}</span>
           {(() => {
             const t = getRankTheme(player.rank);
@@ -124,37 +123,37 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               <BadgeGlow
                 src={player.badge || null}
                 alt={player.rank}
-                size={26}
+                size={22}
                 primary={currentRank?.accent || t.primary}
                 secondary={t.secondary}
                 intensity="sm"
-                className="max-sm:!h-5 max-sm:!w-5"
+                className="max-sm:!h-4 max-sm:!w-4"
               />
             );
           })()}
           <span className="text-border">·</span>
-          <Zap className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
+          <Zap className="h-3 w-3 text-white/70 max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">LV {player.level}</span>
         </div>
 
-        <MiniBar label="XP" value={player.xp} tone="neon" />
-        <MiniBar label="ACT" value={player.activity} tone="dim" />
+        <MiniBar label="XP" value={player.xp} tone="xp" />
+        <MiniBar label="ACT" value={player.activity} tone="act" />
 
         <div className="flex items-center gap-3 pt-0.5 max-sm:gap-2">
-          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground max-sm:text-[8px]">
-            <Coins className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
+          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums max-sm:text-[8px]" style={{ color: "#F5C24B" }}>
+            <Coins className="h-3 w-3 max-sm:h-2.5 max-sm:w-2.5" style={{ color: "#F5C24B" }} />
             <span className="tabular-nums transition-all">{goldDisplay.toLocaleString()}</span>
           </span>
           <span className="flex items-center gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
-                className={cn(
-                  "h-3 w-3 max-sm:h-2.5 max-sm:w-2.5",
+                className="h-3 w-3 max-sm:h-2.5 max-sm:w-2.5"
+                style={
                   i < player.stars
-                    ? "fill-neon text-neon drop-shadow-[0_0_4px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
-                    : "text-border",
-                )}
+                    ? { color: "#F5C24B", fill: "#F5C24B", filter: "drop-shadow(0 0 4px rgba(245,194,75,0.55))" }
+                    : { color: "rgba(255,255,255,0.16)" }
+                }
               />
             ))}
           </span>
