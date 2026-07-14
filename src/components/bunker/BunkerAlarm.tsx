@@ -161,8 +161,8 @@ export function BunkerAlarm() {
   }
 
   return (
-    <div className="relative flex w-full flex-col rounded-md gunmetal-glass p-3 max-sm:p-2">
-      <div className="flex items-center justify-between px-1 pb-2 max-sm:pb-1.5">
+    <div className="relative flex w-full flex-col rounded-md gunmetal-glass p-3 max-sm:p-2 lphone:p-2">
+      <div className="flex items-center justify-between px-1 pb-2 max-sm:pb-1.5 lphone:pb-1">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="absolute inset-0 rounded-full bg-neon animate-ping opacity-60" />
