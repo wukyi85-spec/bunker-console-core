@@ -57,7 +57,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        "group relative flex w-full max-w-full items-stretch gap-3 rounded-md p-3 pr-4 sm:w-[360px]",
+        "group relative flex w-full max-w-full items-stretch gap-3 rounded-md p-3 pr-4 max-sm:gap-2 max-sm:p-2 max-sm:pr-2.5 sm:w-[360px]",
         "gunmetal-glass text-left transition-all duration-300",
         "hover:border-neon/60 hover:shadow-[0_22px_60px_-16px_color-mix(in_oklab,var(--neon)_55%,transparent)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60",
@@ -70,7 +70,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
       </span>
 
-      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
+      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center max-sm:hidden">
         <RankBadge
           name={player.rank}
           badgeImage={player.badge || null}
@@ -79,36 +79,45 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
           size="md"
         />
       </div>
+      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center sm:hidden">
+        <RankBadge
+          name={player.rank}
+          badgeImage={player.badge || null}
+          accent={currentRank?.accent ?? null}
+          level={player.level}
+          size="sm"
+        />
+      </div>
 
 
-      <div className="flex min-w-0 flex-col justify-between gap-1.5">
+      <div className="flex min-w-0 flex-col justify-between gap-1.5 max-sm:gap-1">
         <div className="flex items-center gap-2">
-          <span className="truncate font-display text-sm font-black uppercase tracking-[0.18em] text-foreground">
+          <span className="truncate font-display text-sm font-black uppercase tracking-[0.18em] text-foreground max-sm:text-xs">
             {player.name}
           </span>
-          <span className="flex items-center gap-1 rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-neon">
-            <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse shadow-[0_0_6px_var(--neon)]" />
+          <span className="flex items-center gap-1 rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-neon max-sm:px-1 max-sm:text-[7px]">
+            <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse shadow-[0_0_6px_var(--neon)] max-sm:h-1 max-sm:w-1" />
             {player.status}
           </span>
-          <span className="ml-auto font-mono text-[10px] tabular-nums text-muted-foreground">
+          <span className="ml-auto font-mono text-[10px] tabular-nums text-muted-foreground max-sm:text-[8px]">
             {time}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-          <Shield className="h-3 w-3 text-neon" />
+        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground max-sm:text-[8px]">
+          <Shield className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">{player.rank}</span>
           <span className="text-border">·</span>
-          <Zap className="h-3 w-3 text-neon" />
+          <Zap className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">LV {player.level}</span>
         </div>
 
         <MiniBar label="XP" value={player.xp} tone="neon" />
         <MiniBar label="ACT" value={player.activity} tone="dim" />
 
-        <div className="flex items-center gap-3 pt-0.5">
-          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground">
-            <Coins className="h-3 w-3 text-neon" />
+        <div className="flex items-center gap-3 pt-0.5 max-sm:gap-2">
+          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground max-sm:text-[8px]">
+            <Coins className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
             <span className="tabular-nums transition-all">{goldDisplay.toLocaleString()}</span>
           </span>
           <span className="flex items-center gap-0.5">
@@ -116,7 +125,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               <Star
                 key={i}
                 className={cn(
-                  "h-3 w-3",
+                  "h-3 w-3 max-sm:h-2.5 max-sm:w-2.5",
                   i < player.stars
                     ? "fill-neon text-neon drop-shadow-[0_0_4px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
                     : "text-border",
@@ -124,8 +133,8 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               />
             ))}
           </span>
-          <span className="ml-auto flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-            <Radio className="h-3 w-3 text-neon animate-hud-pulse" />
+          <span className="ml-auto flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground max-sm:text-[7px]">
+            <Radio className="h-3 w-3 text-neon animate-hud-pulse max-sm:h-2.5 max-sm:w-2.5" />
             SECURE
           </span>
         </div>
@@ -137,11 +146,11 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
 function MiniBar({ label, value, tone }: { label: string; value: number; tone: "neon" | "dim" }) {
   const pct = Math.max(0, Math.min(100, value));
   return (
-    <div className="flex items-center gap-2">
-      <span className="w-6 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+    <div className="flex items-center gap-2 max-sm:gap-1.5">
+      <span className="w-6 font-mono text-[9px] uppercase tracking-widest text-muted-foreground max-sm:w-5 max-sm:text-[7px]">
         {label}
       </span>
-      <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40">
+      <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40 max-sm:h-0.5">
         <div
           className={cn(
             "h-full transition-[width] duration-1000 ease-out",
@@ -152,7 +161,7 @@ function MiniBar({ label, value, tone }: { label: string; value: number; tone: "
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="w-8 text-right font-mono text-[9px] tabular-nums text-foreground/80">
+      <span className="w-8 text-right font-mono text-[9px] tabular-nums text-foreground/80 max-sm:w-6 max-sm:text-[7px]">
         {pct}%
       </span>
     </div>

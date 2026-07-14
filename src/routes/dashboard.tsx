@@ -106,17 +106,16 @@ function DashboardPage() {
           </Link>
         </div>
 
-        {/* Top right — Player HUD + Bunker Alarm stack (20px gap) */}
+        {/* Top right — Player HUD + Bunker Alarm stack */}
         <div
-          className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700 left-4 right-4 top-16 sm:left-auto sm:right-6 sm:top-5 sm:w-[360px]"
-          style={{ gap: 20 }}
+          className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700 left-4 right-4 top-16 gap-3 sm:left-auto sm:right-6 sm:top-5 sm:w-[360px] sm:gap-5"
         >
           <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full" />
           <BunkerAlarm />
         </div>
 
         {/* Bottom-left tactical caption + Contact HQ */}
-        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000">
+        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000 max-sm:hidden">
           <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
             // BUNKER ONLINE
           </span>
@@ -134,7 +133,7 @@ function DashboardPage() {
         </div>
 
         {/* Bottom center — Floating nav dock */}
-        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 max-sm:px-2">
           <GameNav />
         </div>
       </div>
