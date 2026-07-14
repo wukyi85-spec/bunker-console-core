@@ -30,9 +30,11 @@ export const Route = createFileRoute("/checkout")({
 });
 
 type Payment = "PromptPay" | "KPay" | "WavePay";
+type Step = "delivery" | "method" | "verify";
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const [step, setStep] = useState<Step>("delivery");
   const [items, setItems] = useState(getLoadout);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -83,16 +85,26 @@ function CheckoutPage() {
   const grandTotal = Math.max(0, productTotal - voucherDiscount);
 
   const referenceValid = /^\d{5}$/.test(reference.trim());
+  const deliveryValid = !!(name.trim() && phone.trim() && address.trim());
+  const qrReady = !!(payment && selectedQR?.qrImage);
 
   const canSubmit =
     settingsReady &&
     minMet &&
     payment &&
     referenceValid &&
-    name.trim() &&
-    phone.trim() &&
-    address.trim() &&
+    deliveryValid &&
     !submitting;
+
+  function goNext() {
+    if (step === "delivery" && deliveryValid) setStep("method");
+    else if (step === "method" && payment && qrReady) setStep("verify");
+  }
+  function goBack() {
+    if (step === "verify") setStep("method");
+    else if (step === "method") setStep("delivery");
+    else navigate({ to: "/loadout" });
+  }
 
   function handleApplyVoucher() {
     const code = voucherInput.trim().toUpperCase();
@@ -170,163 +182,202 @@ function CheckoutPage() {
     <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500">
         <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
-          {/* Rule Panel */}
-          {settingsReady && (
-            <Panel variant="default" className="p-3">
-              <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
-                <span className="font-display text-xs font-bold uppercase tracking-widest">
-                  Checkout Rules
-                </span>
+          {/* Step Indicator */}
+          <div className="flex items-center gap-2">
+            {(["delivery", "method", "verify"] as Step[]).map((s, idx) => {
+              const active = step === s;
+              const done =
+                (s === "delivery" && (step === "method" || step === "verify")) ||
+                (s === "method" && step === "verify");
+              const label =
+                s === "delivery" ? "Delivery" : s === "method" ? "Payment" : "Verify";
+              return (
+                <div key={s} className="flex flex-1 items-center gap-2">
+                  <div
+                    className={cn(
+                      "flex h-6 w-6 items-center justify-center rounded-full border font-mono text-[10px] font-bold",
+                      active
+                        ? "border-neon bg-neon/10 text-neon"
+                        : done
+                          ? "border-neon/60 bg-neon/5 text-neon/80"
+                          : "border-white/10 text-muted-foreground",
+                    )}
+                  >
+                    {idx + 1}
+                  </div>
+                  <span
+                    className={cn(
+                      "font-display text-[10px] font-bold uppercase tracking-widest",
+                      active ? "text-foreground" : "text-muted-foreground",
+                    )}
+                  >
+                    {label}
+                  </span>
+                  {idx < 2 && (
+                    <div className="h-px flex-1 bg-white/10" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* STEP 1 — DELIVERY */}
+          {step === "delivery" && (
+            <>
+              <Panel variant="default" corners className="corner-frame-lines p-4 animate-in fade-in duration-300">
+                <SectionTitle>Delivery Information</SectionTitle>
+                <div className="mt-3 grid grid-cols-2 gap-3">
+                  <BunkerInput
+                    label="Customer Name"
+                    icon={<User className="h-3.5 w-3.5" />}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="OPERATOR NAME"
+                  />
+                  <BunkerInput
+                    label="Phone Number"
+                    icon={<Phone className="h-3.5 w-3.5" />}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+66 ..."
+                    inputMode="tel"
+                  />
+                  <div className="col-span-2">
+                    <BunkerInput
+                      label="Delivery Address"
+                      icon={<MapPin className="h-3.5 w-3.5" />}
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="DROP LOCATION"
+                    />
+                  </div>
+                  <label className="col-span-2 flex cursor-pointer items-center gap-2 rounded-sm border border-white/10 bg-background/40 px-3 py-2 hover:border-neon/40">
+                    <input
+                      type="checkbox"
+                      checked={saveAsDefault}
+                      onChange={(e) => setSaveAsDefault(e.target.checked)}
+                      className="h-3.5 w-3.5 accent-neon"
+                    />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                      Save as my default delivery information
+                    </span>
+                  </label>
+                  <div className="col-span-2 flex flex-col gap-1.5">
+                    <label className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
+                      Optional Notes
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      rows={2}
+                      placeholder="ADDITIONAL INSTRUCTIONS..."
+                      className="rounded-none border border-white/10 bg-background/60 px-3 py-2 font-mono text-sm tracking-wider text-foreground placeholder:text-muted-foreground/50 focus:border-neon/70 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </Panel>
+
+              <Panel variant="default" className="p-4 animate-in fade-in duration-300">
+                <SectionTitle>Voucher Code</SectionTitle>
+                <div className="mt-3 flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Ticket className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neon/70" />
+                    <input
+                      value={voucherInput}
+                      onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
+                      placeholder="ENTER VOUCHER CODE"
+                      className="w-full rounded-sm border border-white/10 bg-background/60 py-2 pl-8 pr-3 font-mono text-sm uppercase tracking-widest text-foreground placeholder:text-muted-foreground/50 focus:border-neon/70 focus:outline-none"
+                    />
+                  </div>
+                  <BunkerButton variant="outline" size="sm" onClick={handleApplyVoucher}>
+                    Apply
+                  </BunkerButton>
+                  {voucher && (
+                    <button
+                      onClick={() => {
+                        setVoucher(null);
+                        setVoucherInput("");
+                        setVoucherError(null);
+                      }}
+                      className="rounded-sm border border-white/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                {voucher && (
+                  <div className="mt-2 flex items-center gap-2 rounded-sm border border-neon/40 bg-neon/5 px-3 py-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-neon" />
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-neon">
+                      {voucher.reward_name} · −฿{Number(voucher.discount_amount).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                {voucherError && (
+                  <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-red-400">
+                    {voucherError}
+                  </div>
+                )}
+              </Panel>
+            </>
+          )}
+
+          {/* STEP 2 — PAYMENT METHOD */}
+          {step === "method" && (
+            <Panel variant="default" corners className="corner-frame-lines p-4 animate-in fade-in duration-300">
+              <SectionTitle>Select Payment Method</SectionTitle>
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {paymentOptions.map((p) => {
+                  const active = payment === p;
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => setPayment(p)}
+                      className={cn(
+                        "flex items-center justify-center gap-2 rounded-sm border py-4 transition-all duration-200",
+                        active
+                          ? "border-neon bg-neon/10 text-neon shadow-[0_0_20px_-6px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
+                          : "border-white/10 bg-background/40 text-muted-foreground hover:border-neon/40 hover:text-foreground",
+                      )}
+                    >
+                      <CreditCard className="h-3.5 w-3.5" />
+                      <span className="font-display text-xs font-bold uppercase tracking-widest">
+                        {p}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-              <ul className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                <li>· Minimum order amount: <span className="text-foreground">฿{minAmount.toLocaleString()}</span></li>
-                <li>· Minimum order weight: <span className="text-foreground">{minWeight}G</span></li>
-                <li>· Meet <span className="text-foreground">amount OR weight</span> to unlock checkout</li>
-                <li>· Enter last <span className="text-foreground">5 digits</span> of your transfer reference</li>
-              </ul>
+              <div className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Only one method may be selected. QR will load on next step.
+              </div>
+              {payment && !qrReady && (
+                <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-amber-300">
+                  Loading QR for {payment}…
+                </div>
+              )}
             </Panel>
           )}
 
-          <Panel variant="default" corners className="corner-frame-lines p-4">
-            <SectionTitle>Delivery Information</SectionTitle>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <BunkerInput
-                label="Customer Name"
-                icon={<User className="h-3.5 w-3.5" />}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="OPERATOR NAME"
-              />
-              <BunkerInput
-                label="Phone Number"
-                icon={<Phone className="h-3.5 w-3.5" />}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+66 ..."
-                inputMode="tel"
-              />
-              <div className="col-span-2">
-                <BunkerInput
-                  label="Delivery Address"
-                  icon={<MapPin className="h-3.5 w-3.5" />}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="DROP LOCATION"
-                />
-              </div>
-              <label className="col-span-2 flex cursor-pointer items-center gap-2 rounded-sm border border-white/10 bg-background/40 px-3 py-2 hover:border-neon/40">
-                <input
-                  type="checkbox"
-                  checked={saveAsDefault}
-                  onChange={(e) => setSaveAsDefault(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-neon"
-                />
-                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                  Save as my default delivery information
-                </span>
-              </label>
-              <div className="col-span-2 flex flex-col gap-1.5">
-                <label className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
-                  Optional Notes
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                  placeholder="ADDITIONAL INSTRUCTIONS..."
-                  className="rounded-none border border-white/10 bg-background/60 px-3 py-2 font-mono text-sm tracking-wider text-foreground placeholder:text-muted-foreground/50 focus:border-neon/70 focus:outline-none"
-                />
-              </div>
-            </div>
-          </Panel>
-
-          {/* Voucher */}
-          <Panel variant="default" className="p-4">
-            <SectionTitle>Voucher Code</SectionTitle>
-            <div className="mt-3 flex items-center gap-2">
-              <div className="relative flex-1">
-                <Ticket className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neon/70" />
-                <input
-                  value={voucherInput}
-                  onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
-                  placeholder="ENTER VOUCHER CODE"
-                  className="w-full rounded-sm border border-white/10 bg-background/60 py-2 pl-8 pr-3 font-mono text-sm uppercase tracking-widest text-foreground placeholder:text-muted-foreground/50 focus:border-neon/70 focus:outline-none"
-                />
-              </div>
-              <BunkerButton variant="outline" size="sm" onClick={handleApplyVoucher}>
-                Apply
-              </BunkerButton>
-              {voucher && (
-                <button
-                  onClick={() => {
-                    setVoucher(null);
-                    setVoucherInput("");
-                    setVoucherError(null);
-                  }}
-                  className="rounded-sm border border-white/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-            {voucher && (
-              <div className="mt-2 flex items-center gap-2 rounded-sm border border-neon/40 bg-neon/5 px-3 py-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-neon" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-neon">
-                  {voucher.reward_name} · −฿{Number(voucher.discount_amount).toLocaleString()}
-                </span>
-              </div>
-            )}
-            {voucherError && (
-              <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-red-400">
-                {voucherError}
-              </div>
-            )}
-          </Panel>
-
-          <Panel variant="default" className="p-4">
-            <SectionTitle>Payment Method</SectionTitle>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {paymentOptions.map((p) => {
-                const active = payment === p;
-                return (
-                  <button
-                    key={p}
-                    onClick={() => setPayment(p)}
-                    className={cn(
-                      "flex items-center justify-center gap-2 rounded-sm border py-3 transition-all duration-200",
-                      active
-                        ? "border-neon bg-neon/10 text-neon shadow-[0_0_20px_-6px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
-                        : "border-white/10 bg-background/40 text-muted-foreground hover:border-neon/40 hover:text-foreground",
-                    )}
-                  >
-                    <CreditCard className="h-3.5 w-3.5" />
-                    <span className="font-display text-xs font-bold uppercase tracking-widest">
-                      {p}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {payment && selectedQR?.qrImage && (
-              <div className="mt-3 flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-3">
-                <img
-                  src={selectedQR.qrImage}
-                  alt={`${payment} QR`}
-                  className="h-40 w-40 rounded-sm object-contain"
-                />
-                <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                  Scan to pay · {payment}
+          {/* STEP 3 — PAYMENT VERIFICATION */}
+          {step === "verify" && (
+            <Panel variant="default" corners className="corner-frame-lines p-4 animate-in fade-in duration-300">
+              <SectionTitle>Payment Verification · {payment}</SectionTitle>
+              {selectedQR?.qrImage && (
+                <div className="mt-3 flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-4">
+                  <img
+                    src={selectedQR.qrImage}
+                    alt={`${payment} QR`}
+                    className="h-56 w-56 rounded-sm object-contain"
+                  />
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Scan to pay · {payment} · ฿{grandTotal.toLocaleString()}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {payment && (
-              <div className="mt-3">
+              )}
+              <div className="mt-4">
                 <label className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">
-                  Last 5 Digits of Transfer Reference
+                  Transfer Reference — Last 5 Digits
                 </label>
                 <input
                   value={reference}
@@ -336,7 +387,7 @@ function CheckoutPage() {
                   inputMode="numeric"
                   placeholder="12345"
                   className={cn(
-                    "mt-1 w-full rounded-sm border bg-background/60 px-3 py-2 font-mono text-lg tracking-[0.5em] text-center text-foreground placeholder:text-muted-foreground/40 focus:outline-none",
+                    "mt-1 w-full rounded-sm border bg-background/60 px-3 py-2 font-mono text-2xl tracking-[0.5em] text-center text-foreground placeholder:text-muted-foreground/40 focus:outline-none",
                     referenceValid
                       ? "border-neon/60 focus:border-neon"
                       : "border-white/10 focus:border-neon/70",
@@ -344,12 +395,19 @@ function CheckoutPage() {
                   maxLength={5}
                 />
                 <div className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                  Required to deploy mission
+                  Enter exactly 5 digits from your transfer reference
                 </div>
               </div>
-            )}
-          </Panel>
+            </Panel>
+          )}
+
+          <div className="flex items-center gap-2">
+            <BunkerButton variant="outline" size="sm" onClick={goBack}>
+              {step === "delivery" ? "Back to Loadout" : "Back"}
+            </BunkerButton>
+          </div>
         </div>
+
 
         <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-4">
           <div className="mb-3 border-b border-white/10 pb-3">
@@ -404,21 +462,42 @@ function CheckoutPage() {
             </div>
           </div>
 
-          <BunkerButton
-            variant="primary"
-            size="lg"
-            disabled={!canSubmit}
-            onClick={handleConfirm}
-            className="mt-4 w-full"
-          >
-            {submitting
-              ? "Transmitting..."
-              : !payment
-                ? "Select Payment"
+          {step !== "verify" ? (
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={
+                (step === "delivery" && !deliveryValid) ||
+                (step === "method" && (!payment || !qrReady))
+              }
+              onClick={goNext}
+              className="mt-4 w-full"
+            >
+              {step === "delivery"
+                ? deliveryValid
+                  ? "Continue to Payment"
+                  : "Complete Delivery Info"
+                : !payment
+                  ? "Select a Method"
+                  : !qrReady
+                    ? "Loading QR..."
+                    : "Continue to Payment"}
+            </BunkerButton>
+          ) : (
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={!canSubmit}
+              onClick={handleConfirm}
+              className="mt-4 w-full"
+            >
+              {submitting
+                ? "Transmitting..."
                 : !referenceValid
                   ? "Enter Last 5 Digits"
                   : "Deploy Mission"}
-          </BunkerButton>
+            </BunkerButton>
+          )}
         </Panel>
       </div>
     </AppShell>
