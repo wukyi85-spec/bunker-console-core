@@ -36,7 +36,7 @@ export function GameNav() {
   return (
     <nav
       className={cn(
-        "relative grid grid-cols-3 grid-rows-2 gap-2 rounded-2xl p-2",
+        "relative grid grid-cols-3 grid-rows-2 gap-2 overflow-hidden rounded-2xl p-2",
         "sm:flex sm:flex-row sm:items-stretch sm:gap-2.5 sm:p-2.5",
         "max-w-full sm:max-w-[calc(100vw-1rem)] sm:overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         "bg-black/55 backdrop-blur-xl",
