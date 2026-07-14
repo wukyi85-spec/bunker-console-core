@@ -131,6 +131,7 @@ function RootComponent() {
       <OrientationGate>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <SoundProvider />
         <Toaster />
       </OrientationGate>
     </QueryClientProvider>
