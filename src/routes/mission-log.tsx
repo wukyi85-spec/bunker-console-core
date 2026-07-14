@@ -229,12 +229,12 @@ function OrderRow({ order }: { order: OrderRow }) {
               )}
               <div className="mt-2">
                 <ContactHQ
-                  size="sm"
-                  variant="ghost"
+                  compact
                   orderId={String(order.id)}
                   label="Contact HQ about this order"
                 />
               </div>
+
             </div>
           ) : null}
 
