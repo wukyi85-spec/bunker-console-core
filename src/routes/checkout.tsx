@@ -173,7 +173,7 @@ function CheckoutPage() {
           <Panel variant="default" className="p-4">
             <SectionTitle>Payment Method</SectionTitle>
             <div className="mt-3 grid grid-cols-3 gap-3">
-              {PAYMENTS.map((p) => {
+              {paymentOptions.map((p) => {
                 const active = payment === p;
                 return (
                   <button
@@ -194,6 +194,19 @@ function CheckoutPage() {
                 );
               })}
             </div>
+            {selectedQR?.qr_image && (
+              <div className="mt-3 flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-3">
+                <img
+                  src={selectedQR.qr_image}
+                  alt={`${payment} QR`}
+                  className="h-40 w-40 rounded-sm object-contain"
+                />
+                <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  Scan to pay · {payment}
+                </div>
+              </div>
+            )}
+
           </Panel>
         </div>
 
