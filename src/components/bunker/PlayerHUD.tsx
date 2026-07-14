@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, Zap, Coins, Star, Radio } from "lucide-react";
+import { Zap, Coins, Star, Radio } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
