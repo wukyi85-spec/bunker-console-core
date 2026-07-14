@@ -16,7 +16,9 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
+import { ContactHQ } from "@/components/bunker/ContactHQ";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/mission-log")({
   head: () => ({
