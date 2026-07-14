@@ -52,7 +52,7 @@ function LoadoutPage() {
 
   return (
     <AppShell hideLogo hideNav>
-      <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500">
+      <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500 lphone:grid-cols-[1fr_300px] lphone:gap-2">
         {/* LEFT — Inventory */}
         <Panel variant="default" className="flex min-h-0 flex-col p-4">
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-3">
