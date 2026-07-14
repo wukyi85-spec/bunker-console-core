@@ -109,28 +109,29 @@ function SupplyPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgb(0_0_0/0.6)_0%,transparent_70%)]" />
 
       {/* Header bar */}
-      <div className="relative z-20 flex items-center justify-between border-b border-white/8 px-5 py-3">
+      <div className="relative z-20 flex items-center justify-between border-b border-white/8 px-5 py-3 lphone:px-3 lphone:py-1.5">
         <div className="flex items-center gap-3">
           <Link
             to="/dashboard"
             className={cn(
               "group inline-flex items-center gap-2 rounded-full",
               "border border-white/10 bg-black/50 backdrop-blur-md",
-              "px-3.5 py-1.5 text-[11px] font-display font-bold uppercase tracking-[0.28em]",
+              "px-3.5 py-1.5 text-[11px] font-display font-bold uppercase tracking-[0.28em] lphone:px-2.5 lphone:py-1 lphone:text-[9px] lphone:tracking-[0.22em]",
               "text-white/70 hover:text-white",
               "transition-all duration-300 hover:border-white/25 hover:bg-black/70",
             )}
           >
-            <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+            <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-0.5 lphone:h-3 lphone:w-3" />
             <span>Back to Bunker</span>
           </Link>
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2 md:flex lphone:hidden">
             <span className="h-1.5 w-1.5 rounded-full bg-neon animate-hud-pulse" />
             <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
               Supply Room · Inventory Terminal
             </span>
           </div>
         </div>
+
 
         <Link
           to="/loadout"
