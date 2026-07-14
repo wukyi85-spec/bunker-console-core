@@ -228,7 +228,8 @@ function CheckoutPage() {
     <AppShell hideLogo hideNav>
       <div className="grid h-full w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500">
         <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
-          {/* Step Indicator */}
+          {/* Step Indicator — hidden for reward orders (delivery only). */}
+          {!isReward && (
           <div className="flex items-center gap-2">
             {(["delivery", "method", "verify"] as Step[]).map((s, idx) => {
               const active = step === s;
