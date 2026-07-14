@@ -208,10 +208,38 @@ function LoadoutPage() {
 
 
 
+          {/* Order Policy */}
+          {enriched.length > 0 && (
+            <div className="mt-3 rounded-sm border border-white/10 bg-background/40 p-2.5">
+              <div className="flex items-center gap-1.5">
+                <ShieldAlert className="h-3.5 w-3.5 text-neon" />
+                <span className="font-display text-[11px] font-bold uppercase tracking-widest text-foreground">
+                  Order Policy
+                </span>
+              </div>
+              <ul className="mt-1.5 space-y-0.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                <li>• Rush orders are not accepted.</li>
+                <li>• Processing & delivery: 2–5 days.</li>
+                <li>• Please answer delivery calls to avoid delays.</li>
+              </ul>
+              <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-sm border border-white/10 bg-background/60 px-2 py-1.5 hover:border-neon/40">
+                <input
+                  type="checkbox"
+                  checked={policyAccepted}
+                  onChange={(e) => setPolicyAccepted(e.target.checked)}
+                  className="h-3.5 w-3.5 accent-neon"
+                />
+                <span className="font-mono text-[9px] uppercase tracking-widest text-foreground">
+                  I have read and agree to the order policy
+                </span>
+              </label>
+            </div>
+          )}
+
           <BunkerButton
             variant="primary"
             size="lg"
-            disabled={!minMet || !settingsReady || enriched.length === 0}
+            disabled={!minMet || !settingsReady || enriched.length === 0 || !policyAccepted}
             className="mt-4 w-full"
             onClick={() => navigate({ to: "/checkout" })}
           >
