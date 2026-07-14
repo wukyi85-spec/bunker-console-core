@@ -16,14 +16,10 @@ import { getPlayerProfile, setPlayerProfile, CHARACTERS } from "@/lib/player";
 import { levelProgress, PROGRESSION } from "@/lib/progression";
 import {
   Coins,
-  Shield,
-  User,
   Phone,
   MapPin,
   Save,
   Pencil,
-  Star,
-  Trophy,
   Zap,
 } from "lucide-react";
 
