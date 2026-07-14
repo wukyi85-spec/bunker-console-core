@@ -235,7 +235,7 @@ export function BunkerAlarm() {
         })}
       </div>
 
-      <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground max-sm:text-[7px]">
+      <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground max-sm:mt-1 max-sm:text-[7px]">
         <span className="text-neon/70">// LIVE</span>
         {(hasMore || allItems.length > 0) && (
           <button
