@@ -46,6 +46,12 @@ function ProfilePage() {
   const profile = getPlayerProfile();
   const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
   const ranksQ = useQuery({ queryKey: ["ranks"], queryFn: listRanks });
+  const fetchRanksSheet = useServerFn(getRankSettings);
+  const ranksSheetQ = useQuery({
+    queryKey: ["sheet_ranks"],
+    queryFn: fetchRanksSheet,
+    staleTime: 60_000,
+  });
   const stats: any = statsQ.data;
 
   const character =
@@ -74,7 +80,12 @@ function ProfilePage() {
   const rankRow: any = (ranksQ.data ?? []).find(
     (r: any) => r.name?.toUpperCase() === rank,
   );
-  const rankAccent = rankRow?.accent ?? "var(--neon)";
+  const sheetRankRow = (ranksSheetQ.data ?? []).find(
+    (r) => r.name?.toUpperCase() === rank,
+  );
+  const rankBadgeImage = sheetRankRow?.badgeImage ?? rankRow?.badge_image_url ?? null;
+  const rankTheme = getRankTheme(rank);
+  const rankAccent = sheetRankRow?.accent ?? rankRow?.accent ?? rankTheme.primary;
   const xpPct = stats ? levelProgress(stats.xp) : 0;
   const xpInLevel = stats ? stats.xp % PROGRESSION.xpPerLevel : 0;
 
