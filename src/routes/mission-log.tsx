@@ -227,8 +227,17 @@ function OrderRow({ order }: { order: OrderRow }) {
                   Tracking information will be available after dispatch.
                 </div>
               )}
+              <div className="mt-2">
+                <ContactHQ
+                  size="sm"
+                  variant="ghost"
+                  orderId={String(order.id)}
+                  label="Contact HQ about this order"
+                />
+              </div>
             </div>
           ) : null}
+
 
 
           <div className="grid grid-cols-[1fr_240px] gap-4">
