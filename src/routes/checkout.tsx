@@ -65,14 +65,17 @@ function CheckoutPage() {
     setAddress((v) => (v ? v : stats.default_address ?? ""));
   }, [stats?.player_key]);
 
+  const minAmount = settingsQ.data?.minimum_order_amount ?? 0;
+  const minWeight = settingsQ.data?.minimum_order_weight ?? 0;
+  const settingsReady = minAmount > 0 && minWeight > 0;
   const { enriched, productTotal, totalGrams, minMet } = loadoutTotals(items, {
-    amount: settingsQ.data?.minimum_order_amount ?? 1000,
-    weight: settingsQ.data?.minimum_order_weight ?? 50,
+    amount: minAmount,
+    weight: minWeight,
   });
 
 
   const canSubmit =
-    minMet && payment && name.trim() && phone.trim() && address.trim() && !submitting;
+    settingsReady && minMet && payment && name.trim() && phone.trim() && address.trim() && !submitting;
 
   const handleConfirm = async () => {
     if (!canSubmit || !payment) return;
