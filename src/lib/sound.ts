@@ -150,7 +150,8 @@ type SoundKey =
   | "orderConfirmed"
   | "terminalBoot"
   | "door"
-  | "error";
+  | "error"
+  | "purchase";
 
 const SFX: Record<SoundKey, () => void> = {
   click: () => {
@@ -200,6 +201,14 @@ const SFX: Record<SoundKey, () => void> = {
   error: () => {
     envTone({ freq: 220, duration: 0.15, type: "square", peak: 0.1 });
     envTone({ freq: 180, duration: 0.2, type: "square", peak: 0.1, when: 0.1 });
+  },
+  purchase: () => {
+    // Cash-register style: two bright ka-ching bells + soft coin shimmer.
+    envTone({ freq: 1320, duration: 0.12, type: "triangle", peak: 0.14, attack: 0.002, release: 0.11 });
+    envTone({ freq: 1760, duration: 0.14, type: "triangle", peak: 0.13, release: 0.13, when: 0.02 });
+    envTone({ freq: 2093, duration: 0.28, type: "sine", peak: 0.11, release: 0.26, when: 0.09 });
+    envTone({ freq: 2637, duration: 0.4, type: "sine", peak: 0.08, release: 0.38, when: 0.16 });
+    noiseBurst({ duration: 0.18, peak: 0.04, filterFreq: 5200, when: 0.05 });
   },
 };
 

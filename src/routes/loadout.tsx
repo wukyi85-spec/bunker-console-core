@@ -14,7 +14,7 @@ import {
   loadoutTotals,
 } from "@/lib/loadout";
 import { getGameSettings } from "@/lib/sheets.functions";
-import { AlertTriangle, Backpack, Package, Trash2, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Backpack, Package, Trash2, ShieldAlert, X, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/loadout")({
@@ -30,6 +30,7 @@ export const Route = createFileRoute("/loadout")({
 function LoadoutPage() {
   const [items, setItems] = useState(getLoadout);
   const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
   const navigate = useNavigate();
   const fetchSettings = useServerFn(getGameSettings);
   const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
@@ -195,33 +196,6 @@ function LoadoutPage() {
               </div>
             )}
 
-            {/* Order Policy */}
-            {enriched.length > 0 && (
-              <div className="rounded-sm border border-white/10 bg-background/40 p-2.5 lphone:p-2">
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="h-3.5 w-3.5 text-neon" />
-                  <span className="font-display text-[11px] font-bold uppercase tracking-[0.2em] text-foreground lphone:text-[10px]">
-                    ORDER POLICY
-                  </span>
-                </div>
-                <ul className="mt-1.5 space-y-1 font-mono text-[10px] leading-snug uppercase tracking-wider text-muted-foreground lphone:text-[9px]">
-                  <li className="flex items-start gap-1.5"><span className="text-neon">•</span><span>No rush orders.</span></li>
-                  <li className="flex items-start gap-1.5"><span className="text-neon">•</span><span>ETA 2–5 days.</span></li>
-                  <li className="flex items-start gap-1.5"><span className="text-neon">•</span><span>Answer delivery calls.</span></li>
-                </ul>
-                <label className="mt-2 flex cursor-pointer items-start gap-2 rounded-sm border border-white/10 bg-background/60 p-2 hover:border-neon/40 lphone:p-1.5">
-                  <input
-                    type="checkbox"
-                    checked={policyAccepted}
-                    onChange={(e) => setPolicyAccepted(e.target.checked)}
-                    className="mt-0.5 h-3.5 w-3.5 accent-neon"
-                  />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-foreground lphone:text-[9px]">
-                    I agree to the Order Policy.
-                  </span>
-                </label>
-              </div>
-            )}
           </div>
 
           {/* Sticky footer */}
@@ -237,15 +211,100 @@ function LoadoutPage() {
             <BunkerButton
               variant="primary"
               size="lg"
-              disabled={!minMet || !settingsReady || enriched.length === 0 || !policyAccepted}
+              disabled={!minMet || !settingsReady || enriched.length === 0}
               className="w-full lphone:!py-2 lphone:!text-xs"
-              onClick={() => navigate({ to: "/checkout" })}
+              onClick={() => {
+                setPolicyAccepted(false);
+                setShowPolicy(true);
+              }}
             >
               {settingsReady ? "Proceed to Checkout" : "Loading Settings..."}
             </BunkerButton>
           </div>
         </Panel>
       </div>
+
+      {/* ORDER POLICY MODAL — must accept before continuing to checkout */}
+      {showPolicy && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-[640px] rounded-md border border-neon/40 bg-panel-elevated/95 shadow-[0_0_60px_-10px_rgba(124,255,77,0.35)] animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setShowPolicy(false)}
+              className="absolute right-2 top-2 rounded-sm p-1.5 text-muted-foreground hover:bg-white/5 hover:text-foreground"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="border-b border-white/10 px-5 py-3 lphone:px-4 lphone:py-2">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 text-neon" />
+                <span className="font-display text-sm font-black uppercase tracking-[0.28em] text-foreground lphone:text-xs">
+                  Order Policy — Please Read Carefully
+                </span>
+              </div>
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto px-5 py-4 lphone:px-4 lphone:py-3">
+              <ul className="space-y-2.5 font-mono text-[13px] leading-relaxed text-foreground/95 lphone:space-y-2 lphone:text-[11px]">
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <span><span className="font-bold text-neon">RUSH ORDERS လက်မခံပါ။</span> Rush order request မလုပ်ပေးပါ။</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <span><span className="font-bold text-neon">Delivery ကြာချိန်</span> — ပါဆယ်ရောက်ချိန်က <span className="text-neon">2–5 ရက်</span> ခန့်ကြာနိုင်ပါတယ်။</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <span><span className="font-bold text-neon">Delivery ဖုန်းကို မဖြစ်မနေ ကိုင်ပေးပါ။</span> Delivery ဘက်ကဖုန်းဆက်လို့ မကိုင်ဖြစ်ရင် ပါဆယ်ကနောက်ကျတတ်ပါတယ်။ အတတ်နိုင်ဆုံး ဖုန်းကိုင်ပေးရပါမယ်။</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <span>ပါဆယ်ကို ကိုယ်တိုင် <span className="font-bold text-neon">လက်ခံစကားပြောနိုင်ရင်</span> ပိုအဆင်ပြေပါတယ်။</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <span>ပါဆယ်ရောက်လာရင် <span className="font-bold text-neon">Unboxing Video</span> ကို မဖြစ်မနေ Record လုပ်ထားပါ။ (ပါဆယ်ပျောက်တာ / ပါဆယ်မပါတာဆိုရင် <span className="text-neon">100% တာဝန်ယူပေး</span>နိုင်ပါတယ်။)</span>
+                </li>
+              </ul>
+
+              <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-sm border border-white/15 bg-background/60 p-3 hover:border-neon/50 lphone:mt-3 lphone:p-2.5">
+                <input
+                  type="checkbox"
+                  checked={policyAccepted}
+                  onChange={(e) => setPolicyAccepted(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-neon"
+                />
+                <span className="font-mono text-[12px] uppercase tracking-wider text-foreground lphone:text-[10px]">
+                  အထက်ပါ Order Policy အားလုံးကို ဖတ်ရှုပြီး သဘောတူပါသည်။
+                </span>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 border-t border-white/10 px-5 py-3 lphone:px-4 lphone:py-2">
+              <BunkerButton
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPolicy(false)}
+              >
+                Cancel
+              </BunkerButton>
+              <BunkerButton
+                variant="primary"
+                size="sm"
+                disabled={!policyAccepted}
+                onClick={() => {
+                  setShowPolicy(false);
+                  navigate({ to: "/checkout" });
+                }}
+              >
+                <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                Accept & Continue
+              </BunkerButton>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
