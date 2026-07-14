@@ -433,6 +433,7 @@ export interface PlayerVoucherRow {
   reward_name: string;
   code: string;
   discount_amount: number | null;
+  discount_percent: number | null;
   gold_cost: number;
   expires_at: string | null;
   redeemed_at: string | null;
