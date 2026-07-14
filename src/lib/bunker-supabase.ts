@@ -10,6 +10,9 @@ export interface OrderInsertPayload {
   payment: "PromptPay" | "KPay" | "WavePay";
   productTotal: number;
   totalGrams: number;
+  paymentReference: string;
+  voucherCode?: string | null;
+  voucherDiscount?: number;
 }
 
 export function calcRewards(productTotal: number) {
