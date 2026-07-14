@@ -453,7 +453,7 @@ function CheckoutPage() {
 
           <div className="flex items-center gap-2">
             <BunkerButton variant="outline" size="sm" onClick={goBack}>
-              {step === "delivery" ? "Back to Loadout" : "Back"}
+              {step === "delivery" ? (isReward ? "Back to Rewards" : "Back to Loadout") : "Back"}
             </BunkerButton>
           </div>
         </div>
