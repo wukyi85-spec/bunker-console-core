@@ -239,20 +239,16 @@ function ProfilePage() {
 
             {/* Rank / Stats */}
             <div className="flex flex-col gap-3 rounded-md border border-white/10 bg-black/40 p-3">
-              <div className="flex items-center gap-3">
-                {(() => {
-                  const t = getRankTheme(rank);
-                  return (
-                    <BadgeGlow
-                      src={rankRow?.badgeImage || null}
-                      alt={rank}
-                      size={48}
-                      primary={t.primary}
-                      secondary={t.secondary}
-                      intensity="md"
-                    />
-                  );
-                })()}
+              <div className="flex items-center gap-2.5">
+                <BadgeGlow
+                  src={rankBadgeImage}
+                  alt={rank}
+                  size={44}
+                  primary={rankAccent || rankTheme.primary}
+                  secondary={rankTheme.secondary}
+                  intensity="md"
+                />
+
                 <div className="min-w-0">
                   <div className="font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
                     Current Rank
