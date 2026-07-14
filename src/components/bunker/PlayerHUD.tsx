@@ -4,10 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
 import { getPlayerStats } from "@/lib/bunker-supabase";
-import { getPlayerProfile } from "@/lib/player";
+import { getPlayerProfile, CHARACTERS } from "@/lib/player";
 import { levelProgress } from "@/lib/progression";
 import { getRankSettings } from "@/lib/sheets.functions";
-import { RankBadge } from "@/components/bunker/RankBadge";
+import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
+import { CharacterPortrait } from "@/components/bunker/CharacterPortrait";
 
 
 
