@@ -149,7 +149,7 @@ function ProfilePage() {
           />
           <div className="pointer-events-none absolute inset-0 hud-grid opacity-[0.08]" />
 
-          <div className="relative grid grid-cols-[170px_1fr_260px] gap-5">
+          <div className="relative grid grid-cols-[140px_1fr_230px] gap-4">
             {/* Character Avatar */}
             <div className="relative flex flex-col gap-3">
               <div className="relative overflow-hidden rounded-md border border-white/10">
