@@ -407,4 +407,50 @@ export function orderStatusLabel(status: string): string {
   return map[status?.toLowerCase?.()] ?? (status || "").toUpperCase();
 }
 
+// ---------- SHOP REWARD REDEMPTION (voucher / physical) ----------
+export interface PlayerVoucherRow {
+  id: string;
+  player_key: string;
+  reward_id: string;
+  reward_name: string;
+  code: string;
+  discount_amount: number | null;
+  gold_cost: number;
+  expires_at: string | null;
+  redeemed_at: string | null;
+  created_at: string;
+}
+
+export async function listPlayerVouchers(): Promise<PlayerVoucherRow[]> {
+  const playerKey = getPlayerKey();
+  const { data, error } = await supabase.rpc("list_player_vouchers" as never, {
+    p_player_key: playerKey,
+  } as never);
+  if (error) throw error;
+  return ((data ?? []) as unknown) as PlayerVoucherRow[];
+}
+
+export async function redeemShopReward(input: {
+  rewardId: string;
+  rewardName: string;
+  goldCost: number;
+  type: "physical" | "voucher";
+  discountAmount?: number;
+  expireDays?: number;
+}) {
+  const playerKey = getPlayerKey();
+  const { data, error } = await supabase.rpc("redeem_shop_reward" as never, {
+    p_player_key: playerKey,
+    p_reward_id: input.rewardId,
+    p_reward_name: input.rewardName,
+    p_gold_cost: input.goldCost,
+    p_type: input.type,
+    p_discount_amount: input.discountAmount ?? 0,
+    p_expire_days: input.expireDays ?? 30,
+  } as never);
+  if (error) throw error;
+  return data as { kind: "voucher" | "physical"; voucher?: PlayerVoucherRow; reward?: unknown };
+}
+
+
 
