@@ -197,11 +197,9 @@ function LoadoutPage() {
                   Mission Requirement Not Met
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-200/80">
-                  Minimum Order: 50G or ฿1,000
+                  Minimum Order: {minWeight}G or ฿{minAmount.toLocaleString()}
                 </div>
-              </div>
-            </div>
-          )}
+
 
           <BunkerButton
             variant="primary"
