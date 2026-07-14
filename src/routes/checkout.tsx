@@ -463,52 +463,109 @@ function CheckoutPage() {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
-            {enriched.map((i) => (
-              <div
-                key={`${i.productId}-${i.sizeLabel}`}
-                className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
-              >
-                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-hud">
-                  {i.productImage ? (
-                    <img src={i.productImage} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <Package className="h-4 w-4 text-neon/70" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
-                    {i.productName ?? i.productId}
+            {isReward
+              ? rewardItems.map((r, idx) => (
+                  <div
+                    key={`${r.rewardId}-${idx}`}
+                    className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
+                  >
+                    <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-hud">
+                      {r.image ? (
+                        <img src={r.image} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Gift className="h-4 w-4 text-neon/70" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
+                        {r.rewardName}
+                      </div>
+                      <div className="font-mono text-[9px] uppercase tracking-widest text-yellow-400/80">
+                        {r.goldCost.toLocaleString()} GOLD · REWARD
+                      </div>
+                    </div>
+                    <div className="font-display text-[11px] font-bold text-neon">FREE</div>
                   </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {i.sizeLabel} · x{i.quantity}
+                ))
+              : enriched.map((i) => (
+                  <div
+                    key={`${i.productId}-${i.sizeLabel}`}
+                    className="flex items-center gap-2 rounded-sm border border-white/10 bg-background/40 p-2"
+                  >
+                    <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-sm border border-white/10 bg-hud">
+                      {i.productImage ? (
+                        <img src={i.productImage} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Package className="h-4 w-4 text-neon/70" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-display text-[11px] font-bold uppercase tracking-wider">
+                        {i.productName ?? i.productId}
+                      </div>
+                      <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                        {i.sizeLabel} · x{i.quantity}
+                      </div>
+                    </div>
+                    <div className="font-display text-[11px] font-bold text-neon">
+                      ฿{i.subtotal.toLocaleString()}
+                    </div>
                   </div>
-                </div>
-                <div className="font-display text-[11px] font-bold text-neon">
-                  ฿{i.subtotal.toLocaleString()}
-                </div>
-              </div>
-            ))}
+                ))}
           </div>
 
           <div className="mt-3 flex flex-col gap-1.5 border-t border-white/10 pt-3 text-xs">
-            <SummaryRow label="Total Weight" value={`${totalGrams} G`} />
-            <SummaryRow label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
-            {voucherDiscount > 0 && (
-              <SummaryRow label="Voucher" value={`−฿${voucherDiscount.toLocaleString()}`} />
+            {isReward ? (
+              <>
+                <SummaryRow label="Reward Items" value={`${rewardTotals.count}`} />
+                <SummaryRow label="Delivery Fee" value="FREE" />
+                <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Grand Total
+                  </span>
+                  <span className="font-display text-lg font-bold text-neon">FREE</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <SummaryRow label="Total Weight" value={`${totalGrams} G`} />
+                <SummaryRow label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
+                {voucherDiscount > 0 && (
+                  <SummaryRow
+                    label={`Voucher (${voucherPercent}%)`}
+                    value={`−฿${voucherDiscount.toLocaleString()}`}
+                  />
+                )}
+                <SummaryRow label="Delivery Fee" value="TO BE CONFIRMED" muted />
+                <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Grand Total
+                  </span>
+                  <span className="font-display text-lg font-bold text-neon">
+                    ฿{grandTotal.toLocaleString()}
+                  </span>
+                </div>
+              </>
             )}
-            <SummaryRow label="Delivery Fee" value="TO BE CONFIRMED" muted />
-            <div className="my-1 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Grand Total
-              </span>
-              <span className="font-display text-lg font-bold text-neon">
-                ฿{grandTotal.toLocaleString()}
-              </span>
-            </div>
           </div>
 
-          {step !== "verify" ? (
+          {isReward ? (
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={!canSubmit}
+              onClick={handleConfirm}
+              className="mt-4 w-full"
+            >
+              {submitting
+                ? "Transmitting..."
+                : !deliveryValid
+                  ? "Complete Delivery Info"
+                  : "Deploy Reward Order"}
+            </BunkerButton>
+          ) : step !== "verify" ? (
             <BunkerButton
               variant="primary"
               size="lg"
@@ -544,6 +601,7 @@ function CheckoutPage() {
                   : "Deploy Mission"}
             </BunkerButton>
           )}
+
         </Panel>
       </div>
     </AppShell>
