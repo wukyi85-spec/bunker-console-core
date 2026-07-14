@@ -353,7 +353,7 @@ function AdminOrdersPage() {
                         className="inline-flex items-center gap-1 rounded-sm border border-red-500/40 bg-red-500/10 px-2 py-1 font-display text-[10px] font-bold uppercase tracking-widest text-red-300 transition-colors hover:bg-red-500/20"
                       >
                         <Ban className="h-3 w-3" />
-                        Cancel
+                        Reject
                       </button>
                     )}
                     {!canConfirm(o) && !canCancel(o) && (
