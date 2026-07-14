@@ -133,7 +133,7 @@ function DashboardPage() {
         </div>
 
         {/* Bottom center — Floating nav dock */}
-        <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 max-sm:px-2">
+        <div className="absolute inset-x-0 bottom-4 z-20 flex origin-bottom justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 lphone:bottom-2 lphone:scale-[0.7]">
           <GameNav />
         </div>
       </div>
