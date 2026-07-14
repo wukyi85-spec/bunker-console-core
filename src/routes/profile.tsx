@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -12,6 +13,7 @@ import {
   changePlayerName,
   listRanks,
 } from "@/lib/bunker-supabase";
+import { getRankSettings } from "@/lib/sheets.functions";
 import { getPlayerProfile, setPlayerProfile, CHARACTERS } from "@/lib/player";
 import { levelProgress, PROGRESSION } from "@/lib/progression";
 import {
@@ -44,6 +46,12 @@ function ProfilePage() {
   const profile = getPlayerProfile();
   const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
   const ranksQ = useQuery({ queryKey: ["ranks"], queryFn: listRanks });
+  const fetchRanksSheet = useServerFn(getRankSettings);
+  const ranksSheetQ = useQuery({
+    queryKey: ["sheet_ranks"],
+    queryFn: fetchRanksSheet,
+    staleTime: 60_000,
+  });
   const stats: any = statsQ.data;
 
   const character =
@@ -72,7 +80,12 @@ function ProfilePage() {
   const rankRow: any = (ranksQ.data ?? []).find(
     (r: any) => r.name?.toUpperCase() === rank,
   );
-  const rankAccent = rankRow?.accent ?? "var(--neon)";
+  const sheetRankRow = (ranksSheetQ.data ?? []).find(
+    (r) => r.name?.toUpperCase() === rank,
+  );
+  const rankBadgeImage = sheetRankRow?.badgeImage ?? rankRow?.badge_image_url ?? null;
+  const rankTheme = getRankTheme(rank);
+  const rankAccent = sheetRankRow?.accent ?? rankRow?.accent ?? rankTheme.primary;
   const xpPct = stats ? levelProgress(stats.xp) : 0;
   const xpInLevel = stats ? stats.xp % PROGRESSION.xpPerLevel : 0;
 
@@ -136,7 +149,7 @@ function ProfilePage() {
           />
           <div className="pointer-events-none absolute inset-0 hud-grid opacity-[0.08]" />
 
-          <div className="relative grid grid-cols-[170px_1fr_260px] gap-5">
+          <div className="relative grid grid-cols-[140px_1fr_230px] gap-4">
             {/* Character Avatar */}
             <div className="relative flex flex-col gap-3">
               <div className="relative overflow-hidden rounded-md border border-white/10">
@@ -164,7 +177,7 @@ function ProfilePage() {
                   // Digital Stoner Pass
                 </div>
                 <div className="mt-1 flex items-center gap-3">
-                  <h1 className="min-w-0 flex-1 truncate font-display text-3xl font-black uppercase tracking-widest text-foreground">
+                  <h1 className="min-w-0 flex-1 truncate font-display text-2xl font-black uppercase tracking-widest text-foreground">
                     {profile.playerName ?? "OPERATOR"}
                   </h1>
                   <button
@@ -226,20 +239,16 @@ function ProfilePage() {
 
             {/* Rank / Stats */}
             <div className="flex flex-col gap-3 rounded-md border border-white/10 bg-black/40 p-3">
-              <div className="flex items-center gap-3">
-                {(() => {
-                  const t = getRankTheme(rank);
-                  return (
-                    <BadgeGlow
-                      src={rankRow?.badgeImage || null}
-                      alt={rank}
-                      size={48}
-                      primary={t.primary}
-                      secondary={t.secondary}
-                      intensity="md"
-                    />
-                  );
-                })()}
+              <div className="flex items-center gap-2.5">
+                <BadgeGlow
+                  src={rankBadgeImage}
+                  alt={rank}
+                  size={44}
+                  primary={rankAccent || rankTheme.primary}
+                  secondary={rankTheme.secondary}
+                  intensity="md"
+                />
+
                 <div className="min-w-0">
                   <div className="font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
                     Current Rank
