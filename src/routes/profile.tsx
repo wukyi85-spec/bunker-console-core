@@ -27,7 +27,9 @@ import {
   Zap,
 } from "lucide-react";
 
+import { ContactHQ } from "@/components/bunker/ContactHQ";
 import { cn } from "@/lib/utils";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile")({
@@ -305,7 +307,11 @@ function ProfilePage() {
             </div>
           </div>
         </Panel>
+        <div className="flex justify-end">
+          <ContactHQ label="Contact HQ on Telegram" />
+        </div>
       </div>
+
 
       {/* ========== Change Name Confirmation ========== */}
       {changeOpen && (

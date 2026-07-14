@@ -7,6 +7,8 @@ import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getPlayerProfile } from "@/lib/player";
 import { levelProgress } from "@/lib/progression";
 import { getRankSettings } from "@/lib/sheets.functions";
+import { RankBadge } from "@/components/bunker/RankBadge";
+
 
 
 interface PlayerHUDProps {
@@ -69,27 +71,16 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
       </span>
 
-      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neon/50 bg-panel-elevated shadow-[0_0_18px_-4px_var(--neon)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,color-mix(in_oklab,var(--neon)_25%,transparent),transparent_70%)]" />
-        {player.badge ? (
-          <img src={player.badge} alt={player.rank} className="relative h-full w-full object-contain p-1.5" />
-        ) : (
-          <svg viewBox="0 0 64 64" className="relative h-full w-full">
-            <defs>
-              <linearGradient id="hud-p" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--neon)" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="var(--neon)" stopOpacity="0.15" />
-              </linearGradient>
-            </defs>
-            <circle cx="32" cy="24" r="10" fill="url(#hud-p)" />
-            <path d="M12 60 C 14 44, 50 44, 52 60 Z" fill="url(#hud-p)" />
-          </svg>
-        )}
-        <span className="absolute -bottom-1 -right-1 rounded-sm border border-background bg-neon px-1 py-[1px] font-mono text-[9px] font-bold text-background shadow-[0_0_8px_-1px_var(--neon)]">
-          {String(player.level).padStart(2, "0")}
-        </span>
-
+      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
+        <RankBadge
+          name={player.rank}
+          badgeImage={player.badge || null}
+          accent={currentRank?.accent ?? null}
+          level={player.level}
+          size="md"
+        />
       </div>
+
 
       <div className="flex min-w-0 flex-col justify-between gap-1.5">
         <div className="flex items-center gap-2">

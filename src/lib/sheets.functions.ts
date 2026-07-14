@@ -65,7 +65,9 @@ export interface GameSettings {
   gold_per_10_thb: number;
   voucher_expire_days: number;
   notification_expire_days: number;
+  contact_telegram_url: string;
 }
+
 
 export const DEFAULT_SETTINGS: GameSettings = {
   minimum_order_amount: 1000,
@@ -86,7 +88,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
   gold_per_10_thb: 1,
   voucher_expire_days: 30,
   notification_expire_days: 3,
+  contact_telegram_url: "https://t.me/blacksbunker",
 };
+
 
 export const getGameSettings = createServerFn({ method: "GET" }).handler(
   async (): Promise<GameSettings> => {
@@ -124,7 +128,13 @@ export const getGameSettings = createServerFn({ method: "GET" }).handler(
       voucher_expire_days: num(map.voucher_expire_days) || DEFAULT_SETTINGS.voucher_expire_days,
       notification_expire_days:
         num(map.notification_expire_days) || DEFAULT_SETTINGS.notification_expire_days,
+      contact_telegram_url:
+        str(map.contact_telegram_url) ||
+        str(map.telegram_url) ||
+        str(map.telegram_link) ||
+        DEFAULT_SETTINGS.contact_telegram_url,
     };
+
   },
 );
 
@@ -270,6 +280,7 @@ export interface SheetRank {
   minXp: number;
   maxXp: number;
   badgeImage: string;
+  accent: string | null;
 }
 
 export const getRankSettings = createServerFn({ method: "GET" }).handler(
@@ -287,7 +298,9 @@ export const getRankSettings = createServerFn({ method: "GET" }).handler(
         minXp: num(row[h.min_xp]),
         maxXp: num(row[h.max_xp]) || Infinity,
         badgeImage: str(row[h.badge_image_url]),
+        accent: str(row[h.accent] ?? row[h.color]) || null,
       });
+
     }
     return out.sort((a, b) => a.minXp - b.minXp);
   },

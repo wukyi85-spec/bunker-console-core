@@ -288,39 +288,94 @@ function BunkerDoorOpening({ target }: { target: string | null }) {
       )}
     >
       {/* Interior glow revealed as doors part */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--neon)_28%,transparent)_0%,transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgb(255_255_255/0.06)_0%,transparent_45%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--neon)_32%,transparent)_0%,transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgb(255_255_255/0.08)_0%,transparent_45%)]" />
+      {/* Volumetric light rays */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <span
+            key={i}
+            className="absolute h-[200%] w-2 origin-center bg-gradient-to-b from-transparent via-neon/25 to-transparent blur-md"
+            style={{
+              transform: `rotate(${i * 18 - 90}deg)`,
+              opacity: 0,
+              animation: `door-ray 1.6s ease-out ${0.9 + i * 0.05}s forwards`,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Left door */}
       <div
-        className="absolute inset-y-0 left-0 w-1/2 border-r border-neon/30 bg-gradient-to-l from-panel-elevated via-background to-black shadow-[inset_-30px_0_60px_-20px_rgb(0_0_0/0.9)]"
-        style={{ animation: "door-open-left 1.2s cubic-bezier(0.7,0,0.2,1) 0.2s forwards" }}
+        className="absolute inset-y-0 left-0 w-1/2 border-r border-neon/40 bg-gradient-to-l from-panel-elevated via-background to-black shadow-[inset_-40px_0_80px_-20px_rgb(0_0_0/0.95)] animate-door-shake"
+        style={{ animation: "door-open-left 1.4s cubic-bezier(0.7,0,0.2,1) 0.35s forwards, door-shake 0.3s ease-in-out 0s 2" }}
       >
-        <div className="pointer-events-none absolute inset-0 hud-grid opacity-20" />
-        <div className="pointer-events-none absolute right-0 top-1/2 h-24 w-24 -translate-y-1/2 translate-x-1/2 rounded-full border-2 border-neon/40 bg-neon/5 shadow-[0_0_40px_-6px_var(--neon)]" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-px bg-neon/60 shadow-[0_0_18px_var(--neon)]" />
+        <div className="pointer-events-none absolute inset-0 hud-grid opacity-25" />
+        {/* Rivets */}
+        <div className="pointer-events-none absolute inset-4 flex flex-col justify-between">
+          {[0, 1, 2, 3].map((r) => (
+            <div key={r} className="flex justify-between">
+              <span className="h-1.5 w-1.5 rounded-full bg-neon/30 shadow-[0_0_4px_var(--neon)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-neon/30 shadow-[0_0_4px_var(--neon)]" />
+            </div>
+          ))}
+        </div>
+        {/* Central vault wheel */}
+        <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2">
+          <div className="relative h-32 w-32">
+            <span className="absolute inset-0 rounded-full border-2 border-neon/50 bg-neon/5 shadow-[0_0_50px_-6px_var(--neon)]" />
+            <span className="absolute inset-3 rounded-full border border-neon/40 animate-badge-spin" />
+            <span className="absolute inset-6 rounded-full border border-dashed border-neon/30" />
+            <span className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neon shadow-[0_0_10px_var(--neon)]" />
+          </div>
+        </div>
+        {/* Seam glow */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-px bg-neon shadow-[0_0_24px_var(--neon)]" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-neon/40 to-transparent" />
       </div>
 
       {/* Right door */}
       <div
-        className="absolute inset-y-0 right-0 w-1/2 border-l border-neon/30 bg-gradient-to-r from-panel-elevated via-background to-black shadow-[inset_30px_0_60px_-20px_rgb(0_0_0/0.9)]"
-        style={{ animation: "door-open-right 1.2s cubic-bezier(0.7,0,0.2,1) 0.2s forwards" }}
+        className="absolute inset-y-0 right-0 w-1/2 border-l border-neon/40 bg-gradient-to-r from-panel-elevated via-background to-black shadow-[inset_40px_0_80px_-20px_rgb(0_0_0/0.95)]"
+        style={{ animation: "door-open-right 1.4s cubic-bezier(0.7,0,0.2,1) 0.35s forwards, door-shake 0.3s ease-in-out 0s 2" }}
       >
-        <div className="pointer-events-none absolute inset-0 hud-grid opacity-20" />
-        <div className="pointer-events-none absolute left-0 top-1/2 h-24 w-24 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-neon/40 bg-neon/5 shadow-[0_0_40px_-6px_var(--neon)]" />
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-px bg-neon/60 shadow-[0_0_18px_var(--neon)]" />
+        <div className="pointer-events-none absolute inset-0 hud-grid opacity-25" />
+        <div className="pointer-events-none absolute inset-4 flex flex-col justify-between">
+          {[0, 1, 2, 3].map((r) => (
+            <div key={r} className="flex justify-between">
+              <span className="h-1.5 w-1.5 rounded-full bg-neon/30 shadow-[0_0_4px_var(--neon)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-neon/30 shadow-[0_0_4px_var(--neon)]" />
+            </div>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2">
+          <div className="relative h-32 w-32">
+            <span className="absolute inset-0 rounded-full border-2 border-neon/50 bg-neon/5 shadow-[0_0_50px_-6px_var(--neon)]" />
+            <span className="absolute inset-3 rounded-full border border-neon/40 animate-badge-spin" style={{ animationDirection: "reverse" }} />
+            <span className="absolute inset-6 rounded-full border border-dashed border-neon/30" />
+            <span className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neon shadow-[0_0_10px_var(--neon)]" />
+          </div>
+        </div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-px bg-neon shadow-[0_0_24px_var(--neon)]" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-neon/40 to-transparent" />
       </div>
 
       {/* Center caption */}
-      <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 px-6 text-center animate-in fade-in duration-500" style={{ animationDelay: "800ms", animationFillMode: "both" }}>
+      <div
+        className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 px-6 text-center animate-in fade-in zoom-in-95 duration-700"
+        style={{ animationDelay: "1000ms", animationFillMode: "both" }}
+      >
         <span className="font-mono text-[10px] uppercase tracking-[0.6em] text-neon animate-hud-pulse">
           // Access Granted
         </span>
         <p className="font-display text-sm font-medium uppercase tracking-[0.28em] text-foreground/90 drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
-          Thank you for choosing Black's Joint &amp; Bud.
+          Thank you for choosing Black&rsquo;s Joint &amp; Bud.
         </p>
-        <h2 className="font-display text-2xl font-black uppercase tracking-[0.35em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
-          Welcome to BLACK'S BUNKER
+        <h2
+          className="font-display text-2xl font-black uppercase tracking-[0.35em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]"
+          style={{ textShadow: "0 0 24px color-mix(in oklab, var(--neon) 60%, transparent)" }}
+        >
+          Welcome to BLACK&rsquo;S BUNKER
         </h2>
         <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground/80">
           {label}
@@ -330,13 +385,21 @@ function BunkerDoorOpening({ target }: { target: string | null }) {
       <style>{`
         @keyframes door-open-left {
           0% { transform: translateX(0); }
+          10% { transform: translateX(-0.6%); }
           100% { transform: translateX(-101%); }
         }
         @keyframes door-open-right {
           0% { transform: translateX(0); }
+          10% { transform: translateX(0.6%); }
           100% { transform: translateX(101%); }
+        }
+        @keyframes door-ray {
+          0%   { opacity: 0; transform: rotate(var(--r, 0deg)) scaleY(0.3); }
+          40%  { opacity: 0.7; }
+          100% { opacity: 0; transform: rotate(var(--r, 0deg)) scaleY(1.4); }
         }
       `}</style>
     </div>
   );
 }
+
