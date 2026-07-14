@@ -234,13 +234,13 @@ export function BunkerAlarm() {
         })}
       </div>
 
-      <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground">
+      <div className="mt-2 flex items-center justify-between px-1 pt-1 font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground max-sm:text-[7px]">
         <span className="text-neon/70">// LIVE</span>
         {(hasMore || allItems.length > 0) && (
           <button
             type="button"
             onClick={() => setShowAll(true)}
-            className="rounded-sm border border-neon/40 bg-neon/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-neon transition-all hover:bg-neon/15 hover:shadow-[0_0_10px_-2px_var(--neon)]"
+            className="rounded-sm border border-neon/40 bg-neon/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-neon transition-all hover:bg-neon/15 hover:shadow-[0_0_10px_-2px_var(--neon)] max-sm:px-1.5 max-sm:py-0.5 max-sm:text-[7px]"
           >
             SEE MORE
           </button>
