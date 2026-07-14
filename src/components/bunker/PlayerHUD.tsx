@@ -116,7 +116,6 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         </div>
 
         <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground max-sm:text-[8px]">
-          <span className="text-foreground/80">{player.rank}</span>
           {(() => {
             const t = getRankTheme(player.rank);
             return (
@@ -131,6 +130,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               />
             );
           })()}
+          <span className="text-foreground/80">{player.rank}</span>
           <span className="text-border">·</span>
           <Zap className="h-3 w-3 text-white/70 max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">LV {player.level}</span>
