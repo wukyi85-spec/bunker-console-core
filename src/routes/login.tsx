@@ -120,7 +120,7 @@ function LoginScreen() {
           <div className="flex w-full flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-500">
             <div className="flex flex-col items-center gap-2">
               <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon/90">
-                // Members Only
+                Members Only
               </span>
               <h1 className="text-center font-display text-2xl font-black uppercase tracking-[0.28em] text-foreground drop-shadow-[0_2px_10px_rgb(0_0_0/0.8)]">
                 Have a Stoner Pass?
