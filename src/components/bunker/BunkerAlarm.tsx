@@ -251,35 +251,37 @@ export function BunkerAlarm() {
 
       {showAll && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/85 backdrop-blur-sm animate-in fade-in duration-200 p-4"
           onClick={() => setShowAll(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex max-h-[85vh] w-[min(560px,92vw)] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
+            className="relative flex h-[min(680px,90vh)] w-[min(640px,94vw)] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            {/* Sticky header with fixed Close button */}
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 gunmetal-glass px-5 py-4">
               <div className="flex items-center gap-2">
                 <Radio className="h-4 w-4 text-neon" />
-                <span className="font-display text-sm font-black uppercase tracking-[0.32em] text-foreground">
+                <span className="font-display text-base font-black uppercase tracking-[0.32em] text-foreground">
                   All Transmissions
                 </span>
-                <span className="rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[9px] font-bold text-neon">
+                <span className="rounded-sm border border-neon/40 bg-neon/10 px-1.5 py-[1px] font-mono text-[10px] font-bold text-neon">
                   {allItems.length}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAll(false)}
-                className="rounded-sm border border-white/10 bg-background/40 p-1 text-muted-foreground hover:text-neon"
+                className="rounded-sm border border-white/15 bg-background/50 p-1.5 text-muted-foreground transition-colors hover:border-neon/50 hover:text-neon"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex flex-col gap-2 overflow-y-auto p-3">
+            {/* Scrollable list with generous spacing */}
+            <div className="flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-5">
               {allItems.length === 0 && (
-                <div className="p-6 text-center font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                <div className="p-8 text-center font-mono text-[12px] uppercase tracking-widest text-muted-foreground">
                   No transmissions in the last {expireDays} days
                 </div>
               )}
@@ -293,13 +295,13 @@ export function BunkerAlarm() {
                     type="button"
                     onClick={() => void handleClick(a)}
                     className={cn(
-                      "relative overflow-hidden rounded-sm border border-border/50 bg-panel/60 p-3 pl-4 text-left transition-colors hover:border-neon/50 hover:bg-panel-elevated/70",
+                      "relative rounded-sm border border-border/50 bg-panel/60 p-4 pl-5 text-left transition-colors hover:border-neon/50 hover:bg-panel-elevated/70",
                       !a.isRead && "ring-1 ring-neon/20",
                     )}
                   >
                     <span
                       className={cn(
-                        "absolute left-0 top-2 bottom-2 w-0.5 rounded-full",
+                        "absolute left-0 top-3 bottom-3 w-0.5 rounded-full",
                         tone === "intel" && "bg-neon shadow-[0_0_6px_var(--neon)]",
                         tone === "supply" && "bg-sky-400",
                         tone === "reward" && "bg-amber-400",
@@ -308,22 +310,24 @@ export function BunkerAlarm() {
                       )}
                     />
                     <div className="flex items-start gap-3">
-                      <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border bg-background/40", styles.badge)}>
+                      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border bg-background/40", styles.badge)}>
                         <Icon className={cn("h-4 w-4", styles.icon)} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className={cn("rounded-sm border px-1.5 py-[1px] font-mono text-[8px] font-bold uppercase tracking-widest", styles.badge)}>
+                          <span className={cn("rounded-sm border px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest", styles.badge)}>
                             {styles.label}
                           </span>
-                          <span className="ml-auto font-mono text-[9px] tabular-nums text-muted-foreground">
+                          <span className="ml-auto font-mono text-[10px] tabular-nums text-muted-foreground">
                             {timeAgo(a.createdAt)}
                           </span>
                         </div>
-                        <div className="mt-1 font-display text-[13px] font-bold uppercase tracking-wider text-foreground">
+                        <div className="mt-1.5 font-display text-[15px] font-bold uppercase tracking-wider text-foreground">
                           {a.title}
                         </div>
-                        <div className="text-[12px] text-muted-foreground">{a.message}</div>
+                        <div className="mt-1 text-[13px] leading-relaxed text-muted-foreground break-words whitespace-normal">
+                          {a.message}
+                        </div>
                       </div>
                     </div>
                   </button>
