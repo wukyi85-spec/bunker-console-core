@@ -52,7 +52,7 @@ function LoadoutPage() {
 
   return (
     <AppShell hideLogo hideNav>
-      <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500">
+      <div className="grid h-full w-full grid-cols-[1fr_360px] gap-4 animate-in fade-in duration-500 lphone:grid-cols-[1fr_300px] lphone:gap-2">
         {/* LEFT — Inventory */}
         <Panel variant="default" className="flex min-h-0 flex-col p-4">
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-3">
@@ -135,30 +135,31 @@ function LoadoutPage() {
         </Panel>
 
         {/* RIGHT — Order Summary */}
-        <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-4">
-          <div className="mb-3 border-b border-white/10 pb-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+        <Panel variant="elevated" corners className="corner-frame-lines flex min-h-0 flex-col p-3 lphone:p-2.5">
+          <div className="mb-2 border-b border-white/10 pb-2 shrink-0">
+            <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground lphone:text-[8px]">
               // Order Summary
             </span>
           </div>
 
-          <div className="flex flex-col gap-2 text-xs">
+          {/* Scrollable middle */}
+          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1 text-xs lphone:text-[11px]">
             <Row label="Total Weight" value={`${totalGrams} G`} />
             <Row label="Product Total" value={`฿${productTotal.toLocaleString()}`} />
             <Row label="Delivery Fee" value="FREE" />
 
-            <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-            <div className="rounded-sm border border-white/10 bg-background/40 p-2.5">
-              <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            <div className="rounded-sm border border-white/10 bg-background/40 p-2 lphone:p-1.5">
+              <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground lphone:text-[8px]">
                 Minimum Requirement
               </div>
-              <div className="mt-0.5 font-display text-xs font-bold uppercase tracking-wider text-foreground">
+              <div className="mt-0.5 font-display text-xs font-bold uppercase tracking-wider text-foreground lphone:text-[10px]">
                 {minWeight}G OR ฿{minAmount.toLocaleString()}
               </div>
               <div
                 className={cn(
-                  "mt-1 font-mono text-[10px] uppercase tracking-widest",
+                  "mt-1 font-mono text-[10px] uppercase tracking-widest lphone:text-[8px]",
                   minMet ? "text-neon" : "text-amber-300",
                 )}
               >
@@ -178,81 +179,71 @@ function LoadoutPage() {
                   }}
                 />
               </div>
-
             </div>
 
-            <div className="my-2 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            {!minMet && enriched.length > 0 && (
+              <div className="flex items-start gap-2 rounded-sm border border-amber-400/40 bg-amber-400/10 p-2 lphone:p-1.5">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
+                <div>
+                  <div className="font-display text-[10px] font-bold uppercase tracking-widest text-amber-300 lphone:text-[9px]">
+                    Requirement Not Met
+                  </div>
+                  <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-200/80 lphone:text-[8px]">
+                    Min: {minWeight}G / ฿{minAmount.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            )}
 
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            {/* Order Policy */}
+            {enriched.length > 0 && (
+              <div className="rounded-sm border border-white/10 bg-background/40 p-2.5 lphone:p-2">
+                <div className="flex items-center gap-2">
+                  <ShieldAlert className="h-3.5 w-3.5 text-neon" />
+                  <span className="font-display text-[11px] font-bold uppercase tracking-[0.2em] text-foreground lphone:text-[10px]">
+                    ORDER POLICY
+                  </span>
+                </div>
+                <ul className="mt-1.5 space-y-1 font-mono text-[10px] leading-snug uppercase tracking-wider text-muted-foreground lphone:text-[9px]">
+                  <li className="flex items-start gap-1.5"><span className="text-neon">•</span><span>No rush orders.</span></li>
+                  <li className="flex items-start gap-1.5"><span className="text-neon">•</span><span>ETA 2–5 days.</span></li>
+                  <li className="flex items-start gap-1.5"><span className="text-neon">•</span><span>Answer delivery calls.</span></li>
+                </ul>
+                <label className="mt-2 flex cursor-pointer items-start gap-2 rounded-sm border border-white/10 bg-background/60 p-2 hover:border-neon/40 lphone:p-1.5">
+                  <input
+                    type="checkbox"
+                    checked={policyAccepted}
+                    onChange={(e) => setPolicyAccepted(e.target.checked)}
+                    className="mt-0.5 h-3.5 w-3.5 accent-neon"
+                  />
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-foreground lphone:text-[9px]">
+                    I agree to the Order Policy.
+                  </span>
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* Sticky footer */}
+          <div className="mt-2 shrink-0 border-t border-white/10 pt-2">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground lphone:text-[8px]">
                 Grand Total
               </span>
-              <span className="font-display text-xl font-bold text-neon">
+              <span className="font-display text-lg font-bold text-neon lphone:text-base">
                 ฿{grandTotal.toLocaleString()}
               </span>
             </div>
+            <BunkerButton
+              variant="primary"
+              size="lg"
+              disabled={!minMet || !settingsReady || enriched.length === 0 || !policyAccepted}
+              className="w-full lphone:!py-2 lphone:!text-xs"
+              onClick={() => navigate({ to: "/checkout" })}
+            >
+              {settingsReady ? "Proceed to Checkout" : "Loading Settings..."}
+            </BunkerButton>
           </div>
-
-          {!minMet && enriched.length > 0 && (
-            <div className="mt-3 flex items-start gap-2 rounded-sm border border-amber-400/40 bg-amber-400/10 p-2.5">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
-              <div>
-                <div className="font-display text-[11px] font-bold uppercase tracking-widest text-amber-300">
-                  Mission Requirement Not Met
-                </div>
-                <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest text-amber-200/80">
-                  Minimum Order: {minWeight}G or ฿{minAmount.toLocaleString()}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Order Policy */}
-          {enriched.length > 0 && (
-            <div className="mt-4 rounded-sm border border-white/10 bg-background/40 p-4">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="h-4 w-4 text-neon" />
-                <span className="font-display text-sm font-bold uppercase tracking-[0.2em] text-foreground">
-                  ORDER POLICY
-                </span>
-              </div>
-              <ul className="mt-3 space-y-2 font-mono text-[11px] leading-relaxed uppercase tracking-wider text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-neon">•</span>
-                  <span>Rush orders are not accepted.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-neon">•</span>
-                  <span>Estimated processing and delivery time is 2–5 days.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-neon">•</span>
-                  <span>Please answer calls from the delivery service to avoid delays.</span>
-                </li>
-              </ul>
-              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-sm border border-white/10 bg-background/60 p-3 hover:border-neon/40">
-                <input
-                  type="checkbox"
-                  checked={policyAccepted}
-                  onChange={(e) => setPolicyAccepted(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 accent-neon"
-                />
-                <span className="font-mono text-[11px] uppercase tracking-widest text-foreground">
-                  I have read and agree to the Order Policy.
-                </span>
-              </label>
-            </div>
-          )}
-
-          <BunkerButton
-            variant="primary"
-            size="lg"
-            disabled={!minMet || !settingsReady || enriched.length === 0 || !policyAccepted}
-            className="mt-4 w-full"
-            onClick={() => navigate({ to: "/checkout" })}
-          >
-            {settingsReady ? "Proceed to Checkout" : "Loading Settings..."}
-          </BunkerButton>
         </Panel>
       </div>
     </AppShell>

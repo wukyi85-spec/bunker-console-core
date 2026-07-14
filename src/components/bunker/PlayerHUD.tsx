@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, Zap, Coins, Star, Radio } from "lucide-react";
+import { Zap, Coins, Star, Radio } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { cn } from "@/lib/utils";
@@ -116,7 +116,6 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         </div>
 
         <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground max-sm:text-[8px]">
-          <Shield className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">{player.rank}</span>
           {(() => {
             const t = getRankTheme(player.rank);
@@ -124,37 +123,37 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               <BadgeGlow
                 src={player.badge || null}
                 alt={player.rank}
-                size={26}
+                size={22}
                 primary={currentRank?.accent || t.primary}
                 secondary={t.secondary}
                 intensity="sm"
-                className="max-sm:!h-5 max-sm:!w-5"
+                className="max-sm:!h-4 max-sm:!w-4"
               />
             );
           })()}
           <span className="text-border">·</span>
-          <Zap className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
+          <Zap className="h-3 w-3 text-white/70 max-sm:h-2.5 max-sm:w-2.5" />
           <span className="text-foreground/80">LV {player.level}</span>
         </div>
 
-        <MiniBar label="XP" value={player.xp} tone="neon" />
-        <MiniBar label="ACT" value={player.activity} tone="dim" />
+        <MiniBar label="XP" value={player.xp} tone="xp" />
+        <MiniBar label="ACT" value={player.activity} tone="act" />
 
         <div className="flex items-center gap-3 pt-0.5 max-sm:gap-2">
-          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground max-sm:text-[8px]">
-            <Coins className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
+          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums max-sm:text-[8px]" style={{ color: "#F5C24B" }}>
+            <Coins className="h-3 w-3 max-sm:h-2.5 max-sm:w-2.5" style={{ color: "#F5C24B" }} />
             <span className="tabular-nums transition-all">{goldDisplay.toLocaleString()}</span>
           </span>
           <span className="flex items-center gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
-                className={cn(
-                  "h-3 w-3 max-sm:h-2.5 max-sm:w-2.5",
+                className="h-3 w-3 max-sm:h-2.5 max-sm:w-2.5"
+                style={
                   i < player.stars
-                    ? "fill-neon text-neon drop-shadow-[0_0_4px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
-                    : "text-border",
-                )}
+                    ? { color: "#F5C24B", fill: "#F5C24B", filter: "drop-shadow(0 0 4px rgba(245,194,75,0.55))" }
+                    : { color: "rgba(255,255,255,0.16)" }
+                }
               />
             ))}
           </span>
@@ -168,8 +167,16 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   );
 }
 
-function MiniBar({ label, value, tone }: { label: string; value: number; tone: "neon" | "dim" }) {
+function MiniBar({ label, value, tone }: { label: string; value: number; tone: "xp" | "act" | "neon" | "dim" }) {
   const pct = Math.max(0, Math.min(100, value));
+  const barStyle =
+    tone === "xp"
+      ? { background: "linear-gradient(90deg,rgba(255,255,255,0.55),rgba(255,255,255,0.95))", boxShadow: "0 0 8px -1px rgba(255,255,255,0.5)" }
+      : tone === "act"
+        ? { background: "linear-gradient(90deg,#7a1414,#ff3a3a)", boxShadow: "0 0 8px -1px rgba(255,58,58,0.6)" }
+        : tone === "neon"
+          ? { background: "linear-gradient(90deg,var(--neon-dim),var(--neon))", boxShadow: "0 0 8px -1px var(--neon)" }
+          : { background: "linear-gradient(90deg,rgba(255,255,255,0.25),rgba(255,255,255,0.5))" };
   return (
     <div className="flex items-center gap-2 max-sm:gap-1.5">
       <span className="w-6 font-mono text-[9px] uppercase tracking-widest text-muted-foreground max-sm:w-5 max-sm:text-[7px]">
@@ -177,13 +184,8 @@ function MiniBar({ label, value, tone }: { label: string; value: number; tone: "
       </span>
       <div className="relative h-1 flex-1 overflow-hidden rounded-sm bg-panel-elevated/80 ring-1 ring-inset ring-black/40 max-sm:h-0.5">
         <div
-          className={cn(
-            "h-full transition-[width] duration-1000 ease-out",
-            tone === "neon"
-              ? "bg-gradient-to-r from-neon-dim via-neon to-neon shadow-[0_0_8px_-1px_var(--neon)]"
-              : "bg-gradient-to-r from-muted-foreground/40 via-muted-foreground/70 to-neon-dim",
-          )}
-          style={{ width: `${pct}%` }}
+          className="h-full transition-[width] duration-1000 ease-out"
+          style={{ width: `${pct}%`, ...barStyle }}
         />
       </div>
       <span className="w-8 text-right font-mono text-[9px] tabular-nums text-foreground/80 max-sm:w-6 max-sm:text-[7px]">

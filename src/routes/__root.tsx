@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OrientationGate } from "../components/bunker/OrientationGate";
+import { SoundProvider } from "../components/bunker/SoundProvider";
 import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
@@ -130,6 +131,7 @@ function RootComponent() {
       <OrientationGate>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
+        <SoundProvider />
         <Toaster />
       </OrientationGate>
     </QueryClientProvider>

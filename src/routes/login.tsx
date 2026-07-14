@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
-import { Eye, EyeOff, Fingerprint, KeyRound, Loader2, Maximize, Minimize } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { Eye, EyeOff, Fingerprint, KeyRound, Loader2 } from "lucide-react";
 import { Logo } from "@/components/bunker/Logo";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
@@ -36,37 +36,7 @@ function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  useEffect(() => {
-    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
-
-  async function toggleFullscreen() {
-    const doc = document as Document & {
-      webkitExitFullscreen?: () => Promise<void> | void;
-      msExitFullscreen?: () => Promise<void> | void;
-    };
-    const el = document.documentElement as HTMLElement & {
-      webkitRequestFullscreen?: () => Promise<void> | void;
-      msRequestFullscreen?: () => Promise<void> | void;
-    };
-    try {
-      if (document.fullscreenElement) {
-        if (document.exitFullscreen) await document.exitFullscreen();
-        else if (doc.webkitExitFullscreen) await doc.webkitExitFullscreen();
-        else if (doc.msExitFullscreen) await doc.msExitFullscreen();
-      } else {
-        if (el.requestFullscreen) await el.requestFullscreen();
-        else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-        else if (el.msRequestFullscreen) await el.msRequestFullscreen();
-      }
-    } catch {
-      // Fullscreen not allowed or unsupported — silently ignore.
-    }
-  }
+  // Fullscreen is controlled globally by double-tap gesture in SoundProvider.
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -168,16 +138,9 @@ function LoginScreen() {
               >
                 ENTER BUNKER
               </BunkerButton>
-              <BunkerButton
-                type="button"
-                size="lg"
-                variant="outline"
-                onClick={toggleFullscreen}
-                className="w-full active:scale-[0.98]"
-              >
-                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-                {isFullscreen ? "EXIT FULL SCREEN" : "FULL SCREEN"}
-              </BunkerButton>
+              <p className="text-center font-mono text-[9px] uppercase tracking-[0.35em] text-muted-foreground/60">
+                Double-tap anywhere · Fullscreen
+              </p>
             </div>
           </div>
         ) : (
