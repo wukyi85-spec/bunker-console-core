@@ -99,7 +99,7 @@ export function getRankTheme(name?: string | null): {
   const key = (name ?? "").toUpperCase().trim();
   if (key.includes("BLACK"))
     return { primary: "#FFD54A", secondary: "#FFA200", stars: 5, crown: false, label: "BLACK" };
-  if (/\bOG\b/.test(key) || key === "OG" || key.startsWith("OG") || key.endsWith(" OG"))
+  if (key.includes("OG"))
     return { primary: "#B47CFF", secondary: "#6B2BD9", stars: 3, crown: false, label: "OG" };
   return { primary: "#7CFF6B", secondary: "#2CFF88", stars: 1, crown: false, label: "ROOKIE" };
 }
