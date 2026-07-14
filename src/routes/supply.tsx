@@ -99,6 +99,7 @@ function SupplyPage() {
       productImage: selected.image || undefined,
       category: selected.category,
     });
+    playSound("purchase");
     closeDrawer();
   };
 
