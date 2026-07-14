@@ -226,8 +226,9 @@ function CheckoutPage() {
 
   return (
     <AppShell hideLogo hideNav>
-      <div className="grid h-full w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500">
-        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
+      <div className="grid h-full min-h-0 w-full grid-cols-[1fr_340px] gap-4 animate-in fade-in duration-500 lphone:grid-cols-[1fr_260px] lphone:gap-2">
+        <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1 pb-8 lphone:gap-2 lphone:pb-6">
+
           {/* Step Indicator — hidden for reward orders (delivery only). */}
           {!isReward && (
           <div className="flex items-center gap-2">
