@@ -70,7 +70,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         <span className="absolute -inset-y-4 left-0 w-1/3 bg-gradient-to-r from-transparent via-neon/10 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-btn-sweep" />
       </span>
 
-      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center">
+      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center max-sm:hidden">
         <RankBadge
           name={player.rank}
           badgeImage={player.badge || null}
@@ -79,9 +79,18 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
           size="md"
         />
       </div>
+      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center sm:hidden">
+        <RankBadge
+          name={player.rank}
+          badgeImage={player.badge || null}
+          accent={currentRank?.accent ?? null}
+          level={player.level}
+          size="sm"
+        />
+      </div>
 
 
-      <div className="flex min-w-0 flex-col justify-between gap-1.5">
+      <div className="flex min-w-0 flex-col justify-between gap-1.5 max-sm:gap-1">
         <div className="flex items-center gap-2">
           <span className="truncate font-display text-sm font-black uppercase tracking-[0.18em] text-foreground">
             {player.name}
