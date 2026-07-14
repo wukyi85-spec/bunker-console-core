@@ -80,6 +80,9 @@ export async function createOrder(p: OrderInsertPayload) {
     payment_reference: p.paymentReference,
     voucher_code: p.voucherCode ?? null,
     voucher_discount: voucherDiscount,
+    order_type: p.orderType ?? "supply",
+    voucher_percent: p.voucherPercent ?? null,
+    voucher_max_discount: p.voucherMaxDiscount ?? null,
   };
 
   const { data, error } = await supabase.rpc("create_player_order", {
