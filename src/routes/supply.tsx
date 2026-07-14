@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProducts, type SheetProduct } from "@/lib/products.functions";
 import { addToLoadout, getLoadout, subscribeLoadout } from "@/lib/loadout";
+import { playSound } from "@/lib/sound";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { QuantityStepper } from "@/components/bunker/QuantityStepper";
 import { cn } from "@/lib/utils";
