@@ -460,7 +460,7 @@ function CheckoutPage() {
         </div>
 
 
-        <Panel variant="elevated" corners className="corner-frame-lines flex flex-col p-4">
+        <Panel variant="elevated" corners className="corner-frame-lines flex min-h-0 flex-col p-4 lphone:p-3">
           <div className="mb-3 border-b border-white/10 pb-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
               // Order Summary
