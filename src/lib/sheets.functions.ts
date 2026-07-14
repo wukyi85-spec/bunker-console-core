@@ -280,6 +280,7 @@ export interface SheetRank {
   minXp: number;
   maxXp: number;
   badgeImage: string;
+  accent: string | null;
 }
 
 export const getRankSettings = createServerFn({ method: "GET" }).handler(
@@ -297,7 +298,9 @@ export const getRankSettings = createServerFn({ method: "GET" }).handler(
         minXp: num(row[h.min_xp]),
         maxXp: num(row[h.max_xp]) || Infinity,
         badgeImage: str(row[h.badge_image_url]),
+        accent: str(row[h.accent] ?? row[h.color]) || null,
       });
+
     }
     return out.sort((a, b) => a.minXp - b.minXp);
   },
