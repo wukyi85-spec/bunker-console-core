@@ -115,9 +115,9 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
         <MiniBar label="XP" value={player.xp} tone="neon" />
         <MiniBar label="ACT" value={player.activity} tone="dim" />
 
-        <div className="flex items-center gap-3 pt-0.5">
-          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground">
-            <Coins className="h-3 w-3 text-neon" />
+        <div className="flex items-center gap-3 pt-0.5 max-sm:gap-2">
+          <span className="flex items-center gap-1 font-mono text-[10px] tabular-nums text-foreground max-sm:text-[8px]">
+            <Coins className="h-3 w-3 text-neon max-sm:h-2.5 max-sm:w-2.5" />
             <span className="tabular-nums transition-all">{goldDisplay.toLocaleString()}</span>
           </span>
           <span className="flex items-center gap-0.5">
@@ -125,7 +125,7 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               <Star
                 key={i}
                 className={cn(
-                  "h-3 w-3",
+                  "h-3 w-3 max-sm:h-2.5 max-sm:w-2.5",
                   i < player.stars
                     ? "fill-neon text-neon drop-shadow-[0_0_4px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
                     : "text-border",
@@ -133,8 +133,8 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
               />
             ))}
           </span>
-          <span className="ml-auto flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-            <Radio className="h-3 w-3 text-neon animate-hud-pulse" />
+          <span className="ml-auto flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground max-sm:text-[7px]">
+            <Radio className="h-3 w-3 text-neon animate-hud-pulse max-sm:h-2.5 max-sm:w-2.5" />
             SECURE
           </span>
         </div>
