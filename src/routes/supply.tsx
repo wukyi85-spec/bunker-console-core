@@ -295,29 +295,30 @@ function CategoryButton({
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col gap-0.5 rounded-md border px-3 py-2.5 text-left transition-all duration-300",
+        "group relative flex flex-col gap-0.5 rounded-md border px-3 py-2.5 text-left transition-all duration-300 lphone:px-2 lphone:py-1.5",
         active
           ? "border-neon/50 bg-panel-elevated shadow-[0_0_24px_-8px_color-mix(in_oklab,var(--neon)_60%,transparent)]"
           : "border-white/8 bg-transparent hover:border-white/25 hover:bg-white/[0.03]",
       )}
     >
       {active && (
-        <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 bg-neon animate-hud-pulse" />
+        <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 bg-neon animate-hud-pulse lphone:h-4" />
       )}
       <span
         className={cn(
-          "font-display text-xs font-bold uppercase tracking-widest",
+          "font-display text-xs font-bold uppercase tracking-widest lphone:text-[10px] lphone:tracking-wider",
           active ? "text-neon" : "text-foreground/90",
         )}
       >
         {label}
       </span>
-      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground lphone:text-[8px]">
         {hint}
       </span>
     </button>
   );
 }
+
 
 function ProductTile({
   product,
