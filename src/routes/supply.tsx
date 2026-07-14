@@ -152,7 +152,7 @@ function SupplyPage() {
       </div>
 
       {/* Main grid — fills the rest of the viewport */}
-      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[200px_1fr] gap-0">
+      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[180px_1fr_360px] gap-0">
         {/* LEFT — Category rail */}
         <aside className="relative flex min-h-0 flex-col border-r border-white/8 bg-black/30 p-3">
           <div className="mb-3 flex items-center gap-2 border-b border-white/8 pb-2">
@@ -248,33 +248,10 @@ function SupplyPage() {
             </>
           )}
         </main>
-      </div>
 
-      {/* RIGHT — Slide-in detail drawer */}
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-0 z-30",
-          selected && "pointer-events-auto",
-        )}
-      >
-        {/* backdrop */}
-        <div
-          onClick={closeDrawer}
-          className={cn(
-            "absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300",
-            selected ? "opacity-100" : "opacity-0",
-          )}
-        />
-        {/* panel */}
-        <aside
-          className={cn(
-            "absolute right-0 top-0 flex h-full w-full flex-col sm:w-[440px] sm:max-w-[92vw]",
-            "border-l border-white/10 bg-gradient-to-b from-[rgb(20_20_20)] to-[rgb(10_10_10)]",
-            "shadow-[-24px_0_60px_-12px_rgb(0_0_0/0.9)] transition-transform duration-400 ease-out overflow-hidden",
-            selected ? "translate-x-0" : "translate-x-full",
-          )}
-        >
-          {selected && (
+        {/* RIGHT — Inline detail panel */}
+        <aside className="relative flex min-h-0 flex-col border-l border-white/10 bg-gradient-to-b from-[rgb(20_20_20)] to-[rgb(10_10_10)]">
+          {selected ? (
             <ProductDrawer
               product={selected}
               size={size}
@@ -284,6 +261,16 @@ function SupplyPage() {
               onClose={closeDrawer}
               onAdd={handleAdd}
             />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-muted-foreground">
+              <Package className="h-9 w-9 opacity-30" />
+              <div className="font-display text-xs font-bold uppercase tracking-widest text-white/60">
+                Select a Unit
+              </div>
+              <p className="max-w-[220px] font-mono text-[9.5px] uppercase leading-relaxed tracking-widest text-muted-foreground/70">
+                Tap any product to load its specs and add it to your loadout.
+              </p>
+            </div>
           )}
         </aside>
       </div>

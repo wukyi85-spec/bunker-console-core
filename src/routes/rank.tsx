@@ -6,7 +6,7 @@ import { Panel } from "@/components/bunker/Panel";
 import { getPlayerStats } from "@/lib/bunker-supabase";
 import { getRankSettings } from "@/lib/sheets.functions";
 import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
-import { Crown, Lock, Star, Trophy } from "lucide-react";
+import { Lock, Star, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/rank")({
@@ -111,28 +111,19 @@ function RankPage() {
                   </span>
                 )}
 
-                {t.crown && (
-                  <Crown
-                    className="relative mb-1 h-5 w-5"
-                    style={{
-                      color: t.primary,
-                      filter: `drop-shadow(0 0 6px ${t.primary})`,
-                    }}
-                  />
-                )}
 
-                <div className="relative flex h-28 w-28 items-center justify-center">
+                <div className="relative flex h-32 w-32 items-center justify-center">
                   {unlocked ? (
                     <BadgeGlow
                       src={r.badgeImage || null}
                       alt={r.name}
-                      size={96}
-                      primary={r.accent || t.primary}
+                      size={116}
+                      primary={t.primary}
                       secondary={t.secondary}
                       intensity="lg"
                     />
                   ) : (
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-black/40">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-black/40">
                       <Lock className="h-8 w-8 text-muted-foreground" />
                     </div>
                   )}

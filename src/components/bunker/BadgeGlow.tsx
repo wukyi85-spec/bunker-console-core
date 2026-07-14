@@ -98,8 +98,8 @@ export function getRankTheme(name?: string | null): {
 } {
   const key = (name ?? "").toUpperCase().trim();
   if (key.includes("BLACK"))
-    return { primary: "#FFD54A", secondary: "#7CFF6B", stars: 5, crown: true, label: "BLACK" };
+    return { primary: "#FFD54A", secondary: "#FFA200", stars: 5, crown: false, label: "BLACK" };
   if (key === "OG" || key.includes("OG"))
-    return { primary: "#A86BFF", secondary: "#D8D8DE", stars: 3, crown: false, label: "OG" };
-  return { primary: "#7CFF6B", secondary: "#B0793A", stars: 1, crown: false, label: "ROOKIE" };
+    return { primary: "#A86BFF", secondary: "#6B2BD9", stars: 3, crown: false, label: "OG" };
+  return { primary: "#7CFF6B", secondary: "#2CFF88", stars: 1, crown: false, label: "ROOKIE" };
 }
