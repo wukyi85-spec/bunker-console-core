@@ -8,6 +8,13 @@ import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { getLoadout, loadoutTotals, clearLoadout } from "@/lib/loadout";
 import {
+  clearRewardLoadout,
+  clearCheckoutMode,
+  getCheckoutMode,
+  getRewardLoadout,
+  rewardLoadoutTotals,
+} from "@/lib/reward-loadout";
+import {
   createOrder,
   getPlayerStats,
   updatePlayerProfileInfo,
@@ -16,7 +23,7 @@ import {
 } from "@/lib/bunker-supabase";
 import { getGameSettings, getPaymentQRs } from "@/lib/sheets.functions";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, CreditCard, MapPin, Package, Phone, Ticket, User } from "lucide-react";
+import { CheckCircle2, CreditCard, Gift, MapPin, Package, Phone, Ticket, User } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
