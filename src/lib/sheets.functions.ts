@@ -177,7 +177,14 @@ export interface SheetPaymentQR {
 
 export const getPaymentQRs = createServerFn({ method: "GET" }).handler(
   async (): Promise<SheetPaymentQR[]> => {
-    const rows = await fetchRange("'payment qr'!A1:Z100");
+    // Sheet tab is "PaymentQR". Fall back to legacy "payment qr" if needed.
+    let rows: string[][] = [];
+    try {
+      rows = await fetchRange("PaymentQR!A1:Z100");
+    } catch (e) {
+      console.warn("[PaymentQR] Primary tab failed, trying legacy 'payment qr'", e);
+      rows = await fetchRange("'payment qr'!A1:Z100");
+    }
     if (rows.length < 2) return [];
     const h = headerMap(rows[0]);
     const out: SheetPaymentQR[] = [];
@@ -185,13 +192,16 @@ export const getPaymentQRs = createServerFn({ method: "GET" }).handler(
       const row = rows[i];
       const method = str(row[h.payment_method]);
       if (!method) continue;
+      // Only method + QR image are exposed. Account numbers are ignored.
       out.push({
         method,
         qrImage: str(row[h.qr_image]),
         active: bool(row[h.active]),
       });
     }
-    return out.filter((p) => p.active);
+    const active = out.filter((p) => p.active);
+    console.log(`[PaymentQR] Loaded ${active.length} active methods:`, active.map((p) => p.method));
+    return active;
   },
 );
 

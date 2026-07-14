@@ -96,12 +96,14 @@ export function enrichLoadout(items: LoadoutItem[]): EnrichedItem[] {
 
 export function loadoutTotals(
   items: LoadoutItem[],
-  mins: { amount: number; weight: number } = { amount: 1000, weight: 50 },
+  mins: { amount: number; weight: number },
 ) {
   const enriched = enrichLoadout(items);
   const productTotal = enriched.reduce((s, i) => s + i.subtotal, 0);
   const totalGrams = enriched.reduce((s, i) => s + i.gramsTotal, 0);
-  const minMet = totalGrams >= mins.weight || productTotal >= mins.amount;
+  // Minimums come from the Settings sheet. If either is missing (<=0), block.
+  const hasMins = mins.amount > 0 && mins.weight > 0;
+  const minMet = hasMins && (totalGrams >= mins.weight || productTotal >= mins.amount);
   return { enriched, productTotal, totalGrams, minMet };
 }
 

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/bunker/AppShell";
 import { Panel } from "@/components/bunker/Panel";
-import { getPlayerStats, listOrders } from "@/lib/bunker-supabase";
+import { listOrders } from "@/lib/bunker-supabase";
 import {
   getGameSettings,
   getSpecialMissions,
@@ -28,25 +28,29 @@ interface MissionWithProgress extends SheetMission {
   done: boolean;
 }
 
+interface OrderSample {
+  at: Date;
+  grams: number;
+  spend: number;
+}
+
 function computeProgress(
   missions: SheetMission[],
-  totals: { grams: number; spend: number; orders: number },
   windowStart: Date,
-  orderDates: { at: Date; grams: number; spend: number }[],
+  orders: OrderSample[],
 ): MissionWithProgress[] {
+  const scoped = orders.filter((o) => o.at >= windowStart);
   return missions.map((m) => {
     let progress = 0;
-    // Weekly/special windows: only orders after windowStart count.
     if (m.metric === "order") {
-      progress = orderDates.filter((o) => o.at >= windowStart).length;
-    } else if (m.metric === "weight") {
-      progress = orderDates
-        .filter((o) => o.at >= windowStart)
-        .reduce((s, o) => s + o.grams, 0);
+      // Cumulative order count.
+      progress = scoped.length;
+    } else if (m.metric === "spend") {
+      // Cumulative spend.
+      progress = scoped.reduce((s, o) => s + o.spend, 0);
     } else {
-      progress = orderDates
-        .filter((o) => o.at >= windowStart)
-        .reduce((s, o) => s + o.spend, 0);
+      // WEIGHT: single-order rule — best single completed order, not a sum.
+      progress = scoped.reduce((max, o) => Math.max(max, o.grams), 0);
     }
     return { ...m, progress, done: progress >= m.requirement };
   });
@@ -61,7 +65,6 @@ function MissionsPage() {
   const specialQ = useQuery({ queryKey: ["sheet_special_missions"], queryFn: fetchSpecial, staleTime: 60_000 });
   const settingsQ = useQuery({ queryKey: ["game_settings"], queryFn: fetchSettings, staleTime: 60_000 });
   const ordersQ = useQuery({ queryKey: ["player_orders"], queryFn: listOrders });
-  const statsQ = useQuery({ queryKey: ["player_stats"], queryFn: getPlayerStats });
 
   const now = new Date();
   const weeklyDays = settingsQ.data?.weekly_mission_reset_days ?? 7;
@@ -69,19 +72,17 @@ function MissionsPage() {
   const weeklyStart = new Date(now.getTime() - weeklyDays * 86400_000);
   const specialStart = new Date(now.getTime() - specialDays * 86400_000);
 
-  const orders = (ordersQ.data ?? []).map((o: any) => ({
-    at: new Date(o.created_at),
-    grams: Number(o.total_grams ?? 0),
-    spend: Number(o.grand_total ?? o.product_total ?? 0),
-  }));
-  const totals = {
-    grams: Number((statsQ.data as any)?.total_weight ?? 0),
-    spend: Number((statsQ.data as any)?.total_purchase ?? 0),
-    orders: orders.length,
-  };
+  // Only completed orders count toward missions.
+  const orders: OrderSample[] = (ordersQ.data ?? [])
+    .filter((o: any) => String(o.status ?? "").toLowerCase() === "completed")
+    .map((o: any) => ({
+      at: new Date(o.completed_at ?? o.created_at),
+      grams: Number(o.total_grams ?? 0),
+      spend: Number(o.grand_total ?? o.product_total ?? 0),
+    }));
 
-  const weekly = computeProgress(weeklyQ.data ?? [], totals, weeklyStart, orders);
-  const special = computeProgress(specialQ.data ?? [], totals, specialStart, orders);
+  const weekly = computeProgress(weeklyQ.data ?? [], weeklyStart, orders);
+  const special = computeProgress(specialQ.data ?? [], specialStart, orders);
 
   return (
     <AppShell hideLogo hideNav>
