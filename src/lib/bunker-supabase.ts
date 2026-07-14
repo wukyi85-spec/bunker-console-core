@@ -165,6 +165,26 @@ export async function changePlayerName(newName: string) {
   return data;
 }
 
+export async function editPlayerProfilePaid(input: {
+  newName: string;
+  phone: string;
+  address: string;
+  cost: number;
+}) {
+  const playerKey = getPlayerKey();
+  const profile = getPlayerProfile();
+  const { data, error } = await supabase.rpc("edit_player_profile_paid" as never, {
+    p_player_key: playerKey,
+    p_new_name: input.newName,
+    p_phone: input.phone,
+    p_address: input.address,
+    p_member_id: profile.memberId,
+    p_cost: input.cost,
+  } as never);
+  if (error) throw error;
+  return data;
+}
+
 export async function completeMemberOnboarding(input: {
   passId: string;
   playerName: string;
