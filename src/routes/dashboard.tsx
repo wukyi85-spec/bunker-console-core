@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Logo } from "@/components/bunker/Logo";
 import { PlayerHUD } from "@/components/bunker/PlayerHUD";
 import { GameNav } from "@/components/bunker/GameNav";
@@ -6,6 +8,10 @@ import { BunkerAlarm } from "@/components/bunker/BunkerAlarm";
 import { ContactHQ } from "@/components/bunker/ContactHQ";
 import heroImage from "@/assets/bunker-hero.jpg";
 import { useCurrentCharacter } from "@/lib/characters";
+import { getPlayerStats } from "@/lib/bunker-supabase";
+import { getRankSettings } from "@/lib/sheets.functions";
+import { getRankTheme } from "@/components/bunker/BadgeGlow";
+
 
 
 export const Route = createFileRoute("/dashboard")({
