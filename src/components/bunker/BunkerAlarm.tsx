@@ -142,7 +142,7 @@ export function BunkerAlarm() {
   }
 
   return (
-    <div className="relative flex h-full w-full min-h-0 flex-col rounded-md gunmetal-glass p-2 lphone:p-1.5">
+    <div className="relative flex h-full w-full min-h-0 flex-col rounded-md gunmetal-glass" style={{ padding: "14px" }}>
       <div className="flex shrink-0 items-center justify-between px-1 pb-1.5">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">

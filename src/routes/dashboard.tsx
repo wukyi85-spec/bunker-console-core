@@ -148,14 +148,14 @@ function DashboardPage() {
         </Link>
       </div>
 
-      {/* Top right — Player HUD only */}
-      <div className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-3 lphone:top-3 lphone:w-[310px] lphone:scale-[0.72]">
+      {/* Top right — shared HUD container (Player HUD + Bunker Alarm) */}
+      <div
+        className="absolute z-20 flex w-[400px] flex-col gap-[10px] animate-in fade-in slide-in-from-right-4 duration-700 top-[20px] right-[20px] max-[1200px]:w-[350px] lphone:w-[300px] lphone:max-w-[calc(100vw-24px)]"
+      >
         <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
-      </div>
-
-      {/* Right side — Bunker Alarm panel, sits between HUD and nav dock */}
-      <div className="absolute right-4 top-[120px] z-30 flex h-[30vh] max-h-[170px] w-[240px] animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:top-[90px] lphone:h-[32vh] lphone:max-h-[140px] lphone:w-[200px]">
-        <BunkerAlarm />
+        <div className="w-full h-[220px] max-h-[220px]">
+          <BunkerAlarm />
+        </div>
       </div>
 
       {/* Bottom-right tactical caption + Contact HQ (kept clear of the character) */}
