@@ -145,24 +145,17 @@ function OnboardingScreen() {
                   )}
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  {c.image ? (
-                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel-elevated">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel-elevated">
+                    {c.image ? (
                       <img
                         src={c.image}
                         alt={c.label}
                         draggable={false}
                         className="h-full w-full object-contain object-bottom"
                       />
-                    </div>
-                  ) : (
-                    <CharacterPortrait
-                      codename={(c as { codename?: string }).codename ?? c.label}
-                      accent={(c as { accent?: string }).accent ?? "#7CFF4D"}
-                      selected={selected}
-                    />
+                    ) : null}
+                  </div>
 
-
-                  )}
                   <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
                     <span className="font-display text-xs font-semibold uppercase tracking-widest text-foreground">
                       {c.label}
