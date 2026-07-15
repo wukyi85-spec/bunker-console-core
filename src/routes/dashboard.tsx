@@ -20,6 +20,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const character = useCurrentCharacter();
   return (
     
     
