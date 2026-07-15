@@ -5,8 +5,8 @@ import { Logo } from "@/components/bunker/Logo";
 import { Panel } from "@/components/bunker/Panel";
 import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
-import { CharacterPortrait } from "@/components/bunker/CharacterPortrait";
-import { CHARACTERS, getPlayerProfile, setPlayerProfile } from "@/lib/player";
+import { getPlayerProfile, setPlayerProfile } from "@/lib/player";
+
 import { useSheetCharacters } from "@/lib/characters";
 import { completeMemberOnboarding, ensurePlayerStats } from "@/lib/bunker-supabase";
 import { cn } from "@/lib/utils";
@@ -33,9 +33,12 @@ function OnboardingScreen() {
   const [stepIdx, setStepIdx] = useState(0);
   const [nameError, setNameError] = useState<string | null>(null);
 
-  const characters = (sheetCharacters && sheetCharacters.length > 0)
-    ? sheetCharacters.map((c) => ({ id: c.id, label: c.name || c.id, image: c.fullBody }))
-    : CHARACTERS.map((c) => ({ id: c.id, label: c.label, image: "", codename: c.codename, accent: c.accent }));
+  const characters = (sheetCharacters ?? []).map((c) => ({
+    id: c.id,
+    label: c.name || c.id,
+    image: c.fullBody,
+  }));
+
 
   // Guard: if setup already done, jump straight to the dashboard.
   useEffect(() => {
@@ -142,24 +145,17 @@ function OnboardingScreen() {
                   )}
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  {c.image ? (
-                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel-elevated">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel-elevated">
+                    {c.image ? (
                       <img
                         src={c.image}
                         alt={c.label}
                         draggable={false}
                         className="h-full w-full object-contain object-bottom"
                       />
-                    </div>
-                  ) : (
-                    <CharacterPortrait
-                      codename={(c as { codename?: string }).codename ?? c.label}
-                      accent={(c as { accent?: string }).accent ?? "#7CFF4D"}
-                      selected={selected}
-                    />
+                    ) : null}
+                  </div>
 
-
-                  )}
                   <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
                     <span className="font-display text-xs font-semibold uppercase tracking-widest text-foreground">
                       {c.label}
