@@ -118,8 +118,13 @@ function OnboardingScreen() {
         {/* Step 1 */}
         <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
           <StepHeader index="01" title="Choose Your Character" />
-          <div className="mt-3 grid grid-cols-3 gap-3">
-            {CHARACTERS.map((c, i) => {
+          <div className={cn("mt-3 grid gap-3", characters.length <= 3 ? "grid-cols-3" : "grid-cols-2 md:grid-cols-4")}>
+            {charsLoading && characters.length === 0 ? (
+              <p className="col-span-full text-center font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                Loading characters...
+              </p>
+            ) : null}
+            {characters.map((c, i) => {
               const selected = characterId === c.id;
               return (
                 <button
@@ -137,7 +142,22 @@ function OnboardingScreen() {
                   )}
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  <CharacterPortrait codename={c.codename} accent={c.accent} selected={selected} />
+                  {c.image ? (
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel-elevated">
+                      <img
+                        src={c.image}
+                        alt={c.label}
+                        draggable={false}
+                        className="h-full w-full object-contain object-bottom"
+                      />
+                    </div>
+                  ) : (
+                    <CharacterPortrait
+                      codename={("codename" in c && c.codename) || c.label}
+                      accent={("accent" in c && c.accent) || "#7CFF4D"}
+                      selected={selected}
+                    />
+                  )}
                   <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
                     <span className="font-display text-xs font-semibold uppercase tracking-widest text-foreground">
                       {c.label}
