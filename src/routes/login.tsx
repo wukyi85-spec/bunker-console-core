@@ -247,6 +247,39 @@ function LoginScreen() {
           0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.9; }
           50% { transform: translate(-50%, 20px) scale(1.08); opacity: 0.6; }
         }
+
+        /* iOS / iPadOS landscape fixes only */
+        .ios-device .login-page {
+          position: relative;
+          width: 100%;
+          height: auto;
+          min-height: 100svh;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-top: max(16px, env(safe-area-inset-top));
+          padding-bottom: max(16px, env(safe-area-inset-bottom));
+        }
+
+        .ios-device .login-page > main {
+          max-width: none;
+        }
+
+        .ios-device .login-card {
+          width: min(820px, calc(100vw - 32px));
+          max-height: none;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        @media (max-height: 760px) {
+          .ios-device .login-page {
+            align-items: flex-start;
+          }
+          .ios-device .login-page > main {
+            align-items: flex-start;
+            justify-content: flex-start;
+          }
+        }
       `}</style>
     </div>
   );
