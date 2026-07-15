@@ -153,10 +153,11 @@ function OnboardingScreen() {
                     </div>
                   ) : (
                     <CharacterPortrait
-                      codename={("codename" in c ? c.codename : undefined) ?? c.label}
-                      accent={("accent" in c ? c.accent : undefined) ?? "#7CFF4D"}
+                      codename={(c as { codename?: string }).codename ?? c.label}
+                      accent={(c as { accent?: string }).accent ?? "#7CFF4D"}
                       selected={selected}
                     />
+
 
                   )}
                   <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
