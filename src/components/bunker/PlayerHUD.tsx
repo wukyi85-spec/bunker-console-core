@@ -9,6 +9,7 @@ import { levelProgress } from "@/lib/progression";
 import { getRankSettings } from "@/lib/sheets.functions";
 import { BadgeGlow, getRankTheme } from "@/components/bunker/BadgeGlow";
 import { CharacterPortrait } from "@/components/bunker/CharacterPortrait";
+import { useSheetCharacters, pickCharacter } from "@/lib/characters";
 
 
 
