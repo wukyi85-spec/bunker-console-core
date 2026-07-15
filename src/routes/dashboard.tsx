@@ -153,8 +153,8 @@ function DashboardPage() {
         <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
       </div>
 
-      {/* Right side — Bunker Alarm panel, sized to fit between HUD and nav dock */}
-      <div className="absolute right-4 top-[110px] bottom-24 z-30 flex w-[260px] animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:top-[70px] lphone:bottom-14 lphone:w-[210px]">
+      {/* Right side — Bunker Alarm panel, compact so it doesn't cover HUD or nav */}
+      <div className="absolute right-4 top-[108px] z-30 flex h-[46vh] max-h-[260px] w-[240px] animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:top-[68px] lphone:h-[52vh] lphone:max-h-[210px] lphone:w-[200px]">
         <BunkerAlarm />
       </div>
 
