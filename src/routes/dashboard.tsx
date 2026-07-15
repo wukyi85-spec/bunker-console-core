@@ -53,234 +53,126 @@ function DashboardPage() {
   const glow2 = theme.secondary ?? theme.primary;
 
   return (
+    <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
+      {/* ============ FULLSCREEN BUNKER SCENE (light blur, darkened) ============ */}
+      <div className="absolute inset-0 animate-camera-breathe">
+        <img
+          src={heroImage}
+          alt=""
+          className="h-full w-full object-cover object-center"
+          style={{
+            transform: "scale(1.08)",
+            transformOrigin: "center 45%",
+            filter: "blur(0px) brightness(0.75)",
+          }}
+          draggable={false}
+        />
+      </div>
 
-    
-    
-      <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
-        {/* ============ FULLSCREEN BUNKER SCENE (zoomed ~15%, blurred, darkened) ============ */}
-        <div className="absolute inset-0 animate-camera-breathe">
-          <img
-            src={heroImage}
-            alt=""
-            className="h-full w-full object-cover object-center"
+      {/* Single soft ambient fog layer (static, very low opacity) */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 mix-blend-screen opacity-40"
+        style={{
+          background:
+            "radial-gradient(70% 55% at 25% 70%, color-mix(in oklab, var(--foreground) 3%, transparent), transparent 70%), radial-gradient(65% 60% at 75% 40%, color-mix(in oklab, var(--neon) 3%, transparent), transparent 75%)",
+          filter: "blur(8px)",
+        }}
+      />
+
+      {/* Soft neon side glow (static) */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 mix-blend-screen opacity-60"
+        style={{
+          background:
+            "radial-gradient(75% 100% at 0% 55%, color-mix(in oklab, var(--neon) 7%, transparent), transparent 60%), radial-gradient(65% 90% at 100% 45%, color-mix(in oklab, var(--neon) 4%, transparent), transparent 55%)",
+          filter: "blur(12px)",
+        }}
+      />
+
+      {/* Cinematic vignette + top/bottom fades so HUD sits legible over scene */}
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgb(0_0_0/0.65)_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-32 bg-gradient-to-b from-background/80 via-background/30 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-44 bg-gradient-to-t from-background/85 via-background/40 to-transparent" />
+
+      {/* Subtle HUD grid (static, very low opacity) */}
+      <div className="pointer-events-none absolute inset-0 z-0 hud-grid opacity-8" />
+
+      {/* Top scanline hairline (static) */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-px bg-gradient-to-r from-transparent via-neon/25 to-transparent" />
+
+      {/* ============ CHARACTER STAGE (bottom-left, ~85% height, soft rank glow) ============ */}
+      {character?.fullBody ? (
+        <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-[85%] aspect-[3/4] max-w-[55%]">
+          {/* Single soft rank-based ambient glow behind character */}
+          <div
+            className="absolute inset-0"
             style={{
-              transform: "scale(1.12)",
-              transformOrigin: "center 45%",
-              filter: "blur(1px) brightness(0.72)",
+              background: `radial-gradient(45% 55% at 50% 55%, ${glow}40, transparent 70%)`,
+              filter: "blur(18px)",
             }}
+          />
+
+          {/* Ground shadow */}
+          <div
+            className="absolute bottom-[2%] left-[8%] right-[8%] h-[6%]"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, transparent 75%)",
+              filter: "blur(4px)",
+            }}
+          />
+
+          {/* Character */}
+          <img
+            src={character.fullBody}
+            alt={character.name}
             draggable={false}
+            className="relative h-full w-full object-contain object-bottom select-none"
+            style={{
+              filter: `drop-shadow(0 0 10px ${glow}40) drop-shadow(0 8px 16px rgba(0,0,0,0.65))`,
+            }}
           />
         </div>
+      ) : null}
 
-        {/* Soft smoke / fog atmosphere */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-smoke-a"
-          style={{
-            background:
-              "radial-gradient(70% 55% at 25% 70%, color-mix(in oklab, var(--foreground) 5%, transparent), transparent 70%)",
-            filter: "blur(22px)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-smoke-b"
-          style={{
-            background:
-              "radial-gradient(65% 60% at 75% 40%, color-mix(in oklab, var(--foreground) 4%, transparent), transparent 75%)",
-            filter: "blur(28px)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-smoke-c"
-          style={{
-            background:
-              "radial-gradient(80% 45% at 50% 85%, color-mix(in oklab, var(--neon) 6%, transparent), transparent 70%)",
-            filter: "blur(34px)",
-          }}
-        />
+      {/* ============ FLOATING HUD OVERLAYS ============ */}
 
-        {/* Ambient fog layers */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-fog"
-          style={{
-            background:
-              "radial-gradient(60% 40% at 30% 65%, rgb(255 255 255 / 0.06), transparent 70%), radial-gradient(50% 35% at 70% 55%, rgb(200 220 255 / 0.05), transparent 75%)",
-            filter: "blur(6px)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-fog-reverse"
-          style={{
-            background:
-              "radial-gradient(45% 30% at 55% 80%, rgb(255 240 210 / 0.05), transparent 75%)",
-            filter: "blur(10px)",
-          }}
-        />
-
-        {/* GTA-style volumetric god-rays from top */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen opacity-70"
-          style={{
-            background:
-              "conic-gradient(from 220deg at 50% -20%, transparent 0deg, color-mix(in oklab, var(--neon) 22%, transparent) 15deg, transparent 30deg, color-mix(in oklab, var(--neon) 14%, transparent) 55deg, transparent 80deg)",
-            filter: "blur(18px)",
-          }}
-        />
-        {/* Warm bunker firelight bottom */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-2/3 mix-blend-screen opacity-70"
-          style={{
-            background:
-              "radial-gradient(60% 55% at 50% 100%, rgb(255 170 90 / 0.14), transparent 70%)",
-            filter: "blur(20px)",
-          }}
-        />
-        {/* Cinematic neon side glow */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen"
-          style={{
-            background:
-              "radial-gradient(75% 100% at 0% 55%, color-mix(in oklab, var(--neon) 14%, transparent), transparent 60%), radial-gradient(65% 90% at 100% 45%, color-mix(in oklab, var(--neon) 9%, transparent), transparent 55%)",
-            filter: "blur(28px)",
-          }}
-        />
-        {/* Top cinematic key light */}
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[60%] mix-blend-screen"
-          style={{
-            background:
-              "radial-gradient(85% 70% at 50% 0%, color-mix(in oklab, #ffffff 11%, transparent), transparent 75%)",
-            filter: "blur(32px)",
-          }}
-        />
-        {/* Cinematic vignette + top/bottom fades so HUD sits legible over scene */}
-        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgb(0_0_0/0.65)_100%)]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40 bg-gradient-to-b from-background/85 via-background/35 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-52 bg-gradient-to-t from-background/90 via-background/45 to-transparent" />
-        {/* Chromatic edge tint for cinematic feel */}
-        <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(90deg,rgb(0_0_0/0.35)_0%,transparent_15%,transparent_85%,rgb(0_0_0/0.35)_100%)]" />
-        {/* Film grain */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.06] mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.7'/></svg>\")",
-          }}
-        />
-
-        {/* Subtle HUD grid + scanline over everything */}
-        <div className="pointer-events-none absolute inset-0 z-0 hud-grid opacity-15" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-24 animate-scanline bg-gradient-to-b from-transparent via-neon/8 to-transparent" />
-
-        {/* Top scanline hairline */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
-
-
-        {/* ============ CHARACTER STAGE (bottom-left, ~85% height, rank glow + smoke + shadow) ============ */}
-        {character?.fullBody ? (
-          <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-[85%] aspect-[3/4] max-w-[55%]">
-            {/* Rank-based ambient glow behind character */}
-            <div
-              className="absolute inset-0 animate-char-glow"
-              style={{
-                background: `radial-gradient(45% 55% at 50% 55%, ${glow}55, transparent 70%)`,
-                filter: "blur(28px)",
-              }}
-            />
-            <div
-              className="absolute inset-0 animate-char-glow"
-              style={{
-                background: `radial-gradient(30% 40% at 50% 50%, ${glow2}44, transparent 75%)`,
-                filter: "blur(46px)",
-                animationDelay: "-3s",
-              }}
-            />
-
-            {/* Ambient smoke around character */}
-            <div
-              className="absolute inset-x-0 bottom-0 h-2/3 animate-char-smoke-a mix-blend-screen"
-              style={{
-                background:
-                  "radial-gradient(45% 55% at 40% 70%, rgba(230,240,255,0.16), transparent 70%)",
-                filter: "blur(14px)",
-              }}
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 h-2/3 animate-char-smoke-b mix-blend-screen"
-              style={{
-                background:
-                  "radial-gradient(40% 50% at 60% 65%, rgba(210,230,255,0.13), transparent 72%)",
-                filter: "blur(18px)",
-              }}
-            />
-
-            {/* Ground shadow */}
-            <div
-              className="absolute bottom-[2%] left-[8%] right-[8%] h-[6%]"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, transparent 75%)",
-                filter: "blur(6px)",
-              }}
-            />
-
-            {/* Character */}
-            <img
-              src={character.fullBody}
-              alt={character.name}
-              draggable={false}
-              className="relative h-full w-full object-contain object-bottom select-none"
-              style={{
-                filter: `drop-shadow(0 0 14px ${glow}55) drop-shadow(0 12px 24px rgba(0,0,0,0.75))`,
-              }}
-            />
-          </div>
-        ) : null}
-
-
-        {/* ============ FLOATING HUD OVERLAYS ============ */}
-
-
-        {/* Top left — Logo only */}
-        <div className="absolute left-4 top-4 z-20 md:left-6 md:top-5 animate-in fade-in slide-in-from-left-4 duration-700">
-          <Link
-            to="/dashboard"
-            aria-label="Back to Dashboard"
-            className="inline-flex rounded-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60"
-          >
-            <Logo />
-          </Link>
-        </div>
-
-        {/* Top right — Player HUD only */}
-        <div
-          className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-3 lphone:top-3 lphone:w-[310px] lphone:scale-[0.72]"
+      {/* Top left — Logo only */}
+      <div className="absolute left-4 top-4 z-20 md:left-6 md:top-5 animate-in fade-in slide-in-from-left-4 duration-700">
+        <Link
+          to="/dashboard"
+          aria-label="Back to Dashboard"
+          className="inline-flex rounded-sm transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/60"
         >
-          <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
-        </div>
-
-        {/* Right side — Bunker Alarm panel, above everything */}
-        <div
-          className="absolute right-4 top-1/2 z-30 w-[300px] -translate-y-1/2 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:w-[260px]"
-        >
-          <BunkerAlarm />
-        </div>
-
-        {/* Bottom-right tactical caption + Contact HQ (kept clear of the character) */}
-        <div className="absolute bottom-28 right-5 z-20 flex flex-col items-end gap-2 md:right-7 animate-in fade-in duration-1000 lphone:hidden">
-          <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
-            // BUNKER ONLINE
-          </span>
-          <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
-            Sector 07 · Secure Channel
-          </span>
-          <ContactHQ className="mt-1 w-fit" />
-        </div>
-
-        {/* Bottom center — Floating nav dock */}
-        <div className="absolute inset-x-0 bottom-4 z-20 flex origin-bottom justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 lphone:bottom-1 lphone:scale-[0.6]">
-          <GameNav />
-        </div>
+          <Logo />
+        </Link>
       </div>
-    
+
+      {/* Top right — Player HUD only */}
+      <div className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-3 lphone:top-3 lphone:w-[310px] lphone:scale-[0.72]">
+        <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
+      </div>
+
+      {/* Right side — Bunker Alarm panel, above everything */}
+      <div className="absolute right-4 top-1/2 z-30 w-[300px] -translate-y-1/2 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:w-[260px]">
+        <BunkerAlarm />
+      </div>
+
+      {/* Bottom-right tactical caption + Contact HQ (kept clear of the character) */}
+      <div className="absolute bottom-28 right-5 z-20 flex flex-col items-end gap-2 md:right-7 animate-in fade-in duration-1000 lphone:hidden">
+        <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
+          // BUNKER ONLINE
+        </span>
+        <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
+          Sector 07 · Secure Channel
+        </span>
+        <ContactHQ className="mt-1 w-fit" />
+      </div>
+
+      {/* Bottom center — Floating nav dock */}
+      <div className="absolute inset-x-0 bottom-4 z-20 flex origin-bottom justify-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-700 lphone:bottom-1 lphone:scale-[0.6]">
+        <GameNav />
+      </div>
+    </div>
   );
 }
