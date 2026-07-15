@@ -276,6 +276,33 @@
   animation: smoke-drift-c 20s ease-in-out infinite;
 }
 
+/* Character-local rising smoke — small, gentle, ambient */
+@keyframes char-smoke-rise-a {
+  0%   { transform: translate3d(-6%, 8%, 0) scale(0.9); opacity: 0; }
+  25%  { opacity: 0.35; }
+  100% { transform: translate3d(4%, -18%, 0) scale(1.25); opacity: 0; }
+}
+@utility animate-char-smoke-a {
+  animation: char-smoke-rise-a 11s ease-in-out infinite;
+}
+@keyframes char-smoke-rise-b {
+  0%   { transform: translate3d(6%, 10%, 0) scale(0.95); opacity: 0; }
+  30%  { opacity: 0.28; }
+  100% { transform: translate3d(-5%, -22%, 0) scale(1.35); opacity: 0; }
+}
+@utility animate-char-smoke-b {
+  animation: char-smoke-rise-b 14s ease-in-out infinite;
+  animation-delay: -4s;
+}
+@keyframes char-glow-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.04); }
+}
+@utility animate-char-glow {
+  animation: char-glow-pulse 6s ease-in-out infinite;
+}
+
+
 @keyframes camera-breathe {
   0%, 100% { transform: scale(1) translate3d(0, 0, 0); }
   50%      { transform: scale(1.015) translate3d(0, -0.3%, 0); }

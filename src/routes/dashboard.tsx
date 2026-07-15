@@ -1,4 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Logo } from "@/components/bunker/Logo";
 import { PlayerHUD } from "@/components/bunker/PlayerHUD";
 import { GameNav } from "@/components/bunker/GameNav";
@@ -6,6 +8,10 @@ import { BunkerAlarm } from "@/components/bunker/BunkerAlarm";
 import { ContactHQ } from "@/components/bunker/ContactHQ";
 import heroImage from "@/assets/bunker-hero.jpg";
 import { useCurrentCharacter } from "@/lib/characters";
+import { getPlayerStats } from "@/lib/bunker-supabase";
+import { getRankSettings } from "@/lib/sheets.functions";
+import { getRankTheme } from "@/components/bunker/BadgeGlow";
+
 
 
 export const Route = createFileRoute("/dashboard")({
@@ -21,7 +27,31 @@ export const Route = createFileRoute("/dashboard")({
 function DashboardPage() {
   const navigate = useNavigate();
   const character = useCurrentCharacter();
+
+  // Rank-based character glow
+  const statsQ = useQuery({
+    queryKey: ["player_stats"],
+    queryFn: getPlayerStats,
+    refetchOnWindowFocus: true,
+    refetchInterval: 8000,
+  });
+  const fetchRanks = useServerFn(getRankSettings);
+  const ranksQ = useQuery({
+    queryKey: ["sheet_ranks"],
+    queryFn: fetchRanks,
+    staleTime: 60_000,
+  });
+  const xp = statsQ.data?.xp ?? 0;
+  const currentRank = (ranksQ.data ?? []).find(
+    (r) => xp >= r.minXp && xp <= r.maxXp,
+  );
+  const rankName = (currentRank?.name ?? statsQ.data?.current_rank ?? "ROOKIE").toUpperCase();
+  const theme = getRankTheme(rankName);
+  const glow = theme.primary;
+  const glow2 = theme.secondary ?? theme.primary;
+
   return (
+
     
     
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
@@ -143,15 +173,67 @@ function DashboardPage() {
         <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
 
-        {/* ============ CHARACTER OVERLAY (bottom-left, ~85% height) ============ */}
+        {/* ============ CHARACTER STAGE (bottom-left, ~85% height, rank glow + smoke + shadow) ============ */}
         {character?.fullBody ? (
-          <img
-            src={character.fullBody}
-            alt={character.name}
-            draggable={false}
-            className="pointer-events-none absolute bottom-0 left-0 z-10 h-[85%] w-auto object-contain object-left-bottom select-none"
-          />
+          <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-[85%] aspect-[3/4] max-w-[55%]">
+            {/* Rank-based ambient glow behind character */}
+            <div
+              className="absolute inset-0 animate-char-glow"
+              style={{
+                background: `radial-gradient(45% 55% at 50% 55%, ${glow}55, transparent 70%)`,
+                filter: "blur(28px)",
+              }}
+            />
+            <div
+              className="absolute inset-0 animate-char-glow"
+              style={{
+                background: `radial-gradient(30% 40% at 50% 50%, ${glow2}44, transparent 75%)`,
+                filter: "blur(46px)",
+                animationDelay: "-3s",
+              }}
+            />
+
+            {/* Ambient smoke around character */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-2/3 animate-char-smoke-a mix-blend-screen"
+              style={{
+                background:
+                  "radial-gradient(45% 55% at 40% 70%, rgba(230,240,255,0.16), transparent 70%)",
+                filter: "blur(14px)",
+              }}
+            />
+            <div
+              className="absolute inset-x-0 bottom-0 h-2/3 animate-char-smoke-b mix-blend-screen"
+              style={{
+                background:
+                  "radial-gradient(40% 50% at 60% 65%, rgba(210,230,255,0.13), transparent 72%)",
+                filter: "blur(18px)",
+              }}
+            />
+
+            {/* Ground shadow */}
+            <div
+              className="absolute bottom-[2%] left-[8%] right-[8%] h-[6%]"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 40%, transparent 75%)",
+                filter: "blur(6px)",
+              }}
+            />
+
+            {/* Character */}
+            <img
+              src={character.fullBody}
+              alt={character.name}
+              draggable={false}
+              className="relative h-full w-full object-contain object-bottom select-none"
+              style={{
+                filter: `drop-shadow(0 0 14px ${glow}55) drop-shadow(0 12px 24px rgba(0,0,0,0.75))`,
+              }}
+            />
+          </div>
         ) : null}
+
 
         {/* ============ FLOATING HUD OVERLAYS ============ */}
 
