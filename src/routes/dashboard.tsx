@@ -25,20 +25,50 @@ function DashboardPage() {
     
     
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
-        {/* ============ FULLSCREEN BUNKER SCENE (zoomed ~15%) ============ */}
+        {/* ============ FULLSCREEN BUNKER SCENE (zoomed ~15%, blurred, darkened) ============ */}
         <div className="absolute inset-0 animate-camera-breathe">
           <img
             src={heroImage}
             alt=""
             className="h-full w-full object-cover object-center"
-            style={{ transform: "scale(1.15)", transformOrigin: "center 45%" }}
+            style={{
+              transform: "scale(1.15)",
+              transformOrigin: "center 45%",
+              filter: "blur(1.5px) brightness(0.78)",
+            }}
             draggable={false}
           />
         </div>
 
+        {/* Soft smoke / fog atmosphere */}
+        <div
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-smoke-a"
+          style={{
+            background:
+              "radial-gradient(70% 55% at 25% 70%, color-mix(in oklab, var(--foreground) 5%, transparent), transparent 70%)",
+            filter: "blur(22px)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-smoke-b"
+          style={{
+            background:
+              "radial-gradient(65% 60% at 75% 40%, color-mix(in oklab, var(--foreground) 4%, transparent), transparent 75%)",
+            filter: "blur(28px)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-smoke-c"
+          style={{
+            background:
+              "radial-gradient(80% 45% at 50% 85%, color-mix(in oklab, var(--neon) 6%, transparent), transparent 70%)",
+            filter: "blur(34px)",
+          }}
+        />
+
         {/* Ambient fog layers */}
         <div
-          className="pointer-events-none absolute inset-0 mix-blend-screen animate-fog"
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-fog"
           style={{
             background:
               "radial-gradient(60% 40% at 30% 65%, rgb(255 255 255 / 0.06), transparent 70%), radial-gradient(50% 35% at 70% 55%, rgb(200 220 255 / 0.05), transparent 75%)",
@@ -46,7 +76,7 @@ function DashboardPage() {
           }}
         />
         <div
-          className="pointer-events-none absolute inset-0 mix-blend-screen animate-fog-reverse"
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen animate-fog-reverse"
           style={{
             background:
               "radial-gradient(45% 30% at 55% 80%, rgb(255 240 210 / 0.05), transparent 75%)",
@@ -56,31 +86,49 @@ function DashboardPage() {
 
         {/* GTA-style volumetric god-rays from top */}
         <div
-          className="pointer-events-none absolute inset-0 mix-blend-screen opacity-60"
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen opacity-70"
           style={{
             background:
-              "conic-gradient(from 220deg at 50% -20%, transparent 0deg, color-mix(in oklab, var(--neon) 18%, transparent) 15deg, transparent 30deg, color-mix(in oklab, var(--neon) 12%, transparent) 55deg, transparent 80deg)",
+              "conic-gradient(from 220deg at 50% -20%, transparent 0deg, color-mix(in oklab, var(--neon) 22%, transparent) 15deg, transparent 30deg, color-mix(in oklab, var(--neon) 14%, transparent) 55deg, transparent 80deg)",
             filter: "blur(18px)",
           }}
         />
         {/* Warm bunker firelight bottom */}
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 mix-blend-screen opacity-70"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-2/3 mix-blend-screen opacity-70"
           style={{
             background:
               "radial-gradient(60% 55% at 50% 100%, rgb(255 170 90 / 0.14), transparent 70%)",
             filter: "blur(20px)",
           }}
         />
+        {/* Cinematic neon side glow */}
+        <div
+          className="pointer-events-none absolute inset-0 z-0 mix-blend-screen"
+          style={{
+            background:
+              "radial-gradient(75% 100% at 0% 55%, color-mix(in oklab, var(--neon) 14%, transparent), transparent 60%), radial-gradient(65% 90% at 100% 45%, color-mix(in oklab, var(--neon) 9%, transparent), transparent 55%)",
+            filter: "blur(28px)",
+          }}
+        />
+        {/* Top cinematic key light */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[60%] mix-blend-screen"
+          style={{
+            background:
+              "radial-gradient(85% 70% at 50% 0%, color-mix(in oklab, #ffffff 11%, transparent), transparent 75%)",
+            filter: "blur(32px)",
+          }}
+        />
         {/* Cinematic vignette + top/bottom fades so HUD sits legible over scene */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgb(0_0_0/0.65)_100%)]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-background/85 via-background/35 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-background/90 via-background/45 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgb(0_0_0/0.65)_100%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-40 bg-gradient-to-b from-background/85 via-background/35 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-52 bg-gradient-to-t from-background/90 via-background/45 to-transparent" />
         {/* Chromatic edge tint for cinematic feel */}
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgb(0_0_0/0.35)_0%,transparent_15%,transparent_85%,rgb(0_0_0/0.35)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(90deg,rgb(0_0_0/0.35)_0%,transparent_15%,transparent_85%,rgb(0_0_0/0.35)_100%)]" />
         {/* Film grain */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.06] mix-blend-overlay"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.7'/></svg>\")",
@@ -88,11 +136,11 @@ function DashboardPage() {
         />
 
         {/* Subtle HUD grid + scanline over everything */}
-        <div className="pointer-events-none absolute inset-0 hud-grid opacity-15" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 animate-scanline bg-gradient-to-b from-transparent via-neon/8 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 z-0 hud-grid opacity-15" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-24 animate-scanline bg-gradient-to-b from-transparent via-neon/8 to-transparent" />
 
         {/* Top scanline hairline */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
 
         {/* ============ CHARACTER OVERLAY (bottom-left, ~85% height) ============ */}
