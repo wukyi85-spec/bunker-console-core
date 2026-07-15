@@ -27,7 +27,31 @@ export const Route = createFileRoute("/dashboard")({
 function DashboardPage() {
   const navigate = useNavigate();
   const character = useCurrentCharacter();
+
+  // Rank-based character glow
+  const statsQ = useQuery({
+    queryKey: ["player_stats"],
+    queryFn: getPlayerStats,
+    refetchOnWindowFocus: true,
+    refetchInterval: 8000,
+  });
+  const fetchRanks = useServerFn(getRankSettings);
+  const ranksQ = useQuery({
+    queryKey: ["sheet_ranks"],
+    queryFn: fetchRanks,
+    staleTime: 60_000,
+  });
+  const xp = statsQ.data?.xp ?? 0;
+  const currentRank = (ranksQ.data ?? []).find(
+    (r) => xp >= r.minXp && xp <= r.maxXp,
+  );
+  const rankName = (currentRank?.name ?? statsQ.data?.current_rank ?? "ROOKIE").toUpperCase();
+  const theme = getRankTheme(rankName);
+  const glow = theme.primary;
+  const glow2 = theme.secondary ?? theme.primary;
+
   return (
+
     
     
       <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
