@@ -32,9 +32,9 @@ function DashboardPage() {
             alt=""
             className="h-full w-full object-cover object-center"
             style={{
-              transform: "scale(1.15)",
+              transform: "scale(1.12)",
               transformOrigin: "center 45%",
-              filter: "blur(1.5px) brightness(0.78)",
+              filter: "blur(1px) brightness(0.72)",
             }}
             draggable={false}
           />
