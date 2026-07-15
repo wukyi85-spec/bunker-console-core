@@ -14,6 +14,7 @@ import {
 } from "@/lib/bunker-supabase";
 import { getRankSettings, getGameSettings } from "@/lib/sheets.functions";
 import { getPlayerProfile, setPlayerProfile, CHARACTERS } from "@/lib/player";
+import { useSheetCharacters, pickCharacter } from "@/lib/characters";
 import { levelProgress, PROGRESSION } from "@/lib/progression";
 import { Coins, Phone, MapPin, Pencil, Zap } from "lucide-react";
 
