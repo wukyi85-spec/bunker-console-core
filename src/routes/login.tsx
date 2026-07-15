@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Eye, EyeOff, Fingerprint, KeyRound, Loader2 } from "lucide-react";
 import { Logo } from "@/components/bunker/Logo";
 import { Panel } from "@/components/bunker/Panel";
