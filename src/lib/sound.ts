@@ -4,10 +4,13 @@
 
 const MUTE_KEY = "bunker.muted";
 
+const AMBIENT_URL =
+  "https://res.cloudinary.com/dl8ixoocw/video/upload/v1784089757/WeedTrance_48k_l0e6fw.mp3";
+const AMBIENT_VOLUME = 0.35;
+
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
-let ambientNodes: { stop: () => void } | null = null;
-let beatTimer: number | null = null;
+let ambientAudio: HTMLAudioElement | null = null;
 let muted = true; // start muted — user must opt in
 const listeners = new Set<() => void>();
 
