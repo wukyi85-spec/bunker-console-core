@@ -150,12 +150,21 @@ function ProfilePage() {
           <div className="relative grid grid-cols-[130px_1fr_210px] gap-3 lphone:grid-cols-[110px_1fr_180px] lphone:gap-2.5">
             {/* Character Avatar */}
             <div className="relative flex flex-col gap-2">
-              <div className="relative overflow-hidden rounded-md border border-white/10">
-                <CharacterPortrait
-                  codename={character.codename}
-                  accent={character.accent}
-                  selected
-                />
+              <div className="relative overflow-hidden rounded-md border border-white/10 aspect-[3/4] bg-black/40">
+                {sheetChar?.halfBody ? (
+                  <img
+                    src={sheetChar.halfBody}
+                    alt={sheetChar.name}
+                    draggable={false}
+                    className="h-full w-full object-contain object-bottom"
+                  />
+                ) : (
+                  <CharacterPortrait
+                    codename={character.codename}
+                    accent={character.accent}
+                    selected
+                  />
+                )}
                 <div className="pointer-events-none absolute -inset-0.5 rounded-md border border-neon/30 shadow-[0_0_25px_-6px_var(--neon)]" />
               </div>
               <div className="rounded-sm border border-white/10 bg-black/40 px-2 py-1.5 text-center">
