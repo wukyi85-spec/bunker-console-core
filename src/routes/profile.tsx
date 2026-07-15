@@ -169,10 +169,10 @@ function ProfilePage() {
               </div>
               <div className="rounded-sm border border-white/10 bg-black/40 px-2 py-1.5 text-center">
                 <div className="font-mono text-[8px] uppercase tracking-[0.3em] text-muted-foreground">
-                  Codename
+                  Character
                 </div>
                 <div className="mt-0.5 truncate font-display text-[11px] font-bold uppercase tracking-widest">
-                  {character.codename}
+                  {sheetChar?.name ?? "—"}
                 </div>
               </div>
             </div>
