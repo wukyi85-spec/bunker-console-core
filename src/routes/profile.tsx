@@ -55,6 +55,8 @@ function ProfilePage() {
 
   const character =
     CHARACTERS.find((c) => c.id === profile.characterId) ?? CHARACTERS[0];
+  const charactersQ = useSheetCharacters();
+  const sheetChar = pickCharacter(charactersQ.data, profile.characterId);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
