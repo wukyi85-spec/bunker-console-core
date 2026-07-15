@@ -245,28 +245,50 @@ function LoadoutPage() {
             </div>
 
             <div className="max-h-[60vh] overflow-y-auto px-5 py-4 lphone:px-4 lphone:py-3">
-              <ul className="space-y-2.5 font-mono text-[13px] leading-relaxed text-foreground/95 lphone:space-y-2 lphone:text-[11px]">
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
-                  <span><span className="font-bold text-neon">RUSH ORDERS လက်မခံပါ။</span> Rush order request မလုပ်ပေးပါ။</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
-                  <span><span className="font-bold text-neon">Delivery ကြာချိန်</span> — ပါဆယ်ရောက်ချိန်က <span className="text-neon">2–5 ရက်</span> ခန့်ကြာနိုင်ပါတယ်။</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
-                  <span><span className="font-bold text-neon">Delivery ဖုန်းကို မဖြစ်မနေ ကိုင်ပေးပါ။</span> Delivery ဘက်ကဖုန်းဆက်လို့ မကိုင်ဖြစ်ရင် ပါဆယ်ကနောက်ကျတတ်ပါတယ်။ အတတ်နိုင်ဆုံး ဖုန်းကိုင်ပေးရပါမယ်။</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
-                  <span>ပါဆယ်ကို ကိုယ်တိုင် <span className="font-bold text-neon">လက်ခံစကားပြောနိုင်ရင်</span> ပိုအဆင်ပြေပါတယ်။</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
-                  <span>ပါဆယ်ရောက်လာရင် <span className="font-bold text-neon">Unboxing Video</span> ကို မဖြစ်မနေ Record လုပ်ထားပါ။ (ပါဆယ်ပျောက်တာ / ပါဆယ်မပါတာဆိုရင် <span className="text-neon">100% တာဝန်ယူပေး</span>နိုင်ပါတယ်။)</span>
-                </li>
-              </ul>
+            <div className="space-y-3 font-mono text-[13px] leading-relaxed text-foreground/95 lphone:space-y-2 lphone:text-[11px]">
+                <div className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <div>
+                    <p className="font-bold text-neon">Prepaid only. Cash on Delivery is not supported.</p>
+                    <p className="text-foreground/80">(ငွေကြိုပေးစနစ်သာရှိပါသည်။ COD မရှိပါ။)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <div>
+                    <p className="font-bold text-neon">No rush orders.</p>
+                    <p className="text-foreground/80">(Rush order လက်မခံပါ။)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <div>
+                    <p className="font-bold text-neon">Please remain reachable for delivery calls to avoid delays.</p>
+                    <p className="text-foreground/80">(Delivery ဖုန်းဆက်လာပါက ဖုန်းကိုင်ပေးပါ။ မကိုင်ပါက ကြာနိုင်ပါသည်။)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <div>
+                    <p className="font-bold text-neon">Estimated delivery time: 2–5 days.</p>
+                    <p className="text-foreground/80">(ပို့ဆောင်ချိန် ၂ မှ ၅ ရက်ခန့်ကြာနိုင်ပါသည်။)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <div>
+                    <p className="font-bold text-neon">Record an unboxing video upon delivery for any claims.</p>
+                    <p className="text-foreground/80">(ပါဆယ်ရောက်ပါက Unboxing video ရိုက်ထားမှသာ တာဝန်ယူပေးပါမည်။)</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon" />
+                  <div>
+                    <p className="font-bold text-neon">Claims without video proof will not be accepted.</p>
+                    <p className="text-foreground/80">(Video မရိုက်ထားပါက တာဝန်မယူပါ။)</p>
+                  </div>
+                </div>
+              </div>
 
               <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-sm border border-white/15 bg-background/60 p-3 hover:border-neon/50 lphone:mt-3 lphone:p-2.5">
                 <input
