@@ -5,6 +5,7 @@ import { GameNav } from "@/components/bunker/GameNav";
 import { BunkerAlarm } from "@/components/bunker/BunkerAlarm";
 import { ContactHQ } from "@/components/bunker/ContactHQ";
 import heroImage from "@/assets/bunker-hero.jpg";
+import { useCurrentCharacter } from "@/lib/characters";
 
 
 export const Route = createFileRoute("/dashboard")({
