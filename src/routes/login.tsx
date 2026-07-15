@@ -99,7 +99,7 @@ function LoginScreen() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-between overflow-hidden bg-background px-6 py-6">
+    <div className="login-page fixed inset-0 flex flex-col items-center justify-between overflow-hidden bg-background px-6 py-6">
       {/* GTA-inspired underground bunker background */}
       <div className="absolute inset-0">
         <img
