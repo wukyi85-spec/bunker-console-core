@@ -256,7 +256,7 @@ export function BunkerAlarm() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex h-[min(680px,90vh)] w-[min(640px,94vw)] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
+            className="relative flex h-[min(680px,90vh)] w-[min(640px,94vw)] lphone:h-[92vh] lphone:w-[min(720px,94vw)] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
           >
             {/* Sticky header with fixed Close button */}
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 gunmetal-glass px-5 py-4">
