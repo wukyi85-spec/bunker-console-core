@@ -33,6 +33,8 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
   });
   const stats = statsQ.data;
   const profile = getPlayerProfile();
+  const charactersQ = useSheetCharacters();
+  const sheetChar = pickCharacter(charactersQ.data, profile.characterId);
 
   const fetchRanks = useServerFn(getRankSettings);
   const ranksQ = useQuery({ queryKey: ["sheet_ranks"], queryFn: fetchRanks, staleTime: 60_000 });
