@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Eye, EyeOff, Fingerprint, KeyRound, Loader2 } from "lucide-react";
 import { Logo } from "@/components/bunker/Logo";
 import { Panel } from "@/components/bunker/Panel";
@@ -35,6 +35,18 @@ function LoginScreen() {
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
+
+  useEffect(() => {
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isIOS) {
+      document.documentElement.classList.add("ios-device");
+    }
+    return () => {
+      document.documentElement.classList.remove("ios-device");
+    };
+  }, []);
 
   // Fullscreen is controlled globally by double-tap gesture in SoundProvider.
 
@@ -87,7 +99,7 @@ function LoginScreen() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-between overflow-hidden bg-background px-6 py-6">
+    <div className="login-page fixed inset-0 flex flex-col items-center justify-between overflow-hidden bg-background px-6 py-6">
       {/* GTA-inspired underground bunker background */}
       <div className="absolute inset-0">
         <img
@@ -146,7 +158,7 @@ function LoginScreen() {
         ) : (
           <Panel
             corners
-            className="w-full animate-in fade-in slide-in-from-bottom-2 duration-500"
+            className="login-card w-full animate-in fade-in slide-in-from-bottom-2 duration-500"
           >
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
               <div className="flex items-center justify-between border-b border-border/60 pb-3">
@@ -234,6 +246,39 @@ function LoginScreen() {
         @keyframes bunker-ambient {
           0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.9; }
           50% { transform: translate(-50%, 20px) scale(1.08); opacity: 0.6; }
+        }
+
+        /* iOS / iPadOS landscape fixes only */
+        .ios-device .login-page {
+          position: relative;
+          width: 100%;
+          height: auto;
+          min-height: 100svh;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-top: max(16px, env(safe-area-inset-top));
+          padding-bottom: max(16px, env(safe-area-inset-bottom));
+        }
+
+        .ios-device .login-page > main {
+          max-width: none;
+        }
+
+        .ios-device .login-card {
+          width: min(820px, calc(100vw - 32px));
+          max-height: none;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        @media (max-height: 760px) {
+          .ios-device .login-page {
+            align-items: flex-start;
+          }
+          .ios-device .login-page > main {
+            align-items: flex-start;
+            justify-content: flex-start;
+          }
         }
       `}</style>
     </div>
