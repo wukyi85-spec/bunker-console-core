@@ -154,7 +154,7 @@ function DashboardPage() {
       </div>
 
       {/* Right side — Bunker Alarm panel, compact so it doesn't cover HUD or nav */}
-      <div className="absolute right-4 top-[150px] z-30 flex h-[44vh] max-h-[240px] w-[240px] animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:top-[100px] lphone:h-[46vh] lphone:max-h-[190px] lphone:w-[200px]">
+      <div className="absolute right-4 top-[300px] z-30 flex h-[44vh] max-h-[240px] w-[240px] animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:top-[200px] lphone:h-[46vh] lphone:max-h-[190px] lphone:w-[200px]">
         <BunkerAlarm />
       </div>
 
