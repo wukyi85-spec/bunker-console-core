@@ -150,16 +150,10 @@ function DashboardPage() {
 
       {/* Top right — shared HUD container (Player HUD + Bunker Alarm) */}
       <div
-        className="absolute z-20 flex flex-col animate-in fade-in slide-in-from-right-4 duration-700"
-        style={{
-          top: "20px",
-          right: "20px",
-          width: "min(400px, calc(100vw - 24px))",
-          gap: "10px",
-        }}
+        className="absolute z-20 flex w-[400px] flex-col gap-[10px] animate-in fade-in slide-in-from-right-4 duration-700 top-[20px] right-[20px] max-[1200px]:w-[350px] lphone:w-[300px] lphone:max-w-[calc(100vw-24px)]"
       >
         <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
-        <div className="w-full" style={{ height: "220px", maxHeight: "220px" }}>
+        <div className="w-full h-[220px] max-h-[220px]">
           <BunkerAlarm />
         </div>
       </div>
