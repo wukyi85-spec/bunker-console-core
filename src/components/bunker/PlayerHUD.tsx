@@ -78,30 +78,37 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
       {(() => {
         const character =
           CHARACTERS.find((c) => c.id === profile.characterId) ?? CHARACTERS[0];
+        const avatarSrc = sheetChar?.avatar || null;
+        const renderInner = (size: "lg" | "sm") => (
+          avatarSrc ? (
+            <img
+              src={avatarSrc}
+              alt={sheetChar?.name ?? character.codename}
+              draggable={false}
+              className="h-full w-full object-cover object-center"
+            />
+          ) : (
+            <CharacterPortrait
+              codename={character.codename}
+              accent={character.accent}
+              selected
+              className="!aspect-auto h-full w-full"
+            />
+          )
+        );
         return (
           <>
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-white/15 bg-panel-elevated shadow-[inset_0_0_18px_rgba(0,0,0,0.6),0_0_18px_-6px_var(--neon)] max-sm:hidden">
-              <CharacterPortrait
-                codename={character.codename}
-                accent={character.accent}
-                selected
-                className="!aspect-auto h-full w-full"
-              />
-              <span
-                className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-neon/25"
-              />
+              {renderInner("lg")}
+              <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-neon/25" />
             </div>
             <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white/15 bg-panel-elevated shadow-[inset_0_0_14px_rgba(0,0,0,0.6)] sm:hidden">
-              <CharacterPortrait
-                codename={character.codename}
-                accent={character.accent}
-                selected
-                className="!aspect-auto h-full w-full"
-              />
+              {renderInner("sm")}
             </div>
           </>
         );
       })()}
+
 
 
       <div className="flex min-w-0 flex-col justify-between gap-1.5 max-sm:gap-1">
