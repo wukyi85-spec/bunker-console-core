@@ -6,7 +6,7 @@ const MUTE_KEY = "bunker.muted";
 
 const AMBIENT_URL =
   "https://res.cloudinary.com/dl8ixoocw/video/upload/v1784089757/WeedTrance_48k_l0e6fw.mp3";
-const AMBIENT_VOLUME = 0.35;
+const AMBIENT_VOLUME = 0.2;
 
 let ctx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
