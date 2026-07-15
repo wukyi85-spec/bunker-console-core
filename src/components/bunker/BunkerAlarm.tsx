@@ -256,7 +256,7 @@ export function BunkerAlarm() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex h-[min(640px,88vh)] w-[min(640px,94vw)] lphone:h-[94vh] lphone:max-h-[94svh] lphone:w-[min(88vw,780px)] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
+            className="relative flex h-[min(560px,86vh)] w-[min(720px,86vw)] lphone:h-[82vh] lphone:max-h-[82svh] lphone:w-[76vw] lphone:max-w-[720px] flex-col overflow-hidden rounded-md border border-neon/40 gunmetal-glass shadow-[0_40px_120px_-20px_var(--neon)]"
           >
             {/* Header with always-visible Close button */}
             <div className="flex shrink-0 items-center justify-between border-b border-white/10 gunmetal-glass px-4 py-2.5 lphone:px-3 lphone:py-1.5">
