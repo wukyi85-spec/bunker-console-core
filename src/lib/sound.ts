@@ -307,130 +307,26 @@ function play808(c: AudioContext, t: number, gain: GainNode, note: number, peak 
 
 export function startAmbient() {
   if (muted) return;
-  const c = ensureCtx();
-  if (!c || !masterGain) return;
-  stopAmbient();
-
-  const bus = c.createGain();
-  bus.gain.value = 0;
-  bus.gain.linearRampToValueAtTime(0.22, c.currentTime + 2.5);
-
-  const eq = c.createBiquadFilter();
-  eq.type = "lowshelf";
-  eq.frequency.value = 200;
-  eq.gain.value = 6;
-
-  const comp = c.createDynamicsCompressor();
-  comp.threshold.value = -22;
-  comp.knee.value = 6;
-  comp.ratio.value = 4;
-  comp.attack.value = 0.003;
-  comp.release.value = 0.12;
-
-  bus.connect(eq).connect(comp).connect(masterGain);
-
-  // Atmospheric pad
-  const padBus = c.createGain();
-  padBus.gain.value = 0.12;
-  const padFilter = c.createBiquadFilter();
-  padFilter.type = "lowpass";
-  padFilter.frequency.value = 1200;
-  padBus.connect(padFilter).connect(bus);
-
-  const padA = c.createOscillator();
-  padA.type = "sawtooth";
-  padA.frequency.value = 82.4; // E2
-  padA.detune.value = -6;
-  padA.connect(padBus);
-  padA.start();
-
-  const padB = c.createOscillator();
-  padB.type = "triangle";
-  padB.frequency.value = 123.5; // B2
-  padB.detune.value = 5;
-  padB.connect(padBus);
-  padB.start();
-
-  const padC = c.createOscillator();
-  padC.type = "sine";
-  padC.frequency.value = 164.8; // E3
-  padC.connect(padBus);
-  padC.start();
-
-  // LFO filter sweep
-  const lfo = c.createOscillator();
-  lfo.type = "sine";
-  lfo.frequency.value = 0.12;
-  const lfoG = c.createGain();
-  lfoG.gain.value = 450;
-  lfo.connect(lfoG).connect(padFilter.frequency);
-  lfo.start();
-
-  // Trap beat scheduler: 85 BPM, 4 bars loop
-  const bpm = 85;
-  const beatDur = 60 / bpm;
-  const stepDur = beatDur / 4; // 16th notes
-  const loopSteps = 16 * 4; // 4 bars
-
-  // Pattern indices (0-based 16th steps)
-  const kickSteps = new Set([0, 3, 6, 10, 14, 16, 19, 22, 26, 30, 32, 35, 38, 42, 46]);
-  const snareSteps = new Set([4, 12, 20, 28, 36, 44]);
-  const hatSteps = new Set([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62]);
-  const openHatSteps = new Set([8, 24, 40, 56]);
-  const bassSteps: Record<number, number> = {
-    0: 41.2, 3: 41.2, 6: 36.7, 10: 36.7, 14: 32.7,
-    16: 41.2, 19: 41.2, 22: 36.7, 26: 36.7, 30: 32.7,
-    32: 41.2, 35: 41.2, 38: 36.7, 42: 36.7, 46: 32.7,
-    48: 41.2, 51: 41.2, 54: 36.7, 58: 36.7, 62: 32.7,
-  };
-
-  let nextStep = 0;
-  const startTime = c.currentTime + 0.1;
-
-  const schedule = () => {
-    if (muted) return;
-    const lookahead = 0.15;
-    while (startTime + nextStep * stepDur < c.currentTime + lookahead) {
-      const stepInLoop = nextStep % loopSteps;
-      const t = startTime + nextStep * stepDur;
-
-      if (kickSteps.has(stepInLoop)) playKick(c, t, bus, 0.5);
-      if (snareSteps.has(stepInLoop)) playSnare(c, t, bus, 0.2);
-      if (openHatSteps.has(stepInLoop)) {
-        playHiHat(c, t, bus, 0.08, true);
-      } else if (hatSteps.has(stepInLoop)) {
-        playHiHat(c, t, bus, 0.055, false);
-      }
-      const bassNote = bassSteps[stepInLoop];
-      if (bassNote) play808(c, t, bus, bassNote, 0.26);
-
-      nextStep++;
-    }
-  };
-
-  beatTimer = window.setInterval(schedule, 60);
-
-  ambientNodes = {
-    stop: () => {
-      try {
-        bus.gain.cancelScheduledValues(c.currentTime);
-        bus.gain.linearRampToValueAtTime(0, c.currentTime + 0.5);
-        padA.stop(c.currentTime + 0.55);
-        padB.stop(c.currentTime + 0.55);
-        padC.stop(c.currentTime + 0.55);
-        lfo.stop(c.currentTime + 0.55);
-      } catch {
-        /* ignore */
-      }
-      if (beatTimer) window.clearInterval(beatTimer);
-      beatTimer = null;
-    },
-  };
+  if (typeof window === "undefined") return;
+  if (!ambientAudio) {
+    ambientAudio = new Audio(AMBIENT_URL);
+    ambientAudio.loop = true;
+    ambientAudio.preload = "auto";
+    ambientAudio.crossOrigin = "anonymous";
+  }
+  ambientAudio.volume = muted ? 0 : AMBIENT_VOLUME;
+  const p = ambientAudio.play();
+  if (p && typeof p.catch === "function") p.catch(() => { /* awaiting user gesture */ });
 }
 
 export function stopAmbient() {
-  if (ambientNodes) {
-    ambientNodes.stop();
-    ambientNodes = null;
+  if (ambientAudio) {
+    try {
+      ambientAudio.pause();
+      ambientAudio.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
   }
 }
+
