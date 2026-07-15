@@ -337,3 +337,35 @@ export const getAnnouncements = createServerFn({ method: "GET" }).handler(
     return out.filter((a) => a.active);
   },
 );
+
+// ---------- CHARACTERS ----------
+export interface SheetCharacter {
+  id: string;
+  name: string;
+  fullBody: string;
+  halfBody: string;
+  avatar: string;
+}
+
+export const getSheetCharacters = createServerFn({ method: "GET" }).handler(
+  async (): Promise<SheetCharacter[]> => {
+    const rows = await fetchRange("characters!A1:Z200");
+    if (rows.length < 2) return [];
+    const h = headerMap(rows[0]);
+    const out: SheetCharacter[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const id = str(row[h.id]);
+      if (!id) continue;
+      out.push({
+        id,
+        name: str(row[h.name]),
+        fullBody: str(row[h.full_body]),
+        halfBody: str(row[h.half_body]),
+        avatar: str(row[h.avatar]),
+      });
+    }
+    return out;
+  },
+);
+
