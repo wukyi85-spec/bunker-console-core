@@ -7,6 +7,7 @@ import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { CharacterPortrait } from "@/components/bunker/CharacterPortrait";
 import { CHARACTERS, getPlayerProfile, setPlayerProfile } from "@/lib/player";
+import { useSheetCharacters } from "@/lib/characters";
 import { completeMemberOnboarding, ensurePlayerStats } from "@/lib/bunker-supabase";
 import { cn } from "@/lib/utils";
 
@@ -25,11 +26,16 @@ const NAME_RE = /^[A-Z0-9]{3,16}$/;
 
 function OnboardingScreen() {
   const navigate = useNavigate();
+  const { data: sheetCharacters, isLoading: charsLoading } = useSheetCharacters();
   const [characterId, setCharacterId] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState("");
   const [saving, setSaving] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [nameError, setNameError] = useState<string | null>(null);
+
+  const characters = (sheetCharacters && sheetCharacters.length > 0)
+    ? sheetCharacters.map((c) => ({ id: c.id, label: c.name || c.id, image: c.fullBody }))
+    : CHARACTERS.map((c) => ({ id: c.id, label: c.label, image: "", codename: c.codename, accent: c.accent }));
 
   // Guard: if setup already done, jump straight to the dashboard.
   useEffect(() => {
@@ -112,8 +118,13 @@ function OnboardingScreen() {
         {/* Step 1 */}
         <section className="animate-in fade-in slide-in-from-bottom-2 duration-500">
           <StepHeader index="01" title="Choose Your Character" />
-          <div className="mt-3 grid grid-cols-3 gap-3">
-            {CHARACTERS.map((c, i) => {
+          <div className={cn("mt-3 grid gap-3", characters.length <= 3 ? "grid-cols-3" : "grid-cols-2 md:grid-cols-4")}>
+            {charsLoading && characters.length === 0 ? (
+              <p className="col-span-full text-center font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                Loading characters...
+              </p>
+            ) : null}
+            {characters.map((c, i) => {
               const selected = characterId === c.id;
               return (
                 <button
@@ -131,7 +142,24 @@ function OnboardingScreen() {
                   )}
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  <CharacterPortrait codename={c.codename} accent={c.accent} selected={selected} />
+                  {c.image ? (
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-panel-elevated">
+                      <img
+                        src={c.image}
+                        alt={c.label}
+                        draggable={false}
+                        className="h-full w-full object-contain object-bottom"
+                      />
+                    </div>
+                  ) : (
+                    <CharacterPortrait
+                      codename={(c as { codename?: string }).codename ?? c.label}
+                      accent={(c as { accent?: string }).accent ?? "#7CFF4D"}
+                      selected={selected}
+                    />
+
+
+                  )}
                   <div className="flex items-center justify-between border-t border-border/60 px-3 py-2">
                     <span className="font-display text-xs font-semibold uppercase tracking-widest text-foreground">
                       {c.label}
