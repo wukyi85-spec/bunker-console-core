@@ -14,6 +14,7 @@ import {
 } from "@/lib/bunker-supabase";
 import { getRankSettings, getGameSettings } from "@/lib/sheets.functions";
 import { getPlayerProfile, setPlayerProfile, CHARACTERS } from "@/lib/player";
+import { useSheetCharacters, pickCharacter } from "@/lib/characters";
 import { levelProgress, PROGRESSION } from "@/lib/progression";
 import { Coins, Phone, MapPin, Pencil, Zap } from "lucide-react";
 
@@ -54,6 +55,8 @@ function ProfilePage() {
 
   const character =
     CHARACTERS.find((c) => c.id === profile.characterId) ?? CHARACTERS[0];
+  const charactersQ = useSheetCharacters();
+  const sheetChar = pickCharacter(charactersQ.data, profile.characterId);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -147,12 +150,21 @@ function ProfilePage() {
           <div className="relative grid grid-cols-[130px_1fr_210px] gap-3 lphone:grid-cols-[110px_1fr_180px] lphone:gap-2.5">
             {/* Character Avatar */}
             <div className="relative flex flex-col gap-2">
-              <div className="relative overflow-hidden rounded-md border border-white/10">
-                <CharacterPortrait
-                  codename={character.codename}
-                  accent={character.accent}
-                  selected
-                />
+              <div className="relative overflow-hidden rounded-md border border-white/10 aspect-[3/4] bg-black/40">
+                {sheetChar?.halfBody ? (
+                  <img
+                    src={sheetChar.halfBody}
+                    alt={sheetChar.name}
+                    draggable={false}
+                    className="h-full w-full object-contain object-bottom"
+                  />
+                ) : (
+                  <CharacterPortrait
+                    codename={character.codename}
+                    accent={character.accent}
+                    selected
+                  />
+                )}
                 <div className="pointer-events-none absolute -inset-0.5 rounded-md border border-neon/30 shadow-[0_0_25px_-6px_var(--neon)]" />
               </div>
               <div className="rounded-sm border border-white/10 bg-black/40 px-2 py-1.5 text-center">
