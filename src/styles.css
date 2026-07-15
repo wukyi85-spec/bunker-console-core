@@ -253,6 +253,29 @@
   animation: fog-drift 30s ease-in-out infinite reverse;
 }
 
+/* Soft volumetric smoke plumes drifting across the bunker */
+@keyframes smoke-drift-a {
+  0%, 100% { transform: translate3d(-6%, 0, 0) scale(1); opacity: 0.22; }
+  50%      { transform: translate3d(8%, -4%, 0) scale(1.12); opacity: 0.42; }
+}
+@utility animate-smoke-a {
+  animation: smoke-drift-a 26s ease-in-out infinite;
+}
+@keyframes smoke-drift-b {
+  0%, 100% { transform: translate3d(5%, 0, 0) scale(1.05); opacity: 0.18; }
+  50%      { transform: translate3d(-7%, 3%, 0) scale(1.2); opacity: 0.35; }
+}
+@utility animate-smoke-b {
+  animation: smoke-drift-b 32s ease-in-out infinite reverse;
+}
+@keyframes smoke-drift-c {
+  0%, 100% { transform: translate3d(0, 2%, 0) scale(1.1); opacity: 0.15; }
+  50%      { transform: translate3d(4%, -3%, 0) scale(1.25); opacity: 0.3; }
+}
+@utility animate-smoke-c {
+  animation: smoke-drift-c 20s ease-in-out infinite;
+}
+
 @keyframes camera-breathe {
   0%, 100% { transform: scale(1) translate3d(0, 0, 0); }
   50%      { transform: scale(1.015) translate3d(0, -0.3%, 0); }
