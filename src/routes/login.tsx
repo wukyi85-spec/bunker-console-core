@@ -158,7 +158,7 @@ function LoginScreen() {
         ) : (
           <Panel
             corners
-            className="w-full animate-in fade-in slide-in-from-bottom-2 duration-500"
+            className="login-card w-full animate-in fade-in slide-in-from-bottom-2 duration-500"
           >
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5">
               <div className="flex items-center justify-between border-b border-border/60 pb-3">
