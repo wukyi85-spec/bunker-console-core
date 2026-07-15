@@ -26,11 +26,16 @@ const NAME_RE = /^[A-Z0-9]{3,16}$/;
 
 function OnboardingScreen() {
   const navigate = useNavigate();
+  const { data: sheetCharacters, isLoading: charsLoading } = useSheetCharacters();
   const [characterId, setCharacterId] = useState<string | null>(null);
   const [playerName, setPlayerName] = useState("");
   const [saving, setSaving] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [nameError, setNameError] = useState<string | null>(null);
+
+  const characters = (sheetCharacters && sheetCharacters.length > 0)
+    ? sheetCharacters.map((c) => ({ id: c.id, label: c.name || c.id, image: c.fullBody }))
+    : CHARACTERS.map((c) => ({ id: c.id, label: c.label, image: "", codename: c.codename, accent: c.accent }));
 
   // Guard: if setup already done, jump straight to the dashboard.
   useEffect(() => {
