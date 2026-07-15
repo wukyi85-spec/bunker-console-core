@@ -36,6 +36,18 @@ function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [nextRoute, setNextRoute] = useState<"/dashboard" | "/onboarding" | "/admin/members" | null>(null);
 
+  useEffect(() => {
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isIOS) {
+      document.documentElement.classList.add("ios-device");
+    }
+    return () => {
+      document.documentElement.classList.remove("ios-device");
+    };
+  }, []);
+
   // Fullscreen is controlled globally by double-tap gesture in SoundProvider.
 
   async function handleSubmit(e: FormEvent) {
