@@ -142,7 +142,7 @@ export function BunkerAlarm() {
   }
 
   return (
-    <div className="relative flex h-full w-full min-h-0 flex-col rounded-md gunmetal-glass p-2.5 lphone:p-2">
+    <div className="relative flex h-full w-full min-h-0 flex-col rounded-md gunmetal-glass p-2 lphone:p-1.5">
       <div className="flex shrink-0 items-center justify-between px-1 pb-1.5">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -154,7 +154,7 @@ export function BunkerAlarm() {
           </span>
         </div>
         <span className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground lphone:text-[7px]">
-          {allItems.length} · 3D
+          {allItems.length}
         </span>
       </div>
 
@@ -214,11 +214,6 @@ export function BunkerAlarm() {
             </button>
           );
         })}
-      </div>
-
-      <div className="mt-1.5 flex shrink-0 items-center justify-between px-1 font-mono text-[8px] uppercase tracking-[0.3em] text-muted-foreground">
-        <span className="text-neon/70">// LIVE</span>
-        <span>Auto-clear 3D</span>
       </div>
     </div>
   );
