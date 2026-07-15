@@ -95,7 +95,18 @@ function DashboardPage() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
 
+        {/* ============ CHARACTER OVERLAY ============ */}
+        {character?.fullBody ? (
+          <img
+            src={character.fullBody}
+            alt={character.name}
+            draggable={false}
+            className="pointer-events-none absolute bottom-0 right-0 z-10 h-[85%] w-auto object-contain object-bottom select-none"
+          />
+        ) : null}
+
         {/* ============ FLOATING HUD OVERLAYS ============ */}
+
 
         {/* Top left — Logo only */}
         <div className="absolute left-4 top-4 z-20 md:left-6 md:top-5 animate-in fade-in slide-in-from-left-4 duration-700">
