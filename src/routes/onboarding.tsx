@@ -33,9 +33,12 @@ function OnboardingScreen() {
   const [stepIdx, setStepIdx] = useState(0);
   const [nameError, setNameError] = useState<string | null>(null);
 
-  const characters = (sheetCharacters && sheetCharacters.length > 0)
-    ? sheetCharacters.map((c) => ({ id: c.id, label: c.name || c.id, image: c.fullBody }))
-    : CHARACTERS.map((c) => ({ id: c.id, label: c.label, image: "", codename: c.codename, accent: c.accent }));
+  const characters = (sheetCharacters ?? []).map((c) => ({
+    id: c.id,
+    label: c.name || c.id,
+    image: c.fullBody,
+  }));
+
 
   // Guard: if setup already done, jump straight to the dashboard.
   useEffect(() => {
