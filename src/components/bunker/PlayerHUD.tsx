@@ -29,7 +29,9 @@ export function PlayerHUD({ onClick, className }: PlayerHUDProps) {
     queryKey: ["player_stats"],
     queryFn: getPlayerStats,
     refetchOnWindowFocus: true,
-    refetchInterval: 8000,
+    refetchOnMount: "always",
+    refetchInterval: 5000,
+    staleTime: 0,
   });
   const stats = statsQ.data;
   const profile = getPlayerProfile();

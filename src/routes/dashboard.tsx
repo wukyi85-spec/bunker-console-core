@@ -33,7 +33,9 @@ function DashboardPage() {
     queryKey: ["player_stats"],
     queryFn: getPlayerStats,
     refetchOnWindowFocus: true,
-    refetchInterval: 8000,
+    refetchOnMount: "always",
+    refetchInterval: 5000,
+    staleTime: 0,
   });
   const fetchRanks = useServerFn(getRankSettings);
   const ranksQ = useQuery({
