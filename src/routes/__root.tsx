@@ -80,14 +80,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BLACK'S BUNKER — Members Only" },
-      { name: "description", content: "An exclusive tactical members-only lobby. Off the grid. Off the record." },
+      { title: "BLACK'S BUNKER" },
+      { name: "description", content: "An exclusive tactical members-only lobby. Off the grid. Off the record.let play!" },
       { name: "author", content: "Black's Bunker" },
       { property: "og:title", content: "BLACK'S BUNKER" },
-      { property: "og:description", content: "An exclusive tactical members-only lobby. Off the grid. Off the record." },
+      { property: "og:description", content: "An exclusive tactical members-only lobby. Off the grid. Off the record.let play!" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "BLACK'S BUNKER" },
+      { name: "twitter:description", content: "An exclusive tactical members-only lobby. Off the grid. Off the record.let play!" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OU9KNJneTiTasTjxrRP5kEEsFr03/social-images/social-1784101073863-bunker.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OU9KNJneTiTasTjxrRP5kEEsFr03/social-images/social-1784101073863-bunker.webp" },
     ],
     links: [
       {
