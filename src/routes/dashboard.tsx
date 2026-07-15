@@ -160,7 +160,7 @@ function DashboardPage() {
 
       {/* Bottom-right tactical caption + Contact HQ (kept clear of the character) */}
       <div className="absolute bottom-28 right-5 z-20 flex flex-col items-end gap-2 md:right-7 animate-in fade-in duration-1000 lphone:hidden">
-        <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
+        <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon">
           // BUNKER ONLINE
         </span>
         <span className="font-display text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
