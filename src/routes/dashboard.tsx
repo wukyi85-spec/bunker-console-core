@@ -95,13 +95,13 @@ function DashboardPage() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/40 to-transparent" />
 
 
-        {/* ============ CHARACTER OVERLAY ============ */}
+        {/* ============ CHARACTER OVERLAY (bottom-left, ~85% height) ============ */}
         {character?.fullBody ? (
           <img
             src={character.fullBody}
             alt={character.name}
             draggable={false}
-            className="pointer-events-none absolute bottom-0 right-0 z-10 h-[85%] w-auto object-contain object-bottom select-none"
+            className="pointer-events-none absolute bottom-0 left-0 z-10 h-[85%] w-auto object-contain object-left-bottom select-none"
           />
         ) : null}
 
@@ -119,18 +119,22 @@ function DashboardPage() {
           </Link>
         </div>
 
-        {/* Top right — Player HUD + Bunker Alarm stack.
-            On landscape phones, shrink further and clamp height so the
-            alarm can never sit behind the bottom navigation dock. */}
+        {/* Top right — Player HUD only */}
         <div
-          className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-3 lphone:top-3 lphone:w-[310px] lphone:gap-3 lphone:scale-[0.72] lphone:max-h-[calc(100svh-64px)]"
+          className="absolute right-6 top-5 z-20 flex w-[360px] origin-top-right flex-col gap-5 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-3 lphone:top-3 lphone:w-[310px] lphone:scale-[0.72]"
         >
           <PlayerHUD onClick={() => navigate({ to: "/profile" })} className="w-full shrink-0" />
+        </div>
+
+        {/* Right side — Bunker Alarm panel, above everything */}
+        <div
+          className="absolute right-4 top-1/2 z-30 w-[300px] -translate-y-1/2 animate-in fade-in slide-in-from-right-4 duration-700 lphone:right-2 lphone:w-[260px]"
+        >
           <BunkerAlarm />
         </div>
 
-        {/* Bottom-left tactical caption + Contact HQ */}
-        <div className="absolute bottom-6 left-5 z-20 flex flex-col gap-2 md:left-7 animate-in fade-in duration-1000 lphone:hidden">
+        {/* Bottom-right tactical caption + Contact HQ (kept clear of the character) */}
+        <div className="absolute bottom-28 right-5 z-20 flex flex-col items-end gap-2 md:right-7 animate-in fade-in duration-1000 lphone:hidden">
           <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-neon animate-hud-pulse">
             // BUNKER ONLINE
           </span>
@@ -138,13 +142,6 @@ function DashboardPage() {
             Sector 07 · Secure Channel
           </span>
           <ContactHQ className="mt-1 w-fit" />
-        </div>
-
-
-        {/* Bottom-right telemetry */}
-        <div className="absolute bottom-6 right-5 z-10 hidden flex-col items-end gap-1 font-mono text-[10px] uppercase tracking-[0.4em] text-muted-foreground md:flex md:right-7 animate-in fade-in duration-1000">
-          <span className="text-neon/80">// LIVE</span>
-          <span>47.812N · 122.335W</span>
         </div>
 
         {/* Bottom center — Floating nav dock */}
