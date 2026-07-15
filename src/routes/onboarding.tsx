@@ -7,6 +7,7 @@ import { BunkerButton } from "@/components/bunker/BunkerButton";
 import { BunkerInput } from "@/components/bunker/BunkerInput";
 import { CharacterPortrait } from "@/components/bunker/CharacterPortrait";
 import { CHARACTERS, getPlayerProfile, setPlayerProfile } from "@/lib/player";
+import { useSheetCharacters } from "@/lib/characters";
 import { completeMemberOnboarding, ensurePlayerStats } from "@/lib/bunker-supabase";
 import { cn } from "@/lib/utils";
 
